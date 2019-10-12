@@ -18,6 +18,6 @@ TEST_CASE("Hello World") {
 
     SECTION("Writes \"Hello, World!\" to stdout") {
         __test__main(0, 0);
-        REQUIRE(cout_buf.str() == "Hello, World!");
+        REQUIRE(cout_buf.str() == "Hello, World!\n");
     }
 }
