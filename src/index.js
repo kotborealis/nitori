@@ -12,7 +12,7 @@ const source_file = `
 #include <iostream>
 
 int main(int argc, char** argv){
-    std::cout << "Hello, World!" << std::endl;
+    std::cout << "Henlo, World!" << std::endl;
     return 100;
 }
 `;
@@ -45,8 +45,11 @@ int main(int argc, char** argv){
         return promisifyMultiplexedDockerStream(stream);
     };
 
-    console.log((await exec(["g++", "--std=c++11", "test.cpp"], true)).stdout);
-    console.log((await exec(["./a.out"], true)).stdout);
+    console.log((await exec(["g++", "--std=c++11", "-c", "-o", "main.o", "main.cpp"], true)).stdout);
+    console.log((await exec(["objcopy", "main.o", "--redefine-sym", "main=__test_main"], true)).stdout);
+    console.log((await exec(["g++", "--std=c++11", "-c", "-o", "test.o", "test.cpp"], true)).stdout);
+    console.log((await exec(["g++", "-o", "test_runner", "main.o", "test.o"], true)).stdout);
+    console.log((await exec(["./test_runner"], true)).stdout);
 
     await container.stop();
     await container.delete();

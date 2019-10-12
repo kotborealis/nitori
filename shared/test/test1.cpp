@@ -3,9 +3,9 @@
 
 #include <iostream>
 
-#define main __test__main
-
-#include "main.cpp"
+extern "C" {
+    int __test_main(int argc, char** argv);
+}
 
 TEST_CASE("Hello World") {
     std::stringstream cin_buf;
@@ -17,7 +17,7 @@ TEST_CASE("Hello World") {
     std::cerr.rdbuf(cerr_buf.rdbuf());
 
     SECTION("Writes \"Hello, World!\" to stdout") {
-        __test__main(0, 0);
+        __test_main(0, 0);
         REQUIRE(cout_buf.str() == "Hello, World!\n");
     }
 }
