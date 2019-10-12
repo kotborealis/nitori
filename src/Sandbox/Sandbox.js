@@ -1,5 +1,9 @@
-const {parseDStream, parseDMStream} = require('./dockerStreamUtils');
 const debug = require('debug')('nitori-sandbox');
+
+const {
+    promisifyDockerStream: parseDStream,
+    promisifyMultiplexedDockerStream: parseDMStream
+} = require('../utils/dockerStreamParser');
 
 /**
  * Docker Sandbox class
@@ -23,7 +27,7 @@ class Sandbox {
      * Create & start container
      * @returns {Promise<void>}
      */
-    start = async () => {
+    async start() {
         const {docker, config} = this;
 
         this.container = await docker.container.create(config.container);
@@ -34,7 +38,7 @@ class Sandbox {
      * Stop & remove container
      * @returns {Promise<void>}
      */
-    stop = async () => {
+    async stop() {
         const {container} = this;
         await container.stop();
         await container.delete();
@@ -47,7 +51,7 @@ class Sandbox {
      * @param tty Allocate tty?
      * @returns {Promise<{stdout, exitCode: *, stderr}>}
      */
-    exec = async (cmd = [], {root = false, tty = true} = {}) => {
+    async exec(cmd = [], {root = false, tty = true} = {}) {
         const {container} = this;
 
         debug("Exec:", cmd);
@@ -77,8 +81,9 @@ class Sandbox {
      * @param tarball
      * @returns {Promise<Object>}
      */
-    fs_put_root = (tarball) =>
-        this.container.fs.put(tarball, {path: '/'});
+    async fs_put_root(tarball) {
+        return this.container.fs.put(tarball, {path: '/'});
+    }
 }
 
 module.exports = {Sandbox};

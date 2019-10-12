@@ -1,7 +1,7 @@
 /**
  * Promisifies multiplexed docker stream and parses it into separate stdin, stdout, stderr
  * @param stream
- * @returns {Promise<any>}
+ * @returns {Promise}
  */
 const promisifyMultiplexedDockerStream = (stream) => new Promise((resolve, reject) => {
     const data = {
@@ -38,7 +38,7 @@ const promisifyMultiplexedDockerStream = (stream) => new Promise((resolve, rejec
 /**
  * Promisifies stream into string
  * @param stream
- * @returns {Promise<any>}
+ * @returns {Promise}
  */
 const promisifyDockerStream = (stream) => new Promise((resolve, reject) => {
     let data = "";
@@ -48,4 +48,4 @@ const promisifyDockerStream = (stream) => new Promise((resolve, reject) => {
     stream.on('error', reject);
 });
 
-module.exports = {parseDStream: promisifyDockerStream, parseDMStream: promisifyMultiplexedDockerStream};
+module.exports = {promisifyDockerStream, promisifyMultiplexedDockerStream};

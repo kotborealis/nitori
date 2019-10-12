@@ -21,10 +21,10 @@ class Compiler {
      * @param I Include path
      * @returns {Promise<void>}
      */
-    compile_obj = async (source_files, {
+    async compile_obj(source_files, {
         std = "c++11",
         I = "/opt/nitori/",
-    } = {}) => {
+    } = {}) {
         const {sandbox} = this;
 
         const cpp_file_names = source_files
@@ -64,10 +64,10 @@ class Compiler {
      * @param L Library path
      * @returns {Promise<{name: string, exec: *}>}
      */
-    compile_exe_from_obj = async (object_file_names, {
+    async compile_exe_from_obj(object_file_names, {
         output = "a.out",
         L = ".",
-    } = {}) => {
+    } = {}) {
         const {sandbox} = this;
 
         const res = await sandbox.exec([
@@ -84,4 +84,4 @@ class Compiler {
     }
 }
 
-module.exports = {Compiler};
+module.exports = Compiler;

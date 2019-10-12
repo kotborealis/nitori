@@ -9,7 +9,7 @@ class Objcopy {
         this.sandbox = sandbox;
     }
 
-    redefine_sym = async (obj, old_sym, new_sym) => {
+    async redefine_sym(obj, old_sym, new_sym) {
         if(Array.isArray(obj)){
             const result = [];
 
@@ -32,4 +32,4 @@ class Objcopy {
     }
 }
 
-module.exports = {Objcopy};
+module.exports = Objcopy;

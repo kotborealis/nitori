@@ -1,9 +1,10 @@
 const args = require('chen.js').args();
+
 const fs = require('fs');
 const {Docker} = require('node-docker-api');
-const {Sandbox} = require('./Sandbox');
-const {Compiler} = require('./utils/Compiler');
-const {Objcopy} = require('./utils/Objcopy');
+
+const {Sandbox} = require('./Sandbox/');
+const {Compiler, Objcopy} = require('./gnu_utils/');
 
 const config = require('./config');
 const docker = new Docker(config.docker);
@@ -38,7 +39,7 @@ const objcopy = new Objcopy(sandbox);
         console.error("Compilation of target failed!");
         console.log(targetCompilation.stdout);
 
-        sandbox.stop();
+        await sandbox.stop();
         process.exit(1);
     }
     else{
@@ -59,7 +60,7 @@ const objcopy = new Objcopy(sandbox);
         console.error("Compilation of test failed!");
         console.log(testCompilation.stdout);
 
-        sandbox.stop();
+        await sandbox.stop();
         process.exit(1);
     }
     else{
@@ -76,7 +77,7 @@ const objcopy = new Objcopy(sandbox);
         console.error("Compilation of exe failed!");
         console.log(exeCompilation.stdout);
 
-        sandbox.stop();
+        await sandbox.stop();
         process.exit(1);
     }
     else{
