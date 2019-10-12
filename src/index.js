@@ -1,4 +1,6 @@
 const config = require('./config');
+const args = require('chen.js').args();
+
 const fs = require('fs');
 
 const {Docker} = require('node-docker-api');
@@ -8,36 +10,41 @@ const tar = require('tar-stream');
 
 const docker = new Docker(config.docker);
 
-const source_file = `
-#include <iostream>
-
-int main(){
-    std::string s(std::istreambuf_iterator<char>(std::cin), {});
-    std::cout << s;
+if(!args.src) {
+    console.error("No --src file specified!");
+    process.exit(1);
 }
-`;
+
+if(!args.spec) {
+    console.error("No --spec file specified!");
+    process.exit(1);
+}
+
+const src_file = fs.readFileSync(args.src);
+const spec_file = fs.readFileSync(args.spec);
 
 (async () => {
     const container = await docker.container.create(config.container);
 
-    const tarball = tar.pack();
-    tarball.entry({name: 'main.cpp'}, source_file);
-    tarball.entry({name: 'test.cpp'}, fs.readFileSync('./shared/test/test_cat.cpp'));
-    tarball.finalize();
+    const tarball_code = tar.pack();
+    tarball_code.entry({name: '/sandbox/main.cpp'}, src_file);
+    tarball_code.entry({name: `${config.testing.libs}/test.cpp`}, spec_file);
+    tarball_code.finalize();
 
-    await container.fs.put(tarball, {
-        path: '/sandbox'
-    });
+    await container.fs.put(tarball_code, {path: '/'});
 
     const tarball_libs = tar.pack();
-    tarball_libs.entry({name: 'nitori-testing/catch.hpp'}, fs.readFileSync('./shared/lib/catch.hpp'));
-    tarball_libs.entry({name: 'nitori-testing/hijack.hpp'}, fs.readFileSync('./shared/lib/hijack.hpp'));
-    tarball_libs.entry({name: 'nitori-testing/testing.hpp'}, fs.readFileSync('./shared/lib/testing.hpp'));
+
+    ['catch.hpp', 'hijack.hpp', 'testing.hpp'].forEach(f =>
+        tarball_libs.entry(
+            {name: `${config.testing.libs}/${f}`},
+            fs.readFileSync(`./shared/lib/${f}`)
+        )
+    );
+
     tarball_libs.finalize();
 
-    await container.fs.put(tarball_libs, {
-        path: '/opt/'
-    });
+    await container.fs.put(tarball_libs, {path: '/'});
 
     await container.start();
 
@@ -54,13 +61,38 @@ int main(){
         return promisifyDockerStream(stream);
     };
 
-    console.log((await exec(["g++", "--std=c++11", "-c", "-o", "main.o", "main.cpp"], true)));
-    console.log((await exec(["objcopy", "main.o", "--redefine-sym", "main=__HIJACK_MAIN__"], true)));
+    console.log((await exec([
+        "g++",
+        `--std=${config.sandbox.std_version}`,
+        "-c",
+        "-o", "main.o",
+        "main.cpp"
+    ], true)));
 
-    console.log((await exec(["g++", "-I/opt/nitori-testing", "--std=c++11", "-c", "-o", "test.o", "test.cpp"], true)));
+    console.log((await exec([
+        "objcopy",
+        "main.o",
+        "--redefine-sym", `main=${config.testing.hijack_main}`
+    ], true)));
 
-    console.log((await exec(["g++", "-o", "test_runner", "main.o", "test.o"], true)));
-    console.log((await exec(["./test_runner", "-s"], true)));
+    console.log((await exec([
+        "g++",
+        `-I${config.testing.libs}`,
+        `--std=${config.sandbox.std_version}`,
+        "-c", "-o", "test.o",
+        `${config.testing.libs}/test.cpp`
+    ], true)));
+
+    console.log((await exec([
+        "g++",
+        "-o", "test_runner",
+        "main.o",
+        "test.o"
+    ], true)));
+
+    console.log((await exec([
+        "./test_runner", "-s"
+    ], true)));
 
     await container.stop();
     await container.delete();
