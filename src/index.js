@@ -12,8 +12,8 @@ const source_file = `
 #include <iostream>
 
 int main(int argc, char** argv){
-    std::cout << "Henlo, World!" << std::endl;
-    return 100;
+    std::string s(std::istreambuf_iterator<char>(std::cin), {});
+    std::cout << s;
 }
 `;
 
@@ -23,7 +23,7 @@ int main(int argc, char** argv){
     const tarball = tar.pack();
     tarball.entry({name: 'main.cpp'}, source_file);
     tarball.entry({name: 'catch.hpp'}, fs.readFileSync('./shared/lib/catch.hpp'));
-    tarball.entry({name: 'test.cpp'}, fs.readFileSync('./shared/test/test1.cpp'));
+    tarball.entry({name: 'test.cpp'}, fs.readFileSync('./shared/test/test_cat.cpp'));
     tarball.finalize();
 
     await container.fs.put(tarball, {
@@ -49,7 +49,7 @@ int main(int argc, char** argv){
     console.log((await exec(["objcopy", "main.o", "--redefine-sym", "main=__test_main"], true)).stdout);
     console.log((await exec(["g++", "--std=c++11", "-c", "-o", "test.o", "test.cpp"], true)).stdout);
     console.log((await exec(["g++", "-o", "test_runner", "main.o", "test.o"], true)).stdout);
-    console.log((await exec(["./test_runner"], true)).stdout);
+    console.log((await exec(["./test_runner", "-s"], true)).stdout);
 
     await container.stop();
     await container.delete();
