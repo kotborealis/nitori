@@ -43,7 +43,7 @@ const promisifyMultiplexedDockerStream = (stream) => new Promise((resolve, rejec
 const promisifyDockerStream = (stream) => new Promise((resolve, reject) => {
     let data = "";
 
-    stream.on('data', chunk => data += chunk.toString());
+    stream.on('data', chunk => data += chunk.slice(8).toString());
     stream.on('end', () => resolve(data));
     stream.on('error', reject);
 });

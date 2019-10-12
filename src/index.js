@@ -2,7 +2,7 @@ const config = require('./config');
 const fs = require('fs');
 
 const {Docker} = require('node-docker-api');
-const {promisifyMultiplexedDockerStream} = require('./dockerStreamUtils');
+const {promisifyDockerStream} = require('./dockerStreamUtils');
 
 const tar = require('tar-stream');
 
@@ -22,12 +22,21 @@ int main(){
 
     const tarball = tar.pack();
     tarball.entry({name: 'main.cpp'}, source_file);
-    tarball.entry({name: 'catch.hpp'}, fs.readFileSync('./shared/lib/catch.hpp'));
     tarball.entry({name: 'test.cpp'}, fs.readFileSync('./shared/test/test_cat.cpp'));
     tarball.finalize();
 
     await container.fs.put(tarball, {
         path: '/sandbox'
+    });
+
+    const tarball_libs = tar.pack();
+    tarball_libs.entry({name: 'nitori-testing/catch.hpp'}, fs.readFileSync('./shared/lib/catch.hpp'));
+    tarball_libs.entry({name: 'nitori-testing/hijack.hpp'}, fs.readFileSync('./shared/lib/hijack.hpp'));
+    tarball_libs.entry({name: 'nitori-testing/testing.hpp'}, fs.readFileSync('./shared/lib/testing.hpp'));
+    tarball_libs.finalize();
+
+    await container.fs.put(tarball_libs, {
+        path: '/opt/'
     });
 
     await container.start();
@@ -42,14 +51,16 @@ int main(){
             User: root ? "root" : "sandbox"
         });
         const stream = await command.start();
-        return promisifyMultiplexedDockerStream(stream);
+        return promisifyDockerStream(stream);
     };
 
-    console.log((await exec(["g++", "--std=c++11", "-c", "-o", "main.o", "main.cpp"], true)).stdout);
-    console.log((await exec(["objcopy", "main.o", "--redefine-sym", "main=__test_main"], true)).stdout);
-    console.log((await exec(["g++", "--std=c++11", "-c", "-o", "test.o", "test.cpp"], true)).stdout);
-    console.log((await exec(["g++", "-o", "test_runner", "main.o", "test.o"], true)).stdout);
-    console.log((await exec(["./test_runner", "-s"], true)).stdout);
+    console.log((await exec(["g++", "--std=c++11", "-c", "-o", "main.o", "main.cpp"], true)));
+    console.log((await exec(["objcopy", "main.o", "--redefine-sym", "main=__HIJACK_MAIN__"], true)));
+
+    console.log((await exec(["g++", "-I/opt/nitori-testing", "--std=c++11", "-c", "-o", "test.o", "test.cpp"], true)));
+
+    console.log((await exec(["g++", "-o", "test_runner", "main.o", "test.o"], true)));
+    console.log((await exec(["./test_runner", "-s"], true)));
 
     await container.stop();
     await container.delete();
