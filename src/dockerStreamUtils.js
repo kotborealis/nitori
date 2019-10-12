@@ -44,8 +44,8 @@ const promisifyDockerStream = (stream) => new Promise((resolve, reject) => {
     let data = "";
 
     stream.on('data', chunk => data += chunk.slice(8).toString());
-    stream.on('end', () => resolve(data));
+    stream.on('end', () => resolve({stdout: data, stderr: ""}));
     stream.on('error', reject);
 });
 
-module.exports = {promisifyDockerStream, promisifyMultiplexedDockerStream};
+module.exports = {parseDStream: promisifyDockerStream, parseDMStream: promisifyMultiplexedDockerStream};
