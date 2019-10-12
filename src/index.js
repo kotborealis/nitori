@@ -11,7 +11,7 @@ const docker = new Docker(config.docker);
 const source_file = `
 #include <iostream>
 
-int main(int argc, char** argv){
+int main(){
     std::string s(std::istreambuf_iterator<char>(std::cin), {});
     std::cout << s;
 }
