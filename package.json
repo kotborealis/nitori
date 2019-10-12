@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "chen.js": "^1.0.24",
-    "node-docker-api": "^1.1.22"
+    "node-docker-api": "^1.1.22",
+    "tar-stream": "^2.1.0"
   }
 }
