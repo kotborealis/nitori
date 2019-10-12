@@ -3,7 +3,7 @@
  * @param stream
  * @returns {Promise<any>}
  */
-const dockerStreamUtils = (stream) => new Promise((resolve, reject) => {
+const promisifyMultiplexedDockerStream = (stream) => new Promise((resolve, reject) => {
     const data = {
         stdin: "",
         stdout: "",
@@ -48,4 +48,4 @@ const promisifyDockerStream = (stream) => new Promise((resolve, reject) => {
     stream.on('error', reject);
 });
 
-module.exports = {promisifyDockerStream: dockerStreamUtils};
+module.exports = {promisifyDockerStream, promisifyMultiplexedDockerStream};

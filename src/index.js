@@ -1,17 +1,18 @@
 const config = require('./config');
+const fs = require('fs');
 
 const {Docker} = require('node-docker-api');
-const {promisifyDockerStream} = require('./dockerStreamUtils');
+const {promisifyMultiplexedDockerStream} = require('./dockerStreamUtils');
 
 const tar = require('tar-stream');
 
 const docker = new Docker(config.docker);
 
 const source_file = `
-#include <iostream.h>
+#include <iostream>
 
 int main(int argc, char** argv){
-    std::cout << "Henlo world!" << std::endl;
+    std::cout << "Hello, world!" << std::endl;
     return 100;
 }
 `;
@@ -21,6 +22,8 @@ int main(int argc, char** argv){
 
     const tarball = tar.pack();
     tarball.entry({name: 'main.cpp'}, source_file);
+    tarball.entry({name: 'catch.hpp'}, fs.readFileSync('./shared/lib/catch.hpp'));
+    tarball.entry({name: 'test.cpp'}, fs.readFileSync('./shared/test/test1.cpp'));
     tarball.finalize();
 
     await container.fs.put(tarball, {
@@ -35,15 +38,15 @@ int main(int argc, char** argv){
             AttachStdin: true,
             AttachStdout: true,
             AttachStderr: true,
-            Tty: false,
+            Tty: true,
             User: root ? "root" : "sandbox"
         });
         const stream = await command.start();
-        return promisifyDockerStream(stream);
+        return promisifyMultiplexedDockerStream(stream);
     };
 
-    console.log("Compilation log: ", await exec(["g++", "main.cpp"], true));
-    console.log("Runner log: ", await exec(["./a.out"]));
+    console.log((await exec(["g++", "--std=c++11", "test.cpp"], true)).stdout);
+    console.log((await exec(["./a.out"], true)).stdout);
 
     await container.stop();
     await container.delete();

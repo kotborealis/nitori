@@ -6,11 +6,11 @@ module.exports = {
     container: {
         Image: "nitori-sandbox",
         Tty: true,
-        StopTimeout: 10,
+        StopTimeout: 60,
         WorkingDir: "/sandbox",
         NetworkDisabled: true,
         HostConfig: {
-            Memory: 1024 * 1024 * 100,
+            Memory: 1024 * 1024 * 1000,
             DiskQuota: 1024 * 1024 * 100,
             OomKillDisable: false,
         }
