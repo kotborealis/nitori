@@ -49,14 +49,16 @@ class Sandbox {
      * @param cmd Command, array
      * @param root Run as root?
      * @param tty Allocate tty?
+     * @param working_dir
      * @returns {Promise<{stdout, exitCode: *, stderr}>}
      */
-    async exec(cmd = [], {root = false, tty = true} = {}) {
+    async exec(cmd = [], {root = false, tty = true, working_dir = ''} = {}) {
         const {container} = this;
 
         debug("Exec:", cmd);
 
         const exec = await container.exec.create({
+            WorkingDir: working_dir ? working_dir : undefined,
             Cmd: cmd,
             AttachStdin: true,
             AttachStdout: true,
@@ -77,12 +79,22 @@ class Sandbox {
     };
 
     /**
-     * Unpack tarball stream into `/`
+     * Unpack tarball stream into specified path
      * @param tarball
+     * @param path
      * @returns {Promise<Object>}
      */
-    async fs_put_root(tarball) {
-        return this.container.fs.put(tarball, {path: '/'});
+    async fs_put(tarball, path = '/') {
+        return this.container.fs.put(tarball, {path});
+    }
+
+    /**
+     * Get tarball from specified path
+     * @param path
+     * @returns {Promise<Object>}
+     */
+    async fs_get(path) {
+        return this.container.fs.get({path});
     }
 }
 

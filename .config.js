@@ -16,10 +16,16 @@ module.exports = {
         }
     },
     sandbox: {
-        std_version: "c++11"
+        std_version: "c++11",
+        working_dir: "/sandbox/"
     },
     testing: {
         libs: "/opt/testing_libs",
-        hijack_main: "__HIJACK_MAIN__"
+        hijack_main: "__HIJACK_MAIN__",
+        test_src_name: "__nitori_test.cpp",
+        test_obj_name: "__nitori_test.o"
+    },
+    cache: {
+        dir: "./.cache/"
     }
 };

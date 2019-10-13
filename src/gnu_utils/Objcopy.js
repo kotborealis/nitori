@@ -9,7 +9,7 @@ class Objcopy {
         this.sandbox = sandbox;
     }
 
-    async redefine_sym(obj, old_sym, new_sym) {
+    async redefine_sym(obj, old_sym, new_sym, {working_dir = ''} = {}) {
         if(Array.isArray(obj)){
             const result = [];
 
@@ -19,7 +19,7 @@ class Objcopy {
                     file,
                     "--redefine-sym",
                     `${old_sym}=${new_sym}`
-                ]);
+                ], {working_dir});
 
                 result.push(res);
             }

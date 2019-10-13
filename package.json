@@ -12,6 +12,7 @@
     "chen.js": "^1.0.24",
     "debug": "^4.1.1",
     "express": "^4.17.1",
+    "md5": "^2.2.1",
     "node-docker-api": "^1.1.22",
     "tar-stream": "^2.1.0"
   }
