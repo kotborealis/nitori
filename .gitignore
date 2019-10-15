@@ -2,4 +2,5 @@ data/cache/*
 !data/cache/.keep
 !data/tests/.keep
 node_modules
+frontend/node_modules
 .idea/*
