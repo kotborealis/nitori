@@ -1,4 +1,10 @@
 module.exports = {
+    api: {
+        port: 3000,
+        limits: {
+            fileSize: 1024 * 10
+        }
+    },
     docker: {
         host: "localhost",
         port: 2375
@@ -20,12 +26,13 @@ module.exports = {
         working_dir: "/sandbox/"
     },
     testing: {
+        dir: "./data/tests/",
         libs: "/opt/testing_libs",
         hijack_main: "__HIJACK_MAIN__",
         test_src_name: "__nitori_test.cpp",
         test_obj_name: "__nitori_test.o"
     },
     cache: {
-        dir: "./.cache/"
+        dir: "./data/cache/"
     }
 };
