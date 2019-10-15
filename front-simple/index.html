@@ -18,6 +18,8 @@
     <pre id="error_output" ></pre>
     <b>Компиляция:</b>
     <pre id="compiler_output" style="background: #010; padding: 10px;"></pre>
+    <b>Компиляция тестов:</b>
+    <pre id="runner_compile_output" style="background: #010; padding: 10px;"></pre>
     <b>Тесты:</b>
     <pre id="runner_output" style="background: #010; padding: 10px;"></pre>
 </div>
@@ -47,6 +49,7 @@
         const hide_loading = () => document.querySelector("#loading").style.display = 'none';
         const show_loading = () => document.querySelector("#loading").style.display = 'block';
         const compilerOutput = document.querySelector("#compiler_output");
+        const runnerCompileOutput = document.querySelector("#runner_compile_output");
         const runnerOutput = document.querySelector("#runner_output");
         const errorOutput = document.querySelector("#error_output");
 
@@ -55,6 +58,7 @@
             event.preventDefault();
 
             compilerOutput.innerHTML = "";
+            runnerCompileOutput.innerHTML = "";
             runnerOutput.innerHTML = "";
             errorOutput.innerHTML = "";
 
@@ -78,9 +82,10 @@
 
             const {data} = json;
 
-            const {targetCompilation, testRunner} = data;
+            const {targetCompilation, testRunner, testCompilation} = data;
 
             compilerOutput.innerHTML = tty_to_html(targetCompilation.stdout);
+            runnerCompileOutput.innerHTML = tty_to_html(testCompilation.stdout);
             runnerOutput.innerHTML = tty_to_html(testRunner.stdout);
         };
 

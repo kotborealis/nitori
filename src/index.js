@@ -2,7 +2,7 @@ const args = require('chen.js').args();
 const config = require('chen.js').config('.config.js').resolve();
 
 if(args.precompile){
-    require('./precompileTests')(config);
+    require('./precompileTests').precompileTests(config);
 }
 else if(args.api) {
     require('./api/').API(config);
