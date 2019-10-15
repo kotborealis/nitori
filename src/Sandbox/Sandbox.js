@@ -28,6 +28,7 @@ class Sandbox {
      * @returns {Promise<void>}
      */
     async start() {
+        debug("Start sandbox");
         const {docker, config} = this;
 
         this.container = await docker.container.create(config.container);
@@ -39,6 +40,7 @@ class Sandbox {
      * @returns {Promise<void>}
      */
     async stop() {
+        debug("Stop sandbox");
         const {container} = this;
         await container.stop();
         await container.delete();

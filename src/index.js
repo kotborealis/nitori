@@ -1,10 +1,13 @@
 const args = require('chen.js').args();
-const config = require('./config');
+const config = require('chen.js').config('.config.js').resolve();
 
-if(args.api) {
+if(args.precompile){
+    require('./precompileTests')(config);
+}
+else if(args.api) {
     require('./api/').API(config);
 }
-else{
+else if(args.src && args.spec){
     const md5 = require('md5');
 
     const fs = require('fs');
@@ -15,16 +18,6 @@ else{
     const {Compiler, Objcopy} = require('./gnu_utils/');
 
     const docker = new Docker(config.docker);
-
-    if(!args.src){
-        console.error("No --src file specified!");
-        process.exit(1);
-    }
-
-    if(!args.spec){
-        console.error("No --spec file specified!");
-        process.exit(1);
-    }
 
     const src_file_content = fs.readFileSync(args.src);
 

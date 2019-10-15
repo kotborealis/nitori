@@ -1,6 +1,11 @@
-const debug_api = require('debug')('nitori-api');
+const fs = require('fs');
+const path = require('path');
+const md5 = require('md5');
+
+const debug = require('debug')('nitori-api');
 const express = require('express');
 const fileUpload = require('express-fileupload');
+const {precompileTests} = require('../precompileTests');
 
 const {Docker} = require('node-docker-api');
 
@@ -13,11 +18,15 @@ function fileSizesValid(files) {
     return Object.keys(files).map(key => files[key].truncated).every(i => !i);
 }
 
-module.exports = (config) => {
+module.exports = async (config) => {
+    await precompileTests(config);
+
     const port = config.api.port;
     const working_dir = config.sandbox.working_dir;
 
     const docker = new Docker(config.docker);
+    const objectCache = new ObjectCache(config.cache.dir);
+
     const app = express();
 
     app.use(fileUpload({
@@ -27,11 +36,11 @@ module.exports = (config) => {
     }));
 
     app.use((req, res, next) => {
-        debug_api("Files handler");
+        debug("Files handler");
 
         const {files} = req;
 
-        if(fileSizesValid(files)){
+        if(!fileSizesValid(files)){
             const err = new Error(`File must be smaller than ${config.api.limits.fileSize} bytes`);
             err.reason = 'invalidFileSize';
             err.status = 400;
@@ -47,7 +56,7 @@ module.exports = (config) => {
     });
 
     app.use(function (err, req, res, next) {
-        debug_api("Error handler", err.message);
+        debug("Error handler: ", err.message);
 
         res.status(err.status).json({
             error: {
@@ -64,8 +73,64 @@ module.exports = (config) => {
         const {exec} = await compiler.compile_obj(req.sourceFiles, {working_dir});
         await sandbox.stop();
 
-        res.json({data: exec});
+        res.json({data: {
+            targetCompilation: exec
+        }});
     });
 
-    app.listen(port, () => debug_api(`Server running on 0.0.0.0:${port}`));
+    app.post("/test_target/:test_id", async (req, res) => {
+        const {test_id} = req.params;
+        const test_source = fs.readFileSync(path.join(config.testing.dir, test_id));
+        const cache_key = md5(test_source);
+
+        const sandbox = new Sandbox(docker, config);
+        await sandbox.start();
+
+        const compiler = new Compiler(sandbox);
+        const {exec: targetCompilation, obj: targetBinaries} = await compiler.compile_obj(req.sourceFiles, {working_dir});
+
+        if(targetCompilation.exitCode) {
+            res.json({data: {
+                targetCompilation
+            }});
+
+            await sandbox.stop();
+            return;
+        }
+
+        const objcopy = new Objcopy(sandbox);
+        await objcopy.redefine_sym(targetBinaries, "main", config.testing.hijack_main, {working_dir});
+
+        if(!objectCache.has(cache_key)) {
+            const err = new Error("Failed to fetch test binary from cache; please run --precompile");
+            err.status = 500;
+            throw err;
+        }
+        else{
+            await sandbox.fs_put(objectCache.get(cache_key), working_dir);
+        }
+
+        const {exec: testCompilation, output} = await compiler.compile_exe_from_obj(
+            [...targetBinaries, config.testing.test_obj_name]
+        );
+
+        if(testCompilation.exitCode !== 0){
+            res.json({data: {
+                    testCompilation
+            }});
+
+            await sandbox.stop();
+            return;
+        }
+
+        const testRunner = await sandbox.exec(["./" + output, "-s"]);
+
+        res.json({data: {
+            targetCompilation,
+            testCompilation,
+            testRunner
+        }});
+    });
+
+    app.listen(port, () => debug(`Server running on 0.0.0.0:${port}`));
 };

@@ -13,6 +13,7 @@
     "debug": "^4.1.1",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6-alpha.5",
+    "glob": "^7.1.4",
     "md5": "^2.2.1",
     "node-docker-api": "^1.1.22",
     "tar-stream": "^2.1.0"
