@@ -15,14 +15,34 @@
     <img src="./loading.gif" id="loading" style="display: none;"/>
 </div>
 <div>
-    <pre id="error_output"></pre>
+    <pre id="error_output" ></pre>
     <b>Компиляция:</b>
-    <pre id="compiler_output"></pre>
+    <pre id="compiler_output" style="background: #010; padding: 10px;"></pre>
     <b>Тесты:</b>
-    <pre id="runner_output"></pre>
+    <pre id="runner_output" style="background: #010; padding: 10px;"></pre>
 </div>
 </body>
 <script>
+    const tty_to_html = tty =>
+        tty
+            .replace(/\[1;30m/g, "<font color='black'>")
+            .replace(/\[1;31m/g, "<font color='#8b0000'>")
+            .replace(/\[1;32m/g, "<font color='green'>")
+            .replace(/\[1;33m/g, "<font color='yellow'>")
+            .replace(/\[1;34m/g, "<font color='blue'>")
+            .replace(/\[1;35m/g, "<font color='#8b008b'>")
+            .replace(/\[1;36m/g, "<font color='#00ffff'>")
+            .replace(/\[1;37m/g, "<font color='#d3d3d3'>")
+            .replace(/\[1;90m/g, "<font color='#a9a9a9'>")
+            .replace(/\[1;91m/g, "<font color='red'>")
+            .replace(/\[1;92m/g, "<font color='#90ee90'>")
+            .replace(/\[1;93m/g, "<font color='#ffffe0'>")
+            .replace(/\[1;94m/g, "<font color='#add8e6'>")
+            .replace(/\[1;95m/g, "<font color='#ff00ff'>")
+            .replace(/\[1;96m/g, "<font color='#e0ffff'>")
+            .replace(/\[1;97m/g, "<font color='white'>")
+            .replace(/\[0m/g, "<font color='white'>");
+
     (async () => {
         const hide_loading = () => document.querySelector("#loading").style.display = 'none';
         const show_loading = () => document.querySelector("#loading").style.display = 'block';
@@ -60,8 +80,8 @@
 
             const {targetCompilation, testRunner} = data;
 
-            compilerOutput.innerHTML = targetCompilation.stdout;
-            runnerOutput.innerHTML = testRunner.stdout;
+            compilerOutput.innerHTML = tty_to_html(targetCompilation.stdout);
+            runnerOutput.innerHTML = tty_to_html(testRunner.stdout);
         };
 
         const testSelector = document.querySelector("#test-selector");
