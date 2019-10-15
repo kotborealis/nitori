@@ -1,4 +1,5 @@
 const fs = require('fs');
+const glob = require('../utils/async-glob');
 const path = require('path');
 const md5 = require('md5');
 
@@ -40,6 +41,11 @@ module.exports = async (config) => {
 
         const {files} = req;
 
+        if(!files) {
+            next();
+            return;
+        }
+
         if(!fileSizesValid(files)){
             const err = new Error(`File must be smaller than ${config.api.limits.fileSize} bytes`);
             err.reason = 'invalidFileSize';
@@ -63,6 +69,14 @@ module.exports = async (config) => {
                 reason: err.reason,
                 message: err.message,
             }
+        });
+    });
+
+    app.get("/list_tests/", async (req, res) => {
+        debug("list tests");
+        const tests = await glob(config.testing.dir + '/**/*');
+        res.json({data:
+                tests.map(i => path.basename(i)) // FIXME
         });
     });
 

@@ -1,8 +1,8 @@
 const debug = require('debug')('nitori-precompile-tests');
 
-const {promisify} = require('util');
 const {fs} = require('./utils/async-fs');
 const glob = require('./utils/async-glob');
+const path = require('path');
 
 const md5 = require('md5');
 
@@ -21,7 +21,7 @@ const precompileTests = async (config) => {
 
     const compiler = new Compiler(sandbox);
 
-    const tests = await glob(config.testing.dir + '/**/*');
+    const tests = await glob(path.join(config.testing.dir, '/**/*'));
     for await (const test of tests) {
         debug("Precompile test", test);
 
