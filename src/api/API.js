@@ -2,6 +2,8 @@ const fs = require('fs');
 const glob = require('../utils/async-glob');
 const path = require('path');
 const md5 = require('md5');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 
 const debug = require('debug')('nitori-api');
 const express = require('express');
@@ -29,6 +31,13 @@ module.exports = async (config) => {
     const objectCache = new ObjectCache(config.cache.dir);
 
     const app = express();
+
+    app.use('*', cors());
+
+    app.use( bodyParser.json() );       // to support JSON-encoded bodies
+    app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+        extended: true
+    })); 
 
     app.use(fileUpload({
         limits: {
@@ -92,8 +101,8 @@ module.exports = async (config) => {
         }});
     });
 
-    app.post("/test_target/:test_id", async (req, res) => {
-        const {test_id} = req.params;
+    app.post("/test_target/", async (req, res) => {
+        const {test_id} = req.body;
         const test_source = fs.readFileSync(path.join(config.testing.dir, test_id));
         const cache_key = md5(test_source);
 

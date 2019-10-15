@@ -1,0 +1,27 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <form id="form">
+            <input type="file" name="file"/>
+            <select name="test_id">
+                <option value="cat.spec.cpp">cat.spec.cpp</option>
+            </select>
+            <button type=submit>Отправить</button>
+        </form>
+    </body>
+    <script>
+        document.querySelector("#form").onsubmit = async (event) => {
+            event.preventDefault();
+            
+            const formData = new FormData(document.querySelector("#form"));
+            const res = await fetch("http://127.0.0.1:3000/test_target/", {
+                mode: 'no-cors', 
+                method: "POST",
+                body: formData
+            });
+            console.log(res);
+        }
+    </script>
+</html>
