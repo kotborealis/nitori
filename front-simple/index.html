@@ -17,11 +17,11 @@
 <div>
     <pre id="error_output" ></pre>
     <b>Компиляция:</b>
-    <pre id="compiler_output" style="background: #010; padding: 10px;"></pre>
+    <pre id="compiler_output" style="background: #010; color: white; padding: 10px;"></pre>
     <b>Компиляция тестов:</b>
-    <pre id="runner_compile_output" style="background: #010; padding: 10px;"></pre>
+    <pre id="runner_compile_output" style="background: #010; color: white; padding: 10px;"></pre>
     <b>Тесты:</b>
-    <pre id="runner_output" style="background: #010; padding: 10px;"></pre>
+    <pre id="runner_output" style="background: #010; color: white; padding: 10px;"></pre>
 </div>
 </body>
 <script>
@@ -82,7 +82,7 @@
 
             const {data} = json;
 
-            const {targetCompilation, testRunner, testCompilation} = data;
+            const {targetCompilation = {stdout: ""}, testRunner = {stdout: ""}, testCompilation = {stdout: ""}} = data;
 
             compilerOutput.innerHTML = tty_to_html(targetCompilation.stdout);
             runnerCompileOutput.innerHTML = tty_to_html(testCompilation.stdout);
