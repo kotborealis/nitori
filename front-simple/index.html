@@ -1,27 +1,72 @@
 <html>
-    <head>
+<head>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<div>
+    <form id="form">
+        <input type="file" name="file"/>
+        <select name="test_id" id="test-selector">
+        </select>
+        <button type=submit>Отправить</button>
+    </form>
+</div>
+<div>
+    <img src="./loading.gif" id="loading" style="display: none;"/>
+</div>
+<div>
+    <pre id="error_output"></pre>
+    <b>Компиляция:</b>
+    <pre id="compiler_output"></pre>
+    <b>Тесты:</b>
+    <pre id="runner_output"></pre>
+</div>
+</body>
+<script>
+    (async () => {
+        const hide_loading = () => document.querySelector("#loading").style.display = 'none';
+        const show_loading = () => document.querySelector("#loading").style.display = 'block';
+        const compilerOutput = document.querySelector("#compiler_output");
+        const runnerOutput = document.querySelector("#runner_output");
+        const errorOutput = document.querySelector("#error_output");
 
-    </head>
-    <body>
-        <form id="form">
-            <input type="file" name="file"/>
-            <select name="test_id">
-                <option value="cat.spec.cpp">cat.spec.cpp</option>
-            </select>
-            <button type=submit>Отправить</button>
-        </form>
-    </body>
-    <script>
-        document.querySelector("#form").onsubmit = async (event) => {
+        const form = document.querySelector("#form");
+        form.onsubmit = async (event) => {
             event.preventDefault();
-            
-            const formData = new FormData(document.querySelector("#form"));
+
+            compilerOutput.innerHTML = "";
+            runnerOutput.innerHTML = "";
+            errorOutput.innerHTML = "";
+
+            const formData = new FormData(form);
+
+            show_loading();
+
             const res = await fetch("http://127.0.0.1:3000/test_target/", {
-                mode: 'no-cors', 
                 method: "POST",
                 body: formData
             });
-            console.log(res);
-        }
-    </script>
+
+            hide_loading();
+
+            const json = await res.json();
+            console.log(json);
+
+            if(json.error){
+                errorOutput.innerHTML = JSON.stringify(json.error, null, 2);
+            }
+
+            const {data} = json;
+
+            const {targetCompilation, testRunner} = data;
+
+            compilerOutput.innerHTML = targetCompilation.stdout;
+            runnerOutput.innerHTML = testRunner.stdout;
+        };
+
+        const testSelector = document.querySelector("#test-selector");
+        const test_list = (await (await fetch("http://127.0.0.1:3000/list_tests/")).json()).data;
+        testSelector.innerHTML += test_list.map(test => `<option value="${test}">${test}</option>`).join('\n');
+    })();
+</script>
 </html>

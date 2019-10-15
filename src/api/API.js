@@ -32,12 +32,10 @@ module.exports = async (config) => {
 
     const app = express();
 
-    app.use('*', cors());
+    app.use(cors());
 
-    app.use( bodyParser.json() );       // to support JSON-encoded bodies
-    app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-        extended: true
-    })); 
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({extended: true}));
 
     app.use(fileUpload({
         limits: {
@@ -45,7 +43,7 @@ module.exports = async (config) => {
         }
     }));
 
-    app.use((req, res, next) => {
+    app.use(function (req, res, next) {
         debug("Files handler");
 
         const {files} = req;
@@ -70,18 +68,7 @@ module.exports = async (config) => {
         next();
     });
 
-    app.use(function (err, req, res, next) {
-        debug("Error handler: ", err.message);
-
-        res.status(err.status).json({
-            error: {
-                reason: err.reason,
-                message: err.message,
-            }
-        });
-    });
-
-    app.get("/list_tests/", async (req, res) => {
+    app.get("/list_tests/", async function (req, res) {
         debug("list tests");
         const tests = await glob(config.testing.dir + '/**/*');
         res.json({data:
@@ -89,7 +76,7 @@ module.exports = async (config) => {
         });
     });
 
-    app.post("/compile_target/", async (req, res) => {
+    app.post("/compile_target/", async function (req, res) {
         const sandbox = new Sandbox(docker, config);
         await sandbox.start();
         const compiler = new Compiler(sandbox);
@@ -101,7 +88,16 @@ module.exports = async (config) => {
         }});
     });
 
-    app.post("/test_target/", async (req, res) => {
+    app.post("/test_target/", async function (req, res, next) {
+        debug("/test_target/");
+        if(!req.sourceFiles) {
+            const err = new Error("No source files specified");
+            err.reason = "no source files";
+            err.status = 400;
+            next(err);
+            return;
+        }
+
         const {test_id} = req.body;
         const test_source = fs.readFileSync(path.join(config.testing.dir, test_id));
         const cache_key = md5(test_source);
@@ -127,7 +123,8 @@ module.exports = async (config) => {
         if(!objectCache.has(cache_key)) {
             const err = new Error("Failed to fetch test binary from cache; please run --precompile");
             err.status = 500;
-            throw err;
+            next(err);
+            return;
         }
         else{
             await sandbox.fs_put(objectCache.get(cache_key), working_dir);
@@ -146,13 +143,27 @@ module.exports = async (config) => {
             return;
         }
 
-        const testRunner = await sandbox.exec(["./" + output, "-s"]);
+        const testRunner = await sandbox.exec(["./" + output]);
+
+        debug("send data");
 
         res.json({data: {
             targetCompilation,
             testCompilation,
             testRunner
         }});
+    });
+
+    app.use(function (err, req, res, next) {
+        debug("Error handler: ", err.message);
+
+        res.status(err.status).json({
+            error: {
+                reason: err.reason,
+                message: err.message,
+                status: err.status
+            }
+        });
     });
 
     app.listen(port, () => debug(`Server running on 0.0.0.0:${port}`));
