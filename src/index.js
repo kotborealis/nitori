@@ -62,9 +62,9 @@ const objcopy = new Objcopy(sandbox);
     console.log("Hijacked main via objcopy!");
 
 
-    if(objectCache.has(spec_file_key, spec_file_name)){
+    if(objectCache.has(spec_file_key)){
         console.log("Loading tests from cache...");
-        await sandbox.fs_put(objectCache.get(spec_file_key, spec_file_name), working_dir);
+        await sandbox.fs_put(objectCache.get(spec_file_key), working_dir);
         console.log("Loaded tests from cache!");
     }
     else{
@@ -86,7 +86,7 @@ const objcopy = new Objcopy(sandbox);
             console.log(testCompilation.stdout);
 
             const testObjStream = await sandbox.fs_get(working_dir + "/" + config.testing.test_obj_name);
-            objectCache.put(spec_file_key, spec_file_name, testObjStream);
+            objectCache.put(spec_file_key, testObjStream);
         }
     }
 
