@@ -7,17 +7,17 @@ std::stringstream hijack_stderr;
 std::stringstream hijack_stdin;
 
 #define HIJACK_STDOUT( )        do { \
-                                    hijack_stdout = ""; \
+                                    hijack_stdout.str(""); \
                                     std::cout.rdbuf(hijack_stdout.rdbuf()); \
                                 } while(0)
 
 #define HIJACK_STDERR( )        do { \
-                                    hijack_stderr = ""; \
+                                    hijack_stderr.str(""); \
                                     std::cerr.rdbuf(hijack_stderr.rdbuf()); \
                                 } while(0)
 
-#define HIJACK_STDIN( input )   do { \
-                                    hijack_stdin = input; \
+#define HIJACK_STDIN( INPUT )   do { \
+                                    hijack_stdin.str(INPUT); \
                                     std::cin.rdbuf(hijack_stdin.rdbuf()); \
                                 } while(0)
 
