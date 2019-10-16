@@ -15,7 +15,7 @@ TEST_CASE("6.2.3") {
         HIJACK_MAIN(0, 0);
 
         REQUIRE(
-            hijack_stdout.str()
+            nitori::trim(nitori::stdout.str())
             ==
             "3 4\n"
             "1 2\n"
@@ -36,7 +36,7 @@ TEST_CASE("6.2.3") {
         HIJACK_MAIN(0, 0);
 
         REQUIRE(
-            hijack_stdout.str()
+            nitori::trim(nitori::stdout.str())
             ==
             "Error\n"
         );

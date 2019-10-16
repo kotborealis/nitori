@@ -1,24 +1,51 @@
 #pragma once
 
 #include <iostream>
+#include <algorithm>
+#include <functional>
+#include <cctype>
+#include <locale>
 
-std::stringstream hijack_stdout;
-std::stringstream hijack_stderr;
-std::stringstream hijack_stdin;
+namespace nitori {
+
+std::stringstream stdout;
+std::stringstream stderr;
+std::stringstream stdin;
+
+// trim from start
+static inline std::string ltrim(std::string s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+            std::not1(std::ptr_fun<int, int>(std::isspace))));
+    return s;
+}
+
+// trim from end
+static inline std::string rtrim(std::string s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(),
+            std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+    return s;
+}
+
+// trim from both ends
+static inline std::string trim(std::string s) {
+    return ltrim(rtrim(s));
+}
+
+}
 
 #define HIJACK_STDOUT( )        do { \
-                                    hijack_stdout.str(""); \
-                                    std::cout.rdbuf(hijack_stdout.rdbuf()); \
+                                    nitori::stdout.str(""); \
+                                    std::cout.rdbuf(nitori::stdout.rdbuf()); \
                                 } while(0)
 
 #define HIJACK_STDERR( )        do { \
-                                    hijack_stderr.str(""); \
-                                    std::cerr.rdbuf(hijack_stderr.rdbuf()); \
+                                    nitori::stderr.str(""); \
+                                    std::cerr.rdbuf(nitori::stderr.rdbuf()); \
                                 } while(0)
 
 #define HIJACK_STDIN( INPUT )   do { \
-                                    hijack_stdin.str(INPUT); \
-                                    std::cin.rdbuf(hijack_stdin.rdbuf()); \
+                                    nitori::stdin.str(INPUT); \
+                                    std::cin.rdbuf(nitori::stdin.rdbuf()); \
                                 } while(0)
 
 extern "C" {

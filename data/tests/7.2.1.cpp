@@ -13,7 +13,7 @@ TEST_CASE("6.2.1") {
 
         HIJACK_MAIN(0, 0);
 
-        REQUIRE(hijack_stdout.str() == "1 2\n");
+        REQUIRE(nitori::trim(nitori::stdout.str()) == "1 2");
     }
 
     SECTION("Example 2") {
@@ -28,6 +28,6 @@ TEST_CASE("6.2.1") {
 
         HIJACK_MAIN(0, 0);
 
-        REQUIRE(hijack_stdout.str() == "Error\n");
+        REQUIRE(nitori::trim(nitori::stdout.str()) == "Error");
     }
 }
