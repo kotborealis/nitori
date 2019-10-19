@@ -1,4 +1,5 @@
-const debug = require('debug')('nitori-sandbox');
+const {PromiseTimeout} = require('../utils/PromiseTimeout');
+const debug = require('debug')('nitori:sandbox');
 
 const {
     promisifyDockerStream: parseDStream,
@@ -42,7 +43,7 @@ class Sandbox {
     async stop() {
         debug("Stop sandbox");
         const {container} = this;
-        await container.stop();
+        await container.kill();
         await container.delete();
     };
 
@@ -51,10 +52,11 @@ class Sandbox {
      * @param cmd Command, array
      * @param root Run as root?
      * @param tty Allocate tty?
-     * @param working_dir
+     * @param working_dir Set working dir
+     * @param timeout Exec timeout
      * @returns {Promise<{stdout, exitCode: *, stderr}>}
      */
-    async exec(cmd = [], {root = false, tty = true, working_dir = ''} = {}) {
+    async exec(cmd = [], {root = false, tty = true, working_dir = '', timeout = 100000} = {}) {
         const {container} = this;
 
         debug("Exec:", cmd);
@@ -69,15 +71,25 @@ class Sandbox {
             User: root ? "root" : "sandbox"
         });
 
-        const dockerStream = await exec.start();
-        const {stdout, stderr} = await (tty ? parseDStream : parseDMStream)(dockerStream);
-        const {data: {ExitCode: exitCode}} = await exec.status();
 
-        debug("Exec exitCode:", exitCode);
-        debug("Exec stdout:", stdout);
-        debug("Exec stderr:", stderr);
+        try{
+            const dockerStream = await exec.start();
+            const {stdout, stderr} = await PromiseTimeout((tty ? parseDStream : parseDMStream)(dockerStream), timeout);
+            const {data: {ExitCode: exitCode}} = await exec.status();
 
-        return {exitCode, stdout, stderr};
+            debug("Exec exitCode:", exitCode);
+            debug("Exec stdout:", stdout);
+            debug("Exec stderr:", stderr);
+
+            return {exitCode, stdout, stderr};
+        }
+        catch({message, stack}){
+            debug(stack);
+            debug("Timed out sandbox will be terminated.");
+            await this.stop();
+            // 124 is exit code for timeout command
+            return {exitCode: 124, stdout: "message", stderr: ""};
+        }
     };
 
     /**

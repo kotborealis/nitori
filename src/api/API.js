@@ -5,7 +5,7 @@ const md5 = require('md5');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const debug = require('debug')('nitori-api');
+const debug = require('debug')('nitori:api');
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const {precompileTests} = require('../precompileTests');

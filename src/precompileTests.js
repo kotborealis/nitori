@@ -1,4 +1,5 @@
-const debug = require('debug')('nitori-precompile-tests');
+require('debug').enable("nitori*");
+const debug = require('debug')('nitori:precompileTests');
 
 const {fs} = require('./utils/async-fs');
 const glob = require('./utils/async-glob');
@@ -22,6 +23,7 @@ const precompileTests = async (config) => {
     const compiler = new Compiler(sandbox);
 
     const tests = await glob(path.join(config.testing.dir, '/**/*'));
+
     for await (const test of tests) {
         debug("Precompile test", test);
 

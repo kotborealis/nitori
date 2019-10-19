@@ -1,8 +1,14 @@
+const debug = require('debug')('nitori');
 const args = require('chen.js').args();
 const config = require('chen.js').config('.config.js').resolve();
 
+process.on('unhandledRejection', ({message}) => debug('unhandledRejection', message));
+
 if(args.precompile){
-    require('./precompileTests').precompileTests(config);
+    (async () => {
+        await require('./precompileTests').precompileTests(config);
+        process.exit(0);
+    })();
 }
 else if(args.api){
     require('./api/').API(config);
