@@ -79,7 +79,7 @@ module.exports = async (config) => {
     app.post("/compile_target/", async function (req, res) {
         const sandbox = new Sandbox(docker, config);
         await sandbox.start();
-        const compiler = new Compiler(sandbox);
+        const compiler = new Compiler(sandbox, config.timeout.compilation);
         const {exec} = await compiler.compile_obj(req.sourceFiles, {working_dir});
         await sandbox.stop();
 
@@ -105,7 +105,7 @@ module.exports = async (config) => {
         const sandbox = new Sandbox(docker, config);
         await sandbox.start();
 
-        const compiler = new Compiler(sandbox);
+        const compiler = new Compiler(sandbox, config.timeout.compilation);
         const {exec: targetCompilation, obj: targetBinaries} = await compiler.compile_obj(req.sourceFiles, {working_dir});
 
         if(targetCompilation.exitCode) {
@@ -143,9 +143,7 @@ module.exports = async (config) => {
             return;
         }
 
-        const testRunner = await sandbox.exec(["./" + output]);
-
-        debug("send data");
+        const testRunner = await sandbox.exec(["./" + output], {timeout: config.timeout.run});
 
         res.json({data: {
             targetCompilation,
@@ -154,6 +152,7 @@ module.exports = async (config) => {
         }});
     });
 
+    //noinspection JSUnusedLocalSymbols
     app.use(function (err, req, res, next) {
         debug("Error handler: ", err.message);
 

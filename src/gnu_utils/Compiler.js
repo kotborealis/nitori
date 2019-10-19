@@ -3,15 +3,18 @@ const tar = require('tar-stream');
 class Compiler {
     sandbox;
     compiler;
+    timeout;
 
     /**
      *
      * @param {Sandbox} sandbox
+     * @param timeout
      * @param compiler
      */
-    constructor(sandbox, compiler = "g++"){
+    constructor(sandbox, timeout = 60000, compiler = "g++") {
         this.sandbox = sandbox;
         this.compiler = compiler;
+        this.timeout = timeout;
     }
 
     /**
@@ -51,7 +54,7 @@ class Compiler {
             "-c",
             ...(cpp_file_names.length === 1 ? ["-o", obj_file_names[0]] : []),
             ...cpp_file_names
-        ], {working_dir});
+        ], {working_dir, timeout: this.timeout});
 
         return {
             exec: res,

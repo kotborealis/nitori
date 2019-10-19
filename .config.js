@@ -34,5 +34,10 @@ module.exports = {
     },
     cache: {
         dir: "./data/cache/"
+    },
+    timeout: {
+        compilation: 1000 * 60,
+        precompilation: 0,
+        run: 1000 * 10
     }
 };

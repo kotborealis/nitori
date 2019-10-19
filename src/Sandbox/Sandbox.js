@@ -56,7 +56,7 @@ class Sandbox {
      * @param timeout Exec timeout
      * @returns {Promise<{stdout, exitCode: *, stderr}>}
      */
-    async exec(cmd = [], {root = false, tty = true, working_dir = '', timeout = 100000} = {}) {
+    async exec(cmd = [], {root = false, tty = true, working_dir = '', timeout = 0} = {}) {
         const {container} = this;
 
         debug("Exec:", cmd);
