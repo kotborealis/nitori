@@ -68,24 +68,12 @@ module.exports = async (config) => {
         next();
     });
 
-    app.get("/list_tests/", async function (req, res) {
-        debug("list tests");
+    app.get("/task_list/", async function(req, res) {
+        debug("Task list");
         const tests = await glob(config.testing.dir + '/**/*');
         res.json({data:
                 tests.map(i => path.basename(i)) // FIXME
         });
-    });
-
-    app.post("/compile_target/", async function (req, res) {
-        const sandbox = new Sandbox(docker, config);
-        await sandbox.start();
-        const compiler = new Compiler(sandbox, config.timeout.compilation);
-        const {exec} = await compiler.compile_obj(req.sourceFiles, {working_dir});
-        await sandbox.stop();
-
-        res.json({data: {
-            targetCompilation: exec
-        }});
     });
 
     app.post("/test_target/", async function (req, res, next) {
@@ -105,12 +93,12 @@ module.exports = async (config) => {
         const sandbox = new Sandbox(docker, config);
         await sandbox.start();
 
-        const compiler = new Compiler(sandbox, config.timeout.compilation);
-        const {exec: targetCompilation, obj: targetBinaries} = await compiler.compile_obj(req.sourceFiles, {working_dir});
+        const compiler = new Compiler(sandbox, config.timeout.compilerResult);
+        const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(req.sourceFiles, {working_dir});
 
-        if(targetCompilation.exitCode) {
+        if(compilerResult.exitCode){
             res.json({data: {
-                targetCompilation
+                    compilerResult
             }});
 
             await sandbox.stop();
@@ -130,26 +118,26 @@ module.exports = async (config) => {
             await sandbox.fs_put(objectCache.get(cache_key), working_dir);
         }
 
-        const {exec: testCompilation, output} = await compiler.compile_exe_from_obj(
+        const {exec: linkerResult, output} = await compiler.link(
             [...targetBinaries, config.testing.test_obj_name]
         );
 
-        if(testCompilation.exitCode !== 0){
+        if(linkerResult.exitCode !== 0){
             res.json({data: {
-                    targetCompilation,
-                    testCompilation
+                    compilerResult,
+                    linkerResult
             }});
 
             await sandbox.stop();
             return;
         }
 
-        const testRunner = await sandbox.exec(["./" + output], {timeout: config.timeout.run});
+        const runnerResult = await sandbox.exec(["./" + output], {timeout: config.timeout.run});
 
         res.json({data: {
-            targetCompilation,
-            testCompilation,
-            testRunner
+                compilerResult,
+                linkerResult,
+                runnerResult
         }});
     });
 

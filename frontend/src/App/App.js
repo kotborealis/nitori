@@ -1,22 +1,19 @@
 import React, {useState} from 'react';
-import {Alert, Col, Container, Row} from 'react-bootstrap';
-import AnsiRenderer from './AnsiRenderer';
+import {Col, Container, Row} from 'react-bootstrap';
 import {SourceInput} from '../SourceInputForm/SourceInputForm';
+import {TestOutput, TestOutputDefaultState} from '../TestOutput/TestOutput';
 
 const App = () => {
-    const defaultOutputState = () => ({
-        targetCompilation: {exitCode: undefined, stdout: ""},
-        testCompilation: {exitCode: undefined, stdout: ""},
-        testRunner: {exitCode: undefined, stdout: ""},
-    });
+    const [outputState, setOutputState] = useState(TestOutputDefaultState());
 
-    const [outputState, setOutputState] = useState(defaultOutputState());
-
-    const onSubmitStart = () => setOutputState(defaultOutputState());
+    const onSubmitStart = () => setOutputState(TestOutputDefaultState());
 
     const onSubmitEnd = ({data, error}) => {
         if(data){
-            setOutputState({...defaultOutputState(), ...data});
+            setOutputState({
+                ...TestOutputDefaultState(),
+                ...data
+            });
         }
         else if(error){
             alert(JSON.stringify(error));
@@ -32,29 +29,12 @@ const App = () => {
     return (<Container style={{padding: "20px"}}>
         <Row>
             <Col>
-                <SourceInput onSubmitStart={onSubmitStart} onSubmitEnd={onSubmitEnd}/>
+                <SourceInput {...{onSubmitStart, onSubmitEnd}}/>
             </Col>
         </Row>
         <Row>
             <Col>
-                <div>
-                    <Alert variant={exitCodeToAlertVariant(outputState.targetCompilation.exitCode)}>
-                        Компиляция
-                    </Alert>
-                    <AnsiRenderer>{outputState.targetCompilation.stdout}</AnsiRenderer>
-                </div>
-                <div>
-                    <Alert variant={exitCodeToAlertVariant(outputState.testCompilation.exitCode)}>
-                        Линковка
-                    </Alert>
-                    <AnsiRenderer>{outputState.testCompilation.stdout}</AnsiRenderer>
-                </div>
-                <div>
-                    <Alert variant={exitCodeToAlertVariant(outputState.testRunner.exitCode)}>
-                        Тестирование
-                    </Alert>
-                    <AnsiRenderer>{outputState.testRunner.stdout}</AnsiRenderer>
-                </div>
+                <TestOutput {...outputState}/>
             </Col>
         </Row>
     </Container>);

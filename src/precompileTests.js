@@ -36,7 +36,7 @@ const precompileTests = async (config) => {
             continue;
         }
 
-        const {exec: {exitCode}} = await compiler.compile_obj(
+        const {exec: {exitCode}} = await compiler.compile(
             [{name: config.testing.test_src_name, content}],
             {working_dir}
         );

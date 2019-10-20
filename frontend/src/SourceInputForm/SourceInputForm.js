@@ -9,7 +9,7 @@ export const SourceInput = ({onSubmitStart = () => 0, onSubmitEnd = () => 0}) =>
 
     useEffect(() => {
         (async () => {
-            setTasksList((await (await fetch(API_URL + "/list_tests/")).json()).data);
+            setTasksList((await (await fetch(API_URL + "/task_list/")).json()).data);
             setLoading(false);
         })();
     }, []);

@@ -2,18 +2,18 @@ const tar = require('tar-stream');
 
 class Compiler {
     sandbox;
-    compiler;
+    compiler_name;
     timeout;
 
     /**
      *
      * @param {Sandbox} sandbox
      * @param timeout
-     * @param compiler
+     * @param compiler_name
      */
-    constructor(sandbox, timeout = 60000, compiler = "g++") {
+    constructor(sandbox, timeout = 60000, compiler_name = "g++") {
         this.sandbox = sandbox;
-        this.compiler = compiler;
+        this.compiler_name = compiler_name;
         this.timeout = timeout;
     }
 
@@ -25,7 +25,7 @@ class Compiler {
      * @param I Include path
      * @returns {Promise<void>}
      */
-    async compile_obj(source_files, {
+    async compile(source_files, {
         working_dir = "/sandbox/",
         std = "c++11",
         I = "/opt/nitori/",
@@ -48,7 +48,7 @@ class Compiler {
         await sandbox.fs_put(tarball);
 
         const res = await sandbox.exec([
-            this.compiler,
+            this.compiler_name,
             ...(std ? [`--std=${std}`] : []),
             ...(I ? [`-I${I}`] : []),
             "-c",
@@ -70,7 +70,7 @@ class Compiler {
      * @param L Library path
      * @returns {Promise<{name: string, exec: *}>}
      */
-    async compile_exe_from_obj(object_file_names, {
+    async link(object_file_names, {
         working_dir = "/sandbox/",
         output = "a.out",
         L = ".",
@@ -78,7 +78,7 @@ class Compiler {
         const {sandbox} = this;
 
         const res = await sandbox.exec([
-            this.compiler,
+            this.compiler_name,
             ...(L ? [`-L${L}`] : []),
             "-o", output,
             ...object_file_names
