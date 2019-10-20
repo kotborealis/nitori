@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Alert, Col, Container, Row} from 'react-bootstrap';
 import AnsiRenderer from './AnsiRenderer';
-import {SourceInput} from '../SourceForm';
+import {SourceInput} from '../SourceInputForm/SourceInputForm';
 
 const App = () => {
     const defaultOutputState = () => ({

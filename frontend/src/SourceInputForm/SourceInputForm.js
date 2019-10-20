@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
-import {API_URL} from '../config';
+import {API_URL} from '../../config';
 
 export const SourceInput = ({onSubmitStart = () => 0, onSubmitEnd = () => 0}) => {
     const [isLoading, setLoading] = useState(true);
