@@ -136,6 +136,7 @@ module.exports = async (config) => {
 
         if(testCompilation.exitCode !== 0){
             res.json({data: {
+                    targetCompilation,
                     testCompilation
             }});
 
