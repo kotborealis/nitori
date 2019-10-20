@@ -1,25 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {Alert, Button, Col, Container, Form, Row} from 'react-bootstrap';
-import {API_URL} from '../../config';
+import React, {useState} from 'react';
+import {Alert, Col, Container, Row} from 'react-bootstrap';
 import AnsiRenderer from './AnsiRenderer';
+import {SourceInput} from '../SourceForm';
 
 const App = () => {
-    const [isLoading, setLoading] = useState(true);
-
-    const [tasksList, setTasksList] = useState([]);
-
-    useEffect(() => {
-        (async () => {
-            setTasksList((await (await fetch(API_URL + "/list_tests/")).json()).data);
-            setLoading(false);
-        })();
-    }, []);
-
-    const [formState, setFormState] = useState({
-        files: undefined,
-        task: ""
-    });
-
     const defaultOutputState = () => ({
         targetCompilation: {exitCode: undefined, stdout: ""},
         testCompilation: {exitCode: undefined, stdout: ""},
@@ -28,23 +12,15 @@ const App = () => {
 
     const [outputState, setOutputState] = useState(defaultOutputState());
 
-    const onSubmitHandler = async (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
+    const onSubmitStart = () => setOutputState(defaultOutputState());
 
-        setLoading(true);
-        setOutputState(defaultOutputState());
-
-        const res = await fetch(API_URL + "/test_target/", {
-            method: "POST",
-            body: formData
-        });
-
-        setLoading(false);
-
-        const json = await res.json();
-
-        setOutputState({...defaultOutputState(), ...json.data});
+    const onSubmitEnd = ({data, error}) => {
+        if(data){
+            setOutputState({...defaultOutputState(), ...data});
+        }
+        else if(error){
+            alert(JSON.stringify(error));
+        }
     };
 
     const exitCodeToAlertVariant = (code) => {
@@ -56,39 +32,7 @@ const App = () => {
     return (<Container style={{padding: "20px"}}>
         <Row>
             <Col>
-                <Form onSubmit={onSubmitHandler}>
-                    <Form.Row>
-                        <Form.Group>
-                            <Form.Label>Исходный код:</Form.Label>
-                            <Form.Control
-                                name={"file"}
-                                type={"file"}
-                                disabled={isLoading}
-                                onChange={({target: {files}}) => setFormState({...formState, files})}
-                            />
-                        </Form.Group>
-                        <Form.Group>
-                            <Form.Label>Задание:</Form.Label>
-                            <Form.Control
-                                name={"test_id"}
-                                as="select"
-                                disabled={isLoading}
-                                onChange={({target: {value: task}}) => setFormState({...formState, task})}
-                            >
-                                <option></option>
-                                {tasksList.map(i => <option value={i}>{i}</option>)}
-                            </Form.Control>
-                        </Form.Group>
-                    </Form.Row>
-                    <Form.Row>
-                        <Button
-                            variant="primary"
-                            type="submit"
-                            disabled={formState.files === undefined || formState.task === "" || isLoading}>
-                            Отправить
-                        </Button>
-                    </Form.Row>
-                </Form>
+                <SourceInput onSubmitStart={onSubmitStart} onSubmitEnd={onSubmitEnd}/>
             </Col>
         </Row>
         <Row>
