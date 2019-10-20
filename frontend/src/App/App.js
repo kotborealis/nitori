@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Col, Container, Row} from 'react-bootstrap';
 import {SourceInput} from '../SourceInputForm/SourceInputForm';
 import {TestOutput, TestOutputDefaultState} from '../TestOutput/TestOutput';
+import styles from './App.css';
 
 const App = () => {
     const [outputState, setOutputState] = useState(TestOutputDefaultState());
@@ -26,8 +27,8 @@ const App = () => {
         return 'danger';
     };
 
-    return (<Container>
-        <Row>
+    return (<Container className={styles.container}>
+        <Row className={styles.row}>
             <Col>
                 <SourceInput {...{onSubmitStart, onSubmitEnd}}/>
             </Col>
