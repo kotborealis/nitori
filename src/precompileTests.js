@@ -20,7 +20,7 @@ const precompileTests = async (config) => {
     const sandbox = new Sandbox(docker, config);
     await sandbox.start();
 
-    const compiler = new Compiler(sandbox);
+    const compiler = new Compiler(sandbox, config.timeout.precompilation);
 
     const tests = await glob(path.join(config.testing.dir, '/**/*'));
 

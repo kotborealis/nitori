@@ -93,7 +93,7 @@ module.exports = async (config) => {
         const sandbox = new Sandbox(docker, config);
         await sandbox.start();
 
-        const compiler = new Compiler(sandbox, config.timeout.compilerResult);
+        const compiler = new Compiler(sandbox, config.timeout.compilation);
         const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(req.sourceFiles, {working_dir});
 
         if(compilerResult.exitCode){
@@ -132,7 +132,10 @@ module.exports = async (config) => {
             return;
         }
 
-        const runnerResult = await sandbox.exec(["./" + output], {timeout: config.timeout.run});
+        debug("START PROCESS WITH TIMEOUT", config.timeout.run);
+        const runnerResult = await sandbox.exec(["./" + output], {
+            timeout: config.timeout.run
+        });
 
         res.json({data: {
                 compilerResult,

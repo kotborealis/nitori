@@ -82,6 +82,7 @@ class Sandbox {
 
         try{
             const dockerStream = await exec.start();
+            debug("Exec with timeout", timeout);
             const {stdout, stderr} = await PromiseTimeout((tty ? parseDStream : parseDMStream)(dockerStream), timeout);
             const {data: {ExitCode: exitCode}} = await exec.status();
 
