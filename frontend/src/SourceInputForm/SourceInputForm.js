@@ -1,11 +1,7 @@
 import React, {useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
-import {API_URL} from '../../config';
-import {useFetch} from '../hooks/useFetch';
 
-export const SourceInput = ({onSubmit = () => 0, disabled = false}) => {
-    const [tasksList, isLoading] = useFetch(API_URL + "/task_list/");
-
+export const SourceInput = ({onSubmit = () => 0, disabled = false, tasksList = []}) => {
     const [formState, setFormState] = useState({
         files: undefined,
         task: ""
@@ -18,7 +14,7 @@ export const SourceInput = ({onSubmit = () => 0, disabled = false}) => {
                 <Form.Control
                     name={"file"}
                     type={"file"}
-                    disabled={isLoading || disabled}
+                    disabled={disabled}
                     onChange={({target: {files}}) => setFormState({...formState, files})}
                 />
             </Form.Group>
@@ -27,11 +23,11 @@ export const SourceInput = ({onSubmit = () => 0, disabled = false}) => {
                 <Form.Control
                     name={"test_id"}
                     as="select"
-                    disabled={isLoading || disabled}
+                    disabled={disabled}
                     onChange={({target: {value: task}}) => setFormState({...formState, task})}
                 >
-                    <option></option>
-                    {tasksList.data ? tasksList.data.map(i => <option value={i}>{i}</option>) : null}
+                    <option/>
+                    {tasksList.data ? tasksList.data.map(i => <option value={i} key={i}>{i}</option>) : null}
                 </Form.Control>
             </Form.Group>
         </Form.Row>
@@ -39,7 +35,7 @@ export const SourceInput = ({onSubmit = () => 0, disabled = false}) => {
             <Button
                 variant="primary"
                 type="submit"
-                disabled={formState.files === undefined || formState.task === "" || isLoading || disabled}>
+                disabled={formState.files === undefined || formState.task === "" || disabled}>
                 Отправить
             </Button>
         </Form.Row>

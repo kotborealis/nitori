@@ -4,10 +4,13 @@ import {SourceInput} from '../SourceInputForm/SourceInputForm';
 import {TestOutput, TestOutputDefaultState} from '../TestOutput/TestOutput';
 import styles from './App.css';
 import {API_URL} from '../../config';
+import {useFetch} from '../hooks/useFetch';
 
 const App = () => {
+    const [tasksList, taskListLoading] = useFetch(API_URL + "/task_list/");
+
     const [outputState, setOutputState] = useState(TestOutputDefaultState());
-    const [loading, setLoading] = useState(false);
+    const [outputStateLoading, setOutputStateLoading] = useState(false);
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -16,12 +19,12 @@ const App = () => {
 
         const formData = new FormData(event.target);
 
-        setLoading(true);
+        setOutputStateLoading(true);
         const res = await fetch(API_URL + "/test_target/", {
             method: "POST",
             body: formData
         });
-        setLoading(false);
+        setOutputStateLoading(false);
 
         const {data, error} = await res.json();
 
@@ -39,7 +42,7 @@ const App = () => {
     return (<Container className={styles.container}>
         <Row className={styles.row}>
             <Col>
-                <SourceInput {...{onSubmit}} disabled={loading}/>
+                <SourceInput {...{onSubmit, tasksList}} disabled={outputStateLoading || taskListLoading}/>
             </Col>
         </Row>
         <Row>
