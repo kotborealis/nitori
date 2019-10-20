@@ -142,6 +142,8 @@ module.exports = async (config) => {
                 linkerResult,
                 runnerResult
         }});
+
+        await sandbox.stop();
     });
 
     //noinspection JSUnusedLocalSymbols

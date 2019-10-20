@@ -39,6 +39,8 @@ class Sandbox {
 
         this.container = await docker.container.create(config.container);
         await this.container.start();
+
+        this._running = true;
     };
 
     /**
@@ -52,7 +54,9 @@ class Sandbox {
 
         const {container} = this;
         await container.kill();
-        await container.delete();
+        await container.delete({force: true});
+
+        this._running = false;
     };
 
     /**
