@@ -26,7 +26,7 @@ const App = () => {
         return 'danger';
     };
 
-    return (<Container style={{padding: "20px"}}>
+    return (<Container>
         <Row>
             <Col>
                 <SourceInput {...{onSubmitStart, onSubmitEnd}}/>

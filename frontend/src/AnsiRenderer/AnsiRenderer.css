@@ -1,71 +1,71 @@
-.ansi-renderer {
+:global .ansi-renderer {
     padding: 10px;
     background-color: #0f0f0f;
 
     color: white;
 }
 
-.ansi-renderer .ansi-black {
+:global .ansi-renderer .ansi-black {
     color: black;
 }
 
-.ansi-renderer .ansi-red {
+:global .ansi-renderer .ansi-red {
     color: red;
 }
 
-.ansi-renderer .ansi-green {
+:global .ansi-renderer .ansi-green {
     color: green;
 }
 
-.ansi-renderer .ansi-yellow {
+:global .ansi-renderer .ansi-yellow {
     color: yellow;
 }
 
-.ansi-renderer .ansi-blue {
+:global .ansi-renderer .ansi-blue {
     color: blue;
 }
 
-.ansi-renderer .ansi-magenta {
+:global .ansi-renderer .ansi-magenta {
     color: magenta;
 }
 
-.ansi-renderer .ansi-cyan {
+:global .ansi-renderer .ansi-cyan {
     color: cyan;
 }
 
-.ansi-renderer .ansi-white {
+:global .ansi-renderer .ansi-white {
     color: white;
 }
 
-.ansi-renderer .ansi-bright-black {
+:global .ansi-renderer .ansi-bright-black {
     background-color: black;
 }
 
-.ansi-renderer .ansi-bright-red {
+:global .ansi-renderer .ansi-bright-red {
     background-color: red;
 }
 
-.ansi-renderer .ansi-bright-green {
+:global .ansi-renderer .ansi-bright-green {
     background-color: green;
 }
 
-.ansi-renderer .ansi-bright-yellow {
+:global .ansi-renderer .ansi-bright-yellow {
     background-color: yellow;
 }
 
-.ansi-renderer .ansi-bright-blue {
+:global .ansi-renderer .ansi-bright-blue {
     background-color: blue;
 }
 
-.ansi-renderer .ansi-bright-magenta {
+:global .ansi-renderer .ansi-bright-magenta {
     background-color: magenta;
 }
 
-.ansi-renderer .ansi-bright-cyan {
+:global .ansi-renderer .ansi-bright-cyan {
     background-color: cyan;
 }
 
-.ansi-renderer .ansi-bright-white {
+:global .ansi-renderer .ansi-bright-white {
     background-color: white;
 }
 

@@ -61,7 +61,15 @@ module.exports = (env = {prod: false}) => {
                 },
                 {
                     test: /\.css/,
-                    use: ['style-loader', 'css-loader'],
+                    use: [
+                        'style-loader',
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                modules: true,
+                            },
+                        }
+                    ],
                 },
                 {
                     test: /\.(jpe?g|png|gif|svg)$/i,
