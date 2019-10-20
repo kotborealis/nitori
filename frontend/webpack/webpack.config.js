@@ -10,7 +10,6 @@ module.exports = (env = {prod: false}) => {
 
     return {
         entry: {
-            'babel-polyfill': 'babel-polyfill',
             app: path.join(__dirname, '../src/index.js'),
             vendor: [
                 'react',
