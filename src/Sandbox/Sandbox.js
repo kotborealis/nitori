@@ -14,6 +14,8 @@ class Sandbox {
     config;
     container;
 
+    _running = false;
+
     /**
      * Constructor
      * @param docker Docker instance
@@ -30,6 +32,9 @@ class Sandbox {
      */
     async start() {
         debug("Start sandbox");
+
+        if(this._running) return;
+
         const {docker, config} = this;
 
         this.container = await docker.container.create(config.container);
@@ -42,6 +47,9 @@ class Sandbox {
      */
     async stop() {
         debug("Stop sandbox");
+
+        if(!this._running) return;
+
         const {container} = this;
         await container.kill();
         await container.delete();
@@ -88,7 +96,7 @@ class Sandbox {
             debug("Timed out sandbox will be terminated.");
             await this.stop();
             // 124 is exit code for timeout command
-            return {exitCode: 124, stdout: "message", stderr: ""};
+            return {exitCode: 124, stdout: message, stderr: ""};
         }
     };
 
