@@ -3,7 +3,7 @@ import {Col, Container, Row} from 'react-bootstrap';
 import {SourceInput} from '../SourceInputForm/SourceInputForm';
 import {TestOutput, TestOutputDefaultState} from '../TestOutput/TestOutput';
 import styles from './App.css';
-import {API_URL} from '../../config';
+import {API_URL} from '../config';
 import {useFetch} from '../hooks/useFetch';
 
 const App = () => {
