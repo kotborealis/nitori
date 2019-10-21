@@ -81,12 +81,6 @@ module.exports = (env = {prod: false}) => {
                                 digest: 'hex',
                                 name: ifProd('[hash].[ext]', '[name].[ext]')
                             }
-                        },
-                        {
-                            loader: 'image-webpack-loader',
-                            options: {
-                                bypassOnDebug: true
-                            }
                         }
                     ]
                 },
