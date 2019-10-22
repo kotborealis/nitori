@@ -49,6 +49,10 @@ std::stringstream stdout;
 std::stringstream stderr;
 std::stringstream stdin;
 
+std::streambuf _stdout;
+std::streambuf _stderr;
+std::streambuf _stdin;
+
 }
 
 /**
