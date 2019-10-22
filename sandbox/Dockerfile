@@ -18,5 +18,5 @@ RUN chown -R sandbox:sandbox /sandbox
 
 RUN mkdir /opt/nitori/
 COPY ./shared/catch.hpp /opt/nitori/catch.hpp
-COPY ./shared/hijack.hpp /opt/nitori/hijack.hpp
+COPY shared/nitori.hpp /opt/nitori/nitori.hpp
 COPY ./shared/testing.hpp /opt/nitori/testing.hpp

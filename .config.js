@@ -28,7 +28,7 @@ module.exports = {
     testing: {
         dir: "./data/tests/",
         libs: "/opt/testing_libs",
-        hijack_main: "__HIJACK_MAIN__",
+        hijack_main: "__NITORI_HIJACK_MAIN__",
         test_src_name: "__nitori_test.cpp",
         test_obj_name: "__nitori_test.o"
     },
