@@ -56,8 +56,7 @@ void reserve(size_t capacity) {
 
     int *new_data = new int[capacity];
 
-    for(size_t i = 0; i < vector_size; i++)
-        new_data[i] = vector_data[i];
+    std::memcpy(new_data, vector_data, vector_size * sizeof(int));
 
     delete[] vector_data;
 
@@ -75,7 +74,7 @@ void print() {
 
 void squeeze() {
     int *new_data = new int[vector_size];
-    std::memcpy(new_data, vector_data, vector_size);
+    std::memcpy(new_data, vector_data, vector_size * sizeof(int));
     delete[] vector_data;
     vector_data = new_data;
     vector_capacity = vector_size;
