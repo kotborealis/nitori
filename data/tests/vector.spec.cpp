@@ -1,6 +1,6 @@
 #include "testing.hpp"
 
-int *getData(); //
+int getValue(size_t); //
 size_t getSize(); //
 size_t getCapacity(); //
 void append(int); //
@@ -22,7 +22,7 @@ TEST_CASE("vector") {
         for(int i = 0; i < 100; i++) append(i);
         REQUIRE(getSize() == 100);
         REQUIRE(getCapacity() >= getSize());
-        for(int i = 0; i < 100; i++) REQUIRE(getData()[i] == i);
+        for(int i = 0; i < 100; i++) REQUIRE(getValue(i) == i);
     }
 
     SECTION("reserve()"){
@@ -31,10 +31,10 @@ TEST_CASE("vector") {
 
         reserve(10);
         append(10);
-        REQUIRE(getData()[0] == 10);
+        REQUIRE(getValue(0) == 10);
 
         reserve(100);
-        REQUIRE(getData()[0] == 10);
+        REQUIRE(getValue(0) == 10);
     }
 
     SECTION("print()") {
@@ -69,7 +69,7 @@ TEST_CASE("vector") {
         clear();
         int arr[] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
         append(arr, 10);
-        for(size_t i = 0; i < 10; i++) REQUIRE(getData()[i] == arr[i]);
+        for(size_t i = 0; i < 10; i++) REQUIRE(getValue(i) == arr[i]);
     }
 
     SECTION("insert(int, int)") {
@@ -78,7 +78,7 @@ TEST_CASE("vector") {
         append(arr, 9);
 
         insert(4, 4);
-        for(size_t i = 0; i < 10; i++) REQUIRE(getData()[i] == i);
+        for(size_t i = 0; i < 10; i++) REQUIRE(getValue(i) == i);
     }
 
     SECTION("erase(int)") {
@@ -89,7 +89,7 @@ TEST_CASE("vector") {
         append(arr1, 10);
         erase(4);
 
-        for(size_t i = 0; i < 9; i++) REQUIRE(getData()[i] == arr2[i]);
+        for(size_t i = 0; i < 9; i++) REQUIRE(getValue(i) == arr2[i]);
     }
 
     SECTION("indexOf(int*, int)") {

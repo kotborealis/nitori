@@ -1,7 +1,7 @@
 #include <cstring>
 #include <iostream>
 
-int *getData();
+int getValue(size_t);
 size_t getSize();
 size_t getCapacity();
 void append(int);
@@ -18,8 +18,8 @@ int *vector_data = NULL;
 size_t vector_size = 0;
 size_t vector_capacity = 0;
 
-int *getData() {
-    return vector_data;
+int getValue(size_t index) {
+    return vector_data[index];
 }
 
 size_t getSize() {
