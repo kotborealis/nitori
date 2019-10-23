@@ -28,7 +28,7 @@ class Compiler {
     async compile(source_files, {
         working_dir = "/sandbox/",
         std = "c++11",
-        I = "/opt/nitori/",
+        I = [],
     } = {}) {
         const {sandbox} = this;
 
@@ -50,7 +50,7 @@ class Compiler {
         const res = await sandbox.exec([
             this.compiler_name,
             ...(std ? [`--std=${std}`] : []),
-            ...(I ? [`-I${I}`] : []),
+            ...I.map(_ => `-I${_}`),
             "-c",
             ...(cpp_file_names.length === 1 ? ["-o", obj_file_names[0]] : []),
             ...cpp_file_names

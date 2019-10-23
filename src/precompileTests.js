@@ -38,7 +38,7 @@ const precompileTests = async (config) => {
 
         const {exec: {exitCode}} = await compiler.compile(
             [{name: config.testing.test_src_name, content}],
-            {working_dir}
+            {working_dir, I: ["/opt/nitori/"]}
         );
 
         if(exitCode){
