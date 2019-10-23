@@ -61,9 +61,13 @@ module.exports = async (config) => {
             return;
         }
 
-        req.sourceFiles = Object.keys(files).map(key => files[key]).map(({name, data}) => ({
-            name, content: data
+        const sourceFiles = (Array.isArray(files.sources) ? files.sources : [files.sources]);
+
+        req.sourceFiles = sourceFiles.map(({name, data}) => ({
+                name, content: data
         }));
+
+        debug(req.sourceFiles);
 
         next();
     });

@@ -12,8 +12,9 @@ export const SourceInput = ({onSubmit = () => 0, disabled = false, tasksList = [
             <Form.Group>
                 <Form.Label>Исходный код:</Form.Label>
                 <Form.Control
-                    name={"file"}
+                    name={"sources"}
                     type={"file"}
+                    multiple={true}
                     disabled={disabled}
                     onChange={({target: {files}}) => setFormState({...formState, files})}
                 />
