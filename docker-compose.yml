@@ -10,3 +10,5 @@ services:
       - src/index
       - --config=./.config.prod.js
       - --api
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
