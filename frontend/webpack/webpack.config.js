@@ -3,6 +3,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
+const PUBLIC_PATH = process.env.PUBLIC_PATH || '/';
+
 module.exports = (env = {prod: false}) => {
     const ifProd = (plugin, _else = undefined) => env.prod ? plugin : _else;
     const ifDebug = (plugin, _else = undefined) => !env.prod ? plugin : _else;
@@ -21,8 +23,7 @@ module.exports = (env = {prod: false}) => {
         output: {
             filename: ifProd('[hash].[name].js', '[name].js'),
             path: path.join(__dirname, '../build/'),
-            publicPath: '/',
-            pathinfo: false
+            publicPath: PUBLIC_PATH
         },
 
         devtool: ifDebug('cheap-module-eval-source-map'),
@@ -136,7 +137,11 @@ module.exports = (env = {prod: false}) => {
                     compress: true,
                     warnings: false
                 }
-            }))
+            })),
+
+            new webpack.DefinePlugin({
+                'process.env.PUBLIC_PATH': JSON.stringify(PUBLIC_PATH),
+            }),
         ]),
 
         devServer: {
@@ -151,8 +156,11 @@ module.exports = (env = {prod: false}) => {
             openPage: '',
             overlay: true,
             proxy: {
-                '/nitori_api/': 'http://127.0.0.1:3000',
-                pathRewrite: {'^/nitori_api' : ''}
+                '/nitori_api': {
+                    target: 'http://127.0.0.1:3000',
+                    pathRewrite: {'^/nitori_api' : ''}
+                },
+
             },
         }
     };
