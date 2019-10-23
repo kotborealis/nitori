@@ -1,1 +1,1 @@
-export const API_URL = __API_URL__;
+export const API_URL = window.location.protocol + "//" + window.location.hostname + ":3000";

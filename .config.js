@@ -10,7 +10,7 @@ module.exports = {
         port: 2375
     },
     container: {
-        Image: "nitori-sandbox",
+        Image: "nitori_sandbox",
         Tty: true,
         StopTimeout: 600,
         WorkingDir: "/sandbox",

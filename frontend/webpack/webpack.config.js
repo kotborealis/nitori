@@ -136,11 +136,7 @@ module.exports = (env = {prod: false}) => {
                     compress: true,
                     warnings: false
                 }
-            })),
-
-            new webpack.DefinePlugin({
-                __API_URL__: JSON.stringify(require('chen.js').env()["API_URL"])
-            })
+            }))
         ]),
 
         devServer: {
