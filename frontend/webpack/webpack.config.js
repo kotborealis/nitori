@@ -149,7 +149,11 @@ module.exports = (env = {prod: false}) => {
             inline: true,
             open: true,
             openPage: '',
-            overlay: true
+            overlay: true,
+            proxy: {
+                '/nitori_api/': 'http://127.0.0.1:3000',
+                pathRewrite: {'^/nitori_api' : ''}
+            },
         }
     };
 
