@@ -3,5 +3,7 @@ import Ansi from 'ansi-to-react';
 import './AnsiRenderer.css';
 
 export default ({children}) => <pre className="ansi-renderer">
-    <Ansi useClasses>{children}</Ansi>
+    <Ansi useClasses>{
+        children.replace(/\r/g, '')
+    }</Ansi>
 </pre>
