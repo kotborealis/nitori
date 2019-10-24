@@ -1,6 +1,6 @@
-import {Alert} from 'react-bootstrap';
+import {Alert, Tab, Tabs} from 'react-bootstrap';
 import AnsiRenderer from '../AnsiRenderer/AnsiRenderer';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 
 export const TestOutputDefaultState = () => ({
     compilerResult: {exitCode: undefined, stdout: ""},
@@ -20,24 +20,43 @@ export const TestOutput = ({
         return 'danger';
     };
 
+    const [tab, setTab] = useState('compilation');
+
+    useEffect(() => {
+        if(exitCodeToAlertVariant(compilerResult.exitCode) === "danger"){
+            if(tab !== 'compilation')
+                setTab('compilation');
+        }
+        else if(exitCodeToAlertVariant(linkerResult.exitCode) === "danger"){
+            if(tab !== 'linking')
+                setTab('linking');
+        }
+        else{
+            if(tab !== 'testing')
+                setTab('testing');
+        }
+    }, [compilerResult.exitCode, linkerResult.exitCode, runnerResult.exitCode]);
+
     return (<div>
-        <div>
-            <Alert variant={exitCodeToAlertVariant(compilerResult.exitCode)}>
-                Компиляция
-            </Alert>
-            <AnsiRenderer>{compilerResult.stdout}</AnsiRenderer>
-        </div>
-        <div>
-            <Alert variant={exitCodeToAlertVariant(linkerResult.exitCode)}>
-                Линковка
-            </Alert>
-            <AnsiRenderer>{linkerResult.stdout}</AnsiRenderer>
-        </div>
-        <div>
-            <Alert variant={exitCodeToAlertVariant(runnerResult.exitCode)}>
-                Тестирование
-            </Alert>
-            <AnsiRenderer>{runnerResult.stdout}</AnsiRenderer>
-        </div>
+        <Tabs activeKey={tab} onSelect={setTab}>
+            <Tab title={"Компиляция"} eventKey={"compilation"}>
+                <Alert variant={exitCodeToAlertVariant(compilerResult.exitCode)}>
+                    Компиляция
+                </Alert>
+                <AnsiRenderer>{compilerResult.stdout}</AnsiRenderer>
+            </Tab>
+            <Tab title={"Линковка"} eventKey={"linking"}>
+                <Alert variant={exitCodeToAlertVariant(linkerResult.exitCode)}>
+                    Линковка
+                </Alert>
+                <AnsiRenderer>{linkerResult.stdout}</AnsiRenderer>
+            </Tab>
+            <Tab title={"Тестирование"} eventKey={"testing"}>
+                <Alert variant={exitCodeToAlertVariant(runnerResult.exitCode)}>
+                    Тестирование
+                </Alert>
+                <AnsiRenderer>{runnerResult.stdout}</AnsiRenderer>
+            </Tab>
+        </Tabs>
     </div>);
 };
