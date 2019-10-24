@@ -1,4 +1,4 @@
-FROM node:alpine AS build
+FROM node:12-alpine AS build
 
 RUN apk update && apk add autoconf automake
 
