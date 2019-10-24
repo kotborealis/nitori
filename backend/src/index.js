@@ -11,7 +11,7 @@ if(args.precompile){
     })();
 }
 else if(args.api){
-    require('./api/').API(config);
+    require('./api').API(config);
 }
 else{
     console.log(`Usage:

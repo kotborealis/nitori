@@ -2,7 +2,7 @@ version: "3"
 
 services:
   backend:
-    build: ./
+    build: ./backend/
     entrypoint:
       - node
       - src/index

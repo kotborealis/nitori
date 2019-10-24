@@ -12,9 +12,9 @@ const {precompileTests} = require('../precompileTests');
 
 const {Docker} = require('node-docker-api');
 
-const {Sandbox} = require('../Sandbox/');
+const {Sandbox} = require('../Sandbox');
 const {ObjectCache} = require('../ObjectCache');
-const {Compiler, Objcopy} = require('../gnu_utils/');
+const {Compiler, Objcopy} = require('../gnu_utils');
 
 function fileSizesValid(files) {
     if(!files || Object.keys(files).length === 0) return true;

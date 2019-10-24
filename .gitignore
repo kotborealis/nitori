@@ -1,6 +1,8 @@
-data/cache/*
-!data/cache/.keep
-!data/tests/.keep
-node_modules
-frontend/node_modules
+!data/cache/.gitkeep
+!data/tests/.gitkeep
+!frontend/build/.gitkeep
+
 .idea/*
+data/cache/*
+frontend/node_modules
+backend/node_modules
