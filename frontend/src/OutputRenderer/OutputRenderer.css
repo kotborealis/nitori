@@ -1,0 +1,83 @@
+.title {
+    margin-bottom: 0!important;
+    border-bottom: 0!important;
+    border-bottom-left-radius: 0!important;
+    border-bottom-right-radius: 0!important;
+}
+
+:global .output-renderer {
+    margin-top: 20px;
+}
+
+:global .output-renderer pre {
+    padding: 10px;
+    background-color: #0f0f0f;
+
+    color: white;
+}
+
+:global .output-renderer .ansi-black {
+    color: black;
+}
+
+:global .output-renderer .ansi-red {
+    color: red;
+}
+
+:global .output-renderer .ansi-green {
+    color: green;
+}
+
+:global .output-renderer .ansi-yellow {
+    color: yellow;
+}
+
+:global .output-renderer .ansi-blue {
+    color: blue;
+}
+
+:global .output-renderer .ansi-magenta {
+    color: magenta;
+}
+
+:global .output-renderer .ansi-cyan {
+    color: cyan;
+}
+
+:global .output-renderer .ansi-white {
+    color: white;
+}
+
+:global .output-renderer .ansi-bright-black {
+    background-color: black;
+}
+
+:global .output-renderer .ansi-bright-red {
+    background-color: red;
+}
+
+:global .output-renderer .ansi-bright-green {
+    background-color: green;
+}
+
+:global .output-renderer .ansi-bright-yellow {
+    background-color: yellow;
+}
+
+:global .output-renderer .ansi-bright-blue {
+    background-color: blue;
+}
+
+:global .output-renderer .ansi-bright-magenta {
+    background-color: magenta;
+}
+
+:global .output-renderer .ansi-bright-cyan {
+    background-color: cyan;
+}
+
+:global .output-renderer .ansi-bright-white {
+    background-color: white;
+}
+
+

@@ -1,5 +1,5 @@
 import {Alert, Tab, Tabs} from 'react-bootstrap';
-import AnsiRenderer from '../AnsiRenderer/AnsiRenderer';
+import AnsiRenderer from '../OutputRenderer/OutputRenderer';
 import React, {useState, useEffect} from 'react';
 
 export const TestOutputDefaultState = () => ({
@@ -40,22 +40,13 @@ export const TestOutput = ({
     return (<div>
         <Tabs activeKey={tab} onSelect={setTab}>
             <Tab title={"Компиляция"} eventKey={"compilation"}>
-                <Alert variant={exitCodeToAlertVariant(compilerResult.exitCode)}>
-                    Компиляция
-                </Alert>
-                <AnsiRenderer>{compilerResult.stdout}</AnsiRenderer>
+                <AnsiRenderer {...compilerResult} title={"Результат компиляции:"}/>
             </Tab>
             <Tab title={"Линковка"} eventKey={"linking"}>
-                <Alert variant={exitCodeToAlertVariant(linkerResult.exitCode)}>
-                    Линковка
-                </Alert>
-                <AnsiRenderer>{linkerResult.stdout}</AnsiRenderer>
+                <AnsiRenderer {...linkerResult} title={"Результат линковки:"}/>
             </Tab>
             <Tab title={"Тестирование"} eventKey={"testing"}>
-                <Alert variant={exitCodeToAlertVariant(runnerResult.exitCode)}>
-                    Тестирование
-                </Alert>
-                <AnsiRenderer>{runnerResult.stdout}</AnsiRenderer>
+                <AnsiRenderer {...runnerResult} title={"Результат тестирования:"}/>
             </Tab>
         </Tabs>
     </div>);
