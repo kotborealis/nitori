@@ -6,12 +6,16 @@ services:
     entrypoint:
       - node
       - src/index
-      - --config=./.config.prod.js
       - --api
+      - --config=./.config.docker.js
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   frontend:
-    build: ./frontend/
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+      args:
+        PUBLIC_PATH: /
     ports:
       - "8080:80"
     links:

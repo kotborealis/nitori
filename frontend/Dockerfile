@@ -1,5 +1,7 @@
 FROM node:12-alpine AS build
 
+ARG PUBLIC_PATH
+
 RUN apk update && apk add autoconf automake
 
 RUN mkdir -p /app
