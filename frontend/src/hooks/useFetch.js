@@ -7,6 +7,7 @@ export const useFetch = (...args) => {
     useEffect(() => {
         (async () => {
             const response = await fetch(...args);
+            const {status} = response;
             const json = await response.json();
 
             setData(json);
@@ -14,5 +15,5 @@ export const useFetch = (...args) => {
         })();
     }, []);
 
-    return [data, loading];
+    return [data, loading, status];
 };
