@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const mockApi = require('../mock-api/mock-api');
 
 const PUBLIC_PATH = process.env.PUBLIC_PATH || '/';
 
@@ -160,7 +161,7 @@ module.exports = (env = {prod: false}) => {
                     target: 'http://127.0.0.1:3000',
                     pathRewrite: {'^/nitori_api' : ''}
                 },
-
+                ...mockApi
             },
         }
     };
