@@ -1,10 +1,12 @@
 import React, {useState} from 'react';
 import {Col, Container, Row, ProgressBar} from 'react-bootstrap';
 import {SourceInput} from '../SourceInputForm/SourceInputForm';
-import {TestOutput, TestOutputDefaultState} from '../TestOutput/TestOutput';
+import {TestOutput} from '../TestOutput/TestOutput';
 import styles from './App.css';
 import {API_URL} from '../config';
 import {useFetch} from '../hooks/useFetch';
+import {TestOutputDefaultState} from '../utils/TestOutputDefaultState';
+import TestingProgressbar from '../TestingProgressbar/TestingProgressbar';
 
 const App = () => {
     const [userData, userDataLoading, userDataStatus] = useFetch("/auth/user_data.php");
@@ -12,23 +14,6 @@ const App = () => {
 
     const [outputState, setOutputState] = useState(TestOutputDefaultState());
     const [outputStateLoading, setOutputStateLoading] = useState(false);
-
-    const outputStateToProgress = () => {
-        const _ = {};
-        ['compilerResult', 'linkerResult', 'runnerResult'].forEach(key => {
-            const {exitCode} = outputState[key];
-            if(exitCode === undefined) {
-                _[key] = {now: 0};
-            }
-            else if(exitCode !== 0) {
-                _[key] = {now: 100/3, variant: 'danger'};
-            }
-            else {
-                _[key] = {now: 100/3, variant: 'success'};
-            }
-        });
-        return _;
-    };
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -94,11 +79,7 @@ const App = () => {
         </Row>
         <Row className={styles.row}>
             <Col>
-                <ProgressBar>
-                    <ProgressBar striped animated key={1} {...outputStateToProgress().compilerResult}/>
-                    <ProgressBar striped animated key={2}  {...outputStateToProgress().linkerResult}/>
-                    <ProgressBar striped animated key={3}  {...outputStateToProgress().runnerResult}/>
-                </ProgressBar>
+                <TestingProgressbar state={outputState} loading={outputStateLoading}/>
             </Col>
         </Row>
         <Row className={styles.row}>

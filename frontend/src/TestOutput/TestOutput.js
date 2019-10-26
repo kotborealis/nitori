@@ -1,12 +1,7 @@
-import {Alert, Tab, Tabs} from 'react-bootstrap';
+import {Tab, Tabs} from 'react-bootstrap';
 import AnsiRenderer from '../OutputRenderer/OutputRenderer';
-import React, {useState, useEffect} from 'react';
-
-export const TestOutputDefaultState = () => ({
-    compilerResult: {exitCode: undefined, stdout: ""},
-    linkerResult: {exitCode: undefined, stdout: ""},
-    runnerResult: {exitCode: undefined, stdout: ""},
-});
+import React, {useEffect, useState} from 'react';
+import {TestOutputDefaultState} from '../utils/TestOutputDefaultState';
 
 export const TestOutput = ({
                                compilerResult = {},
