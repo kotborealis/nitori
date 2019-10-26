@@ -51,7 +51,7 @@ module.exports = async (config) => {
         }
     }));
 
-    app.use(function(req, res, next) {
+    const filesHandler = function(req, res, next) {
         debug("Files handler");
 
         const {files} = req;
@@ -78,7 +78,7 @@ module.exports = async (config) => {
         debug(req.sourceFiles);
 
         next();
-    });
+    }
 
     app.get("/task_list/", async function(req, res) {
         debug("Task list");
@@ -113,7 +113,7 @@ module.exports = async (config) => {
         });
     });
 
-    app.post("/test_target/", async function(req, res, next) {
+    app.post("/test_target/", filesHandler, async function(req, res, next) {
         debug("/test_target/");
         if(!req.sourceFiles){
             const err = new Error("No source files specified");
