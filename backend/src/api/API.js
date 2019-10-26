@@ -5,6 +5,9 @@ const md5 = require('md5');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
+const EventEmitter = require('events');
+const uuid = require('uuid');
+
 const debug = require('debug')('nitori:api');
 const express = require('express');
 const fileUpload = require('express-fileupload');
@@ -16,12 +19,17 @@ const {Sandbox} = require('../Sandbox');
 const {ObjectCache} = require('../ObjectCache');
 const {Compiler, Objcopy} = require('../gnu_utils');
 
+const SSE = require('../sse/SSE');
+
 function fileSizesValid(files) {
     if(!files || Object.keys(files).length === 0) return true;
     return Object.keys(files).map(key => files[key].truncated).every(i => !i);
 }
 
 module.exports = async (config) => {
+    const tasksEvents = new EventEmitter;
+    const tasks = new Set;
+
     await precompileTests(config);
 
     const port = config.api.port;
@@ -43,12 +51,12 @@ module.exports = async (config) => {
         }
     }));
 
-    app.use(function (req, res, next) {
+    app.use(function(req, res, next) {
         debug("Files handler");
 
         const {files} = req;
 
-        if(!files) {
+        if(!files){
             next();
             return;
         }
@@ -64,7 +72,7 @@ module.exports = async (config) => {
         const sourceFiles = (Array.isArray(files.sources) ? files.sources : [files.sources]);
 
         req.sourceFiles = sourceFiles.map(({name, data}) => ({
-                name, content: data
+            name, content: data
         }));
 
         debug(req.sourceFiles);
@@ -75,20 +83,50 @@ module.exports = async (config) => {
     app.get("/task_list/", async function(req, res) {
         debug("Task list");
         const tests = await glob(config.testing.dir + '/**/*');
-        res.json({data:
+        res.json({
+            data:
                 tests.map(i => path.basename(i)) // FIXME
         });
     });
 
-    app.post("/test_target/", async function (req, res, next) {
+    app.get("/test_target/sse/:id", SSE(1000, 1000), async function(req, res, next) {
+        debug("/test_target/sse/:id");
+
+        const {id} = req.params;
+        res.task_id = id;
+
+        if(!tasks.has(id)) {
+            const err = new Error("No such task");
+            err.reason = "No such task";
+            err.status = 400;
+            next(err);
+            return;
+        }
+
+        tasksEvents.on(id, ({event, data}) => {
+            res.sse(event, {data});
+
+            if(event === 'stop') {
+                tasksEvents.removeAllListeners(id);
+                res.end();
+            }
+        });
+    });
+
+    app.post("/test_target/", async function(req, res, next) {
         debug("/test_target/");
-        if(!req.sourceFiles) {
+        if(!req.sourceFiles){
             const err = new Error("No source files specified");
             err.reason = "no source files";
             err.status = 400;
             next(err);
             return;
         }
+
+        res.task_id = uuid.v4();
+        tasks.add(res.task_id);
+
+        res.json({data: {taskId: res.task_id}});
 
         const {test_id} = req.body;
         const test_source = fs.readFileSync(path.join(config.testing.dir, test_id));
@@ -100,22 +138,26 @@ module.exports = async (config) => {
         const compiler = new Compiler(sandbox, config.timeout.compilation);
         const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(req.sourceFiles, {working_dir});
 
-        if(compilerResult.exitCode){
-            res.json({data: {
-                    compilerResult
-            }});
+        tasksEvents.emit(res.task_id, {
+            event: 'compilation',
+            data: {compilerResult}
+        });
 
+        if(compilerResult.exitCode){
+            tasksEvents.emit(res.task_id, {event: 'stop'});
             await sandbox.stop();
+            tasks.delete(res.task_id);
             return;
         }
 
         const objcopy = new Objcopy(sandbox);
         await objcopy.redefine_sym(targetBinaries, "main", config.testing.hijack_main, {working_dir});
 
-        if(!objectCache.has(cache_key)) {
+        if(!objectCache.has(cache_key)){
             const err = new Error("Failed to fetch test binary from cache; please run --precompile");
             err.status = 500;
             next(err);
+            tasks.delete(res.task_id);
             return;
         }
         else{
@@ -126,41 +168,65 @@ module.exports = async (config) => {
             [...targetBinaries, config.testing.test_obj_name]
         );
 
-        if(linkerResult.exitCode !== 0){
-            res.json({data: {
-                    compilerResult,
-                    linkerResult
-            }});
+        tasksEvents.emit(res.task_id, {
+            event: 'linking',
+            data: {
+                compilerResult,
+                linkerResult
+            }
+        });
 
+        if(linkerResult.exitCode !== 0){
+            tasksEvents.emit(res.task_id, {event: 'stop'});
             await sandbox.stop();
+            tasks.delete(res.task_id);
             return;
         }
 
-        debug("START PROCESS WITH TIMEOUT", config.timeout.run);
         const runnerResult = await sandbox.exec(["./" + output], {
             timeout: config.timeout.run
         });
 
-        res.json({data: {
+        tasksEvents.emit(res.task_id, {
+            event: 'testing',
+            data: {
                 compilerResult,
                 linkerResult,
                 runnerResult
-        }});
+            }
+        });
+
+        tasksEvents.emit(res.task_id, {event: 'stop'});
 
         await sandbox.stop();
+        tasks.delete(res.task_id);
     });
 
     //noinspection JSUnusedLocalSymbols
-    app.use(function (err, req, res, next) {
+    app.use(function(err, req, res, next) {
         debug("Error handler: ", err.message);
 
-        res.status(err.status).json({
-            error: {
-                reason: err.reason,
-                message: err.message,
-                status: err.status
-            }
-        });
+        if(res.sse){
+            tasksEvents.removeAllListeners(res.task_id);
+            res.sse('error', {
+                error: {
+                    reason: err.reason,
+                    message: err.message,
+                    status: err.status
+                }
+            }).end();
+        }
+        else{
+            res.status(err.status).json({
+                error: {
+                    reason: err.reason,
+                    message: err.message,
+                    status: err.status
+                }
+            });
+        }
+
+        if(res.task_id) tasks.delete(res.task_id);
     });
 
     app.listen(port, () => debug(`Server running on 0.0.0.0:${port}`));
