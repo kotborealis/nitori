@@ -72,7 +72,7 @@ module.exports = async (config) => {
         }
 
         tasksEvents.on(id, ({event, data}) => {
-            res.sse(event, {data});
+            res.sse.emit(event, {data});
 
             if(event === 'stop') {
                 tasksEvents.removeAllListeners(id);
@@ -176,7 +176,7 @@ module.exports = async (config) => {
 
         if(res.sse){
             tasksEvents.removeAllListeners(res.task_id);
-            res.sse('error', {
+            res.sse.emit('error', {
                 error: {
                     reason: err.reason,
                     message: err.message,
