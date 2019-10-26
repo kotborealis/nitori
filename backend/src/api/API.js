@@ -8,6 +8,8 @@ const bodyParser = require('body-parser');
 const EventEmitter = require('events');
 const uuid = require('uuid');
 
+const sourceFilesHandler = require('./sourceFilesHandler');
+
 const debug = require('debug')('nitori:api');
 const express = require('express');
 const fileUpload = require('express-fileupload');
@@ -20,11 +22,6 @@ const {ObjectCache} = require('../ObjectCache');
 const {Compiler, Objcopy} = require('../gnu_utils');
 
 const SSE = require('../sse/SSE');
-
-function fileSizesValid(files) {
-    if(!files || Object.keys(files).length === 0) return true;
-    return Object.keys(files).map(key => files[key].truncated).every(i => !i);
-}
 
 module.exports = async (config) => {
     const tasksEvents = new EventEmitter;
@@ -50,35 +47,6 @@ module.exports = async (config) => {
             fileSize: config.api.limits.fileSize
         }
     }));
-
-    const filesHandler = function(req, res, next) {
-        debug("Files handler");
-
-        const {files} = req;
-
-        if(!files){
-            next();
-            return;
-        }
-
-        if(!fileSizesValid(files)){
-            const err = new Error(`File must be smaller than ${config.api.limits.fileSize} bytes`);
-            err.reason = 'invalidFileSize';
-            err.status = 400;
-            next(err);
-            return;
-        }
-
-        const sourceFiles = (Array.isArray(files.sources) ? files.sources : [files.sources]);
-
-        req.sourceFiles = sourceFiles.map(({name, data}) => ({
-            name, content: data
-        }));
-
-        debug(req.sourceFiles);
-
-        next();
-    }
 
     app.get("/task_list/", async function(req, res) {
         debug("Task list");
@@ -113,7 +81,7 @@ module.exports = async (config) => {
         });
     });
 
-    app.post("/test_target/", filesHandler, async function(req, res, next) {
+    app.post("/test_target/", sourceFilesHandler, async function(req, res, next) {
         debug("/test_target/");
         if(!req.sourceFiles){
             const err = new Error("No source files specified");
