@@ -3,10 +3,7 @@ const debug = require('debug')('nitori:sandbox');
 
 const shortid = require('shortid');
 
-const {
-    promisifyDockerStream: parseDStream,
-    promisifyMultiplexedDockerStream: parseDMStream
-} = require('../utils/dockerStreamParser');
+const {promisifyDockerStream} = require('../utils/promisifyDockerStream');
 
 const instanceId = shortid.generate();
 
@@ -99,7 +96,7 @@ class Sandbox {
         try{
             const dockerStream = await exec.start();
             debug("Exec with timeout", timeout);
-            const {stdout, stderr} = await PromiseTimeout((tty ? parseDStream : parseDMStream)(dockerStream), timeout);
+            const {stdout, stderr} = await PromiseTimeout(promisifyDockerStream(dockerStream), timeout);
             const {data: {ExitCode: exitCode}} = await exec.status();
 
             debug("Exec exitCode:", exitCode);

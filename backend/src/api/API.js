@@ -57,6 +57,18 @@ module.exports = async (config) => {
         });
     });
 
+    app.get('/task_source/:filename', function(req, res) {
+        const file = path.join(config.testing.dir, req.params.filename);
+
+        if(!fs.existsSync(file)){
+            debug("requested file does not exists", file);
+            res.status(404).end();
+            return;
+        }
+
+        fs.createReadStream(file).pipe(res);
+    });
+
     app.get("/test_target/sse/:id", sse_req_handler(1000, 1000), async function(req, res, next) {
         debug("/test_target/sse/:id");
 

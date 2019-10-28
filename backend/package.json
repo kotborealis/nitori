@@ -13,6 +13,7 @@
     "chen.js": "^1.0.24",
     "cors": "^2.8.5",
     "debug": "^4.1.1",
+    "docker-modem": "^2.0.3",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6-alpha.5",
     "glob": "^7.1.4",
