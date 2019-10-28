@@ -25,7 +25,7 @@ class SSE {
 
     emit(event, data) {
         if(event !== undefined && data !== undefined){
-            debug('sse', event, data);
+            debug('sse', event);
             try{
                 this.res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
             }

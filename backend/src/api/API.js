@@ -150,7 +150,7 @@ module.exports = async (config) => {
             return;
         }
 
-        const runnerResult = await sandbox.exec(["./" + output], {
+        const runnerResult = await sandbox.exec(["./" + output, "-r", "compact", "-s"], {
             timeout: config.timeout.run
         });
 
