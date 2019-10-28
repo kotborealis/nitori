@@ -61,7 +61,6 @@ module.exports = async (config) => {
         debug("/test_target/sse/:id");
 
         const {id} = req.params;
-        res.task_id = id;
 
         if(!tasks.has(id)) {
             const err = new Error("No such task");
@@ -71,12 +70,12 @@ module.exports = async (config) => {
             return;
         }
 
-        tasksEvents.on(id, ({event, data}) => {
-            res.sse.emit(event, {data});
+        tasksEvents.on(id, ({event, data, error}) => {
+            res.sse.emit(event, {data, error});
 
             if(event === 'stop') {
                 tasksEvents.removeAllListeners(id);
-                res.end();
+                res.sse.end();
             }
         });
     });
@@ -121,7 +120,7 @@ module.exports = async (config) => {
         const objcopy = new Objcopy(sandbox);
         await objcopy.redefine_sym(targetBinaries, "main", config.testing.hijack_main, {working_dir});
 
-        if(!!objectCache.has(cache_key)){
+        if(!objectCache.has(cache_key)){
             const err = new Error("Failed to fetch test binary from cache; please run --precompile");
             err.status = 500;
             next(err);
@@ -177,8 +176,15 @@ module.exports = async (config) => {
         debug("Error handler: ", err.message);
 
         if(res.task_id){
-            tasks.delete(res.task_id);
-            tasksEvents.removeAllListeners(res.task_id);
+            tasksEvents.emit(res.task_id, {
+                event: 'error',
+                error: {
+                    reason: err.reason,
+                    message: err.message,
+                    status: err.status
+                }
+            });
+            tasksEvents.emit(res.task_id, {event: 'stop'});
         }
 
         if(res.finished) return;

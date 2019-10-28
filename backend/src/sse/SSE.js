@@ -43,7 +43,6 @@ class SSE {
 
     end() {
         clearInterval(this.keepAliveInterval);
-        this.res.end();
         return this;
     }
 }
@@ -61,6 +60,7 @@ const sse_req_handler = (retry = 2000, keepAlive = 1000) => function(req, res, n
 
 const sse_err_handler = function (err, req, res, next) {
     if(res.sse){
+        debug("Error handler: ", err.message);
         res.sse.emit('error', {
             error: {
                 reason: err.reason,
@@ -69,7 +69,7 @@ const sse_err_handler = function (err, req, res, next) {
             }
         }).end();
     }
-    else {
+    else{
         next(err);
     }
 };
