@@ -6,7 +6,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const EventEmitter = require('events');
-const uuid = require('uuid');
+const shortid = require('shortid');
 
 const sourceFilesHandler = require('./sourceFilesHandler');
 
@@ -90,7 +90,7 @@ module.exports = async (config) => {
             return;
         }
 
-        res.task_id = uuid.v4();
+        res.task_id = shortid.generate();
         tasks.add(res.task_id);
 
         res.json({data: {taskId: res.task_id}});
