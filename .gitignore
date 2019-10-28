@@ -3,7 +3,7 @@
 !frontend/build/.gitkeep
 
 .idea/*
-data/cache/*
+backend/data/cache/*
 frontend/node_modules
 backend/node_modules
 

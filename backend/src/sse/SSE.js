@@ -19,6 +19,8 @@ class SSE {
 
         res.on('close', this.end);
         res.on('error', this.end);
+
+
     }
 
     emit(event, data) {
@@ -52,9 +54,28 @@ class SSE {
  * @param keepAlive Keep alive interval
  * @returns {Function}
  */
-const sse_handler = (retry = 2000, keepAlive = 1000) => function(req, res, next){
+const sse_req_handler = (retry = 2000, keepAlive = 1000) => function(req, res, next){
     res.sse = new SSE(res, retry, keepAlive);
     next();
 };
 
-module.exports = sse_handler;
+const sse_err_handler = function (err, req, res, next) {
+    if(res.sse){
+        res.sse.emit('error', {
+            error: {
+                reason: err.reason,
+                message: err.message,
+                status: err.status
+            }
+        }).end();
+    }
+    else {
+        next(err);
+    }
+};
+
+module.exports = {
+    SSE,
+    sse_req_handler,
+    sse_err_handler
+};

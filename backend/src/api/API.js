@@ -21,7 +21,7 @@ const {Sandbox} = require('../Sandbox');
 const {ObjectCache} = require('../ObjectCache');
 const {Compiler, Objcopy} = require('../gnu_utils');
 
-const SSE = require('../sse/SSE');
+const {sse_req_handler, sse_err_handler} = require('../sse/SSE');
 
 module.exports = async (config) => {
     const tasksEvents = new EventEmitter;
@@ -57,7 +57,7 @@ module.exports = async (config) => {
         });
     });
 
-    app.get("/test_target/sse/:id", SSE(1000, 1000), async function(req, res, next) {
+    app.get("/test_target/sse/:id", sse_req_handler(1000, 1000), async function(req, res, next) {
         debug("/test_target/sse/:id");
 
         const {id} = req.params;
@@ -121,7 +121,7 @@ module.exports = async (config) => {
         const objcopy = new Objcopy(sandbox);
         await objcopy.redefine_sym(targetBinaries, "main", config.testing.hijack_main, {working_dir});
 
-        if(!objectCache.has(cache_key)){
+        if(!!objectCache.has(cache_key)){
             const err = new Error("Failed to fetch test binary from cache; please run --precompile");
             err.status = 500;
             next(err);
@@ -170,31 +170,26 @@ module.exports = async (config) => {
         tasks.delete(res.task_id);
     });
 
+    app.use(sse_err_handler);
+
     //noinspection JSUnusedLocalSymbols
     app.use(function(err, req, res, next) {
         debug("Error handler: ", err.message);
 
-        if(res.sse){
+        if(res.task_id){
+            tasks.delete(res.task_id);
             tasksEvents.removeAllListeners(res.task_id);
-            res.sse.emit('error', {
-                error: {
-                    reason: err.reason,
-                    message: err.message,
-                    status: err.status
-                }
-            }).end();
-        }
-        else{
-            res.status(err.status).json({
-                error: {
-                    reason: err.reason,
-                    message: err.message,
-                    status: err.status
-                }
-            });
         }
 
-        if(res.task_id) tasks.delete(res.task_id);
+        if(res.finished) return;
+
+        res.status(err.status).json({
+            error: {
+                reason: err.reason,
+                message: err.message,
+                status: err.status
+            }
+        });
     });
 
     app.listen(port, () => debug(`Server running on 0.0.0.0:${port}`));
