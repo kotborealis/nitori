@@ -198,5 +198,17 @@ module.exports = async (config) => {
         });
     });
 
-    app.listen(port, () => debug(`Server running on 0.0.0.0:${port}`));
+    const server = app.listen(port, () => debug(`Server running on 0.0.0.0:${port}`));
+
+    process.on('SIGINT', async () => {
+        server.close();
+        try {
+            await Sandbox.destroy_all(docker);
+            process.exit(0);
+        }
+        catch(e){
+            debug("Error on handling signal", e);
+            process.exit(1);
+        }
+    });
 };

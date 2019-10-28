@@ -1,10 +1,14 @@
 const {PromiseTimeout} = require('../utils/PromiseTimeout');
 const debug = require('debug')('nitori:sandbox');
 
+const shortid = require('shortid');
+
 const {
     promisifyDockerStream: parseDStream,
     promisifyMultiplexedDockerStream: parseDMStream
 } = require('../utils/dockerStreamParser');
+
+const instanceId = shortid.generate();
 
 /**
  * Docker Sandbox class
@@ -13,6 +17,7 @@ class Sandbox {
     docker;
     config;
     container;
+    id;
 
     _running = false;
 
@@ -24,6 +29,7 @@ class Sandbox {
     constructor(docker, config) {
         this.docker = docker;
         this.config = config;
+        this.id = shortid.generate();
     }
 
     /**
@@ -35,9 +41,16 @@ class Sandbox {
 
         if(this._running) return;
 
-        const {docker, config} = this;
+        const {docker, config, id} = this;
 
-        this.container = await docker.container.create(config.container);
+        this.container = await docker.container.create({
+            ...config.container,
+            name: `${config.sandbox.container_prefix}_${id}`,
+            Labels: {
+                "nitori-sandbox-id": id,
+                "nitori-sandbox-instance-id": instanceId
+            }
+        });
         await this.container.start();
 
         this._running = true;
@@ -53,7 +66,6 @@ class Sandbox {
         if(!this._running) return;
 
         const {container} = this;
-        await container.kill();
         await container.delete({force: true});
 
         this._running = false;
@@ -122,6 +134,49 @@ class Sandbox {
      */
     async fs_get(path) {
         return this.container.fs.get({path});
+    }
+
+    /**
+     * Destroy all containers, created by this instance
+     * @param docker
+     * @returns {Promise<void>}
+     */
+    static async destroy_all(docker) {
+        debug("Destroying all created containers");
+
+        const containers = await docker.container.list({
+            all: true,
+            filters: JSON.stringify({
+                label: [`nitori-sandbox-instance-id=${instanceId}`]
+            })
+        });
+
+        debug(`Removing ${containers.length} containers`);
+
+        for await (let container of containers) {
+            await container.pause();
+
+            const {data: {Name, Image, State: {Status}}} = await container.status();
+            debug("Processing container", Name, Image, Status);
+
+            debug("Killing & deleting container");
+
+            try{
+                await container.kill();
+            }
+            catch(e){
+                debug(e);
+            }
+
+            try{
+                await container.delete();
+            }
+            catch(e){
+                debug(e);
+            }
+        }
+
+        debug("Done");
     }
 }
 

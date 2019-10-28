@@ -2,6 +2,9 @@ const debug = require('debug')('nitori');
 const args = require('chen.js').args();
 const config = require('chen.js').config('.config.js').resolve();
 
+const {Docker} = require('node-docker-api');
+const {Sandbox} = require('./Sandbox');
+
 process.on('unhandledRejection', (reason) => debug('unhandledRejection', reason));
 
 if(args.precompile){
