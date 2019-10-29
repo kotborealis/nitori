@@ -1,16 +1,23 @@
 import React, {useEffect, useState} from 'react';
 
 export const useFetch = (...args) => {
+    const [status, setStatus] = useState(0);
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         (async () => {
             const response = await fetch(...args);
-            const {status} = response;
-            const json = await response.json();
+            setStatus(response.status);
 
-            setData(json);
+            try{
+                const json = await response.json();
+                setData(json);
+            }
+            catch(e){
+
+            }
+
             setLoading(false);
         })();
     }, []);

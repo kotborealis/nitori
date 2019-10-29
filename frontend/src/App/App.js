@@ -30,29 +30,16 @@ const App = () => {
 
         const {data, error} = await res.json();
 
-        if(data && data.taskId){
-            let state = TestOutputDefaultState();
-            const sse = new EventSource(API_URL + "/test/" + data.taskId);
-            const reduceState = ({data}) => {
-                const {data: newState} = JSON.parse(data);
-                state = {...state, ...newState};
-                setOutputState(state);
-            };
-            sse.addEventListener('error', ({data}) =>
-                alert(JSON.stringify(data))
-            );
-
-            sse.addEventListener('stop', () => {
-                sse.close();
-                setOutputStateLoading(false);
-            });
-
-            sse.addEventListener('compilation', reduceState);
-            sse.addEventListener('linking', reduceState);
-            sse.addEventListener('testing', reduceState);
-        }
-        else if(error){
+        if(error){
             alert(JSON.stringify(error));
+            setOutputStateLoading(false);
+        }
+        else{
+            setOutputState({
+                ...TestOutputDefaultState(),
+                ...data
+            });
+            setOutputStateLoading(false);
         }
     };
 

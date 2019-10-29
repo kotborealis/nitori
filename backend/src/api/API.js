@@ -23,14 +23,9 @@ const {Sandbox} = require('../Sandbox');
 const {ObjectCache} = require('../ObjectCache');
 const {Compiler, Objcopy} = require('../gnu_utils');
 
-const {sse_req_handler, sse_err_handler} = require('../sse/SSE');
-
 module.exports = async (config) => {
     const nano = Nano(config.database);
     const tasks_db = nano.use('tasks');
-
-    const tasksEvents = new EventEmitter;
-    const tasks = new Set;
 
     const port = config.api.port;
     const working_dir = config.sandbox.working_dir;
@@ -108,29 +103,6 @@ module.exports = async (config) => {
         fs.createReadStream(file).pipe(res);
     });
 
-    app.get("/test/:id", sse_req_handler(5000, 5000), async function(req, res, next) {
-        debug("/test/:id");
-
-        const {id} = req.params;
-
-        if(!tasks.has(id)){
-            const err = new Error("No such task");
-            err.reason = "No such task";
-            err.status = 400;
-            next(err);
-            return;
-        }
-
-        tasksEvents.on(id, ({event, data, error}) => {
-            res.sse.emit(event, {data, error});
-
-            if(event === 'stop'){
-                tasksEvents.removeAllListeners(id);
-                res.sse.end();
-            }
-        });
-    });
-
     app.post("/test/", sourceFilesHandler(config.api.limits, 10), async function(req, res, next) {
         debug("/test/");
 
@@ -143,11 +115,6 @@ module.exports = async (config) => {
             return;
         }
 
-        res.task_id = shortid.generate();
-        tasks.add(res.task_id);
-
-        res.json({data: {taskId: res.task_id}});
-
         const test_source = await db_utils.getFirstAttachment(tasks_db, test_id);
         const cache_key = md5(test_source);
 
@@ -157,15 +124,9 @@ module.exports = async (config) => {
         const compiler = new Compiler(sandbox, config.timeout.compilation);
         const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(req.sourceFiles, {working_dir});
 
-        tasksEvents.emit(res.task_id, {
-            event: 'compilation',
-            data: {compilerResult}
-        });
-
         if(compilerResult.exitCode){
-            tasksEvents.emit(res.task_id, {event: 'stop'});
+            res.json({data: {compilerResult}});
             await sandbox.stop();
-            tasks.delete(res.task_id);
             return;
         }
 
@@ -176,7 +137,6 @@ module.exports = async (config) => {
             const err = new Error("Failed to fetch test binary from cache; please run --precompile_all");
             err.status = 500;
             next(err);
-            tasks.delete(res.task_id);
             return;
         }
         else{
@@ -187,18 +147,9 @@ module.exports = async (config) => {
             [...targetBinaries, config.testing.test_obj_name]
         );
 
-        tasksEvents.emit(res.task_id, {
-            event: 'linking',
-            data: {
-                compilerResult,
-                linkerResult
-            }
-        });
-
         if(linkerResult.exitCode !== 0){
-            tasksEvents.emit(res.task_id, {event: 'stop'});
+            res.json({data: {compilerResult, linkerResult}});
             await sandbox.stop();
-            tasks.delete(res.task_id);
             return;
         }
 
@@ -206,40 +157,14 @@ module.exports = async (config) => {
             timeout: config.timeout.run
         });
 
-        tasksEvents.emit(res.task_id, {
-            event: 'testing',
-            data: {
-                compilerResult,
-                linkerResult,
-                runnerResult
-            }
-        });
-
-        tasksEvents.emit(res.task_id, {event: 'stop'});
+        res.json({data: {compilerResult, linkerResult, runnerResult}});
 
         await sandbox.stop();
-        tasks.delete(res.task_id);
     });
-
-    app.use(sse_err_handler);
 
     //noinspection JSUnusedLocalSymbols
     app.use(function(err, req, res, next) {
         debug("Error handler: ", err.message);
-
-        if(res.task_id){
-            tasksEvents.emit(res.task_id, {
-                event: 'error',
-                error: {
-                    reason: err.reason,
-                    message: err.message,
-                    status: err.status
-                }
-            });
-            tasksEvents.emit(res.task_id, {event: 'stop'});
-        }
-
-        if(res.finished) return;
 
         res.status(err.status).json({
             error: {
