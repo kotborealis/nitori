@@ -48,8 +48,8 @@ module.exports = async (config) => {
         }
     }));
 
-    app.get("/task_list/", async function(req, res) {
-        debug("Task list");
+    app.get("/task/", async function(req, res) {
+        debug("/task/");
         const tests = await glob(config.testing.dir + '/**/*');
         res.json({
             data:
@@ -57,7 +57,7 @@ module.exports = async (config) => {
         });
     });
 
-    app.get('/task_source/:filename', function(req, res) {
+    app.get('/task/:filename', function(req, res) {
         const file = path.join(config.testing.dir, req.params.filename);
 
         if(!fs.existsSync(file)){
@@ -69,8 +69,8 @@ module.exports = async (config) => {
         fs.createReadStream(file).pipe(res);
     });
 
-    app.get("/test_target/sse/:id", sse_req_handler(1000, 1000), async function(req, res, next) {
-        debug("/test_target/sse/:id");
+    app.get("/test/:id", sse_req_handler(1000, 1000), async function(req, res, next) {
+        debug("/test/:id");
 
         const {id} = req.params;
 
@@ -92,8 +92,8 @@ module.exports = async (config) => {
         });
     });
 
-    app.post("/test_target/", sourceFilesHandler, async function(req, res, next) {
-        debug("/test_target/");
+    app.post("/test/", sourceFilesHandler, async function(req, res, next) {
+        debug("/test/");
         if(!req.sourceFiles){
             const err = new Error("No source files specified");
             err.reason = "no source files";

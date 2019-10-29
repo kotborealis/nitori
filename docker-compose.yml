@@ -10,6 +10,10 @@ services:
       - --config=./.config.docker.js
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - database
+    depends_on:
+      - database
   frontend:
     build:
       context: ./frontend/
@@ -20,3 +24,9 @@ services:
       - "8080:80"
     links:
       - backend
+    depends_on:
+      - backend
+  database:
+    image: couchdb:latest
+    volumes:
+      - database:/opt/couchdb/data

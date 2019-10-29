@@ -10,7 +10,7 @@ import TestingProgressbar from '../TestingProgressbar/TestingProgressbar';
 
 const App = () => {
     const [userData, userDataLoading, userDataStatus] = useFetch("/auth/user_data.php");
-    const [tasksList, taskListLoading] = useFetch(API_URL + "/task_list/");
+    const [tasksList, taskListLoading] = useFetch(API_URL + "/task/");
 
     const [outputState, setOutputState] = useState(TestOutputDefaultState());
     const [outputStateLoading, setOutputStateLoading] = useState(false);
@@ -23,7 +23,7 @@ const App = () => {
         const formData = new FormData(event.target);
 
         setOutputStateLoading(true);
-        const res = await fetch(API_URL + "/test_target/", {
+        const res = await fetch(API_URL + "/test/", {
             method: "POST",
             body: formData
         });
@@ -32,7 +32,7 @@ const App = () => {
 
         if(data && data.taskId){
             let state = TestOutputDefaultState();
-            const sse = new EventSource(API_URL + "/test_target/sse/" + data.taskId);
+            const sse = new EventSource(API_URL + "/test/" + data.taskId);
             const reduceState = ({data}) => {
                 const {data: newState} = JSON.parse(data);
                 state = {...state, ...newState};
