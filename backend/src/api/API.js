@@ -15,6 +15,7 @@ const fileUpload = require('express-fileupload');
 
 const Nano = require('nano');
 const db_utils = require('../database/utils');
+const {precompile} = require('../precompile/precompile');
 
 const {Docker} = require('node-docker-api');
 
@@ -83,7 +84,7 @@ module.exports = async (config) => {
             content_type: file.content_type
         }], id);
 
-        // precompile
+        await precompile(config, id);
 
         res.status(200).end();
     });
