@@ -157,9 +157,9 @@ module.exports = (env = {prod: false}) => {
             openPage: '',
             overlay: true,
             proxy: {
-                '/nitori_api': {
+                '/api/v1': {
                     target: 'http://127.0.0.1:3000',
-                    pathRewrite: {'^/nitori_api' : ''}
+                    pathRewrite: {'^/api/v1' : ''}
                 },
                 ...mockApi
             },
