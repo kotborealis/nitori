@@ -43,8 +43,8 @@ class Compiler {
         debug("creating tarball");
 
         const tarball = tar.pack();
-        source_files.forEach(({name, data}) => {
-            tarball.entry({name: `${working_dir}/${name}`}, data);
+        source_files.forEach(({name, content}) => {
+            tarball.entry({name: `${working_dir}/${name}`}, content);
         });
         tarball.finalize();
 

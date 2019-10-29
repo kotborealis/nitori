@@ -93,7 +93,11 @@ module.exports = async (config) => {
                 name,
                 wid,
                 description
-            }, [file], _id);
+            }, [{
+                name: file.name,
+                data: file.content,
+                content_type: file.content_type
+            }], _id);
         }
         catch(e){
             debug(e);

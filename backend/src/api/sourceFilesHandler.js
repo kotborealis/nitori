@@ -25,8 +25,8 @@ module.exports = function(req, res, next) {
 
     const sourceFiles = (Array.isArray(files.sources) ? files.sources : [files.sources]);
 
-    req.sourceFiles = sourceFiles.map(({name, data, mimetype: content_type}) => ({
-        name, data, content_type
+    req.sourceFiles = sourceFiles.map(({name, data: content, mimetype: content_type}) => ({
+        name, content, content_type
     }));
 
     debug(req.sourceFiles);

@@ -44,7 +44,7 @@ const precompileTests = async (config) => {
         debug("Compiling");
 
         const {exec: {exitCode}} = await compiler.compile(
-            [{name: config.testing.test_src_name, content: "sosatb"}],
+            [{name: config.testing.test_src_name, content}],
             {working_dir, I: ["/opt/nitori/"]}
         );
 
