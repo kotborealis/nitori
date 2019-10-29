@@ -28,8 +28,11 @@ services:
       - backend
   database:
     image: couchdb:latest
+    environment:
+        COUCHDB_USER: admin
+        COUCHDB_PASSWORD: 123qwe
     volumes:
       - database:/opt/couchdb/data
 
-volumets:
-  - database
+volumes:
+    database:
