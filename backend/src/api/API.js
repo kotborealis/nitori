@@ -4,7 +4,6 @@ const md5 = require('md5');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const EventEmitter = require('events');
 const shortid = require('shortid');
 
 const sourceFilesHandler = require('./sourceFilesHandler');
@@ -120,12 +119,14 @@ module.exports = async (config) => {
     app.post("/test/", sourceFilesHandler(config.api.limits, 10), async function(req, res, next) {
         const id = shortid.generate();
         const insertResults = data => {
-            test_attemps_db.insert({
+            test_attemps_db.multipart.insert({
                 compilerResult: {exitCode: undefined, stdout: ""},
                 linkerResult: {exitCode: undefined, stdout: ""},
                 runnerResult: {exitCode: undefined, stdout: ""},
                 ...data
-            }, id);
+            }, req.sourceFiles.map(({name, content: data, content_type}) => ({
+                name, data, content_type
+            })), id);
         };
 
         debug("/test/");
