@@ -113,13 +113,30 @@ module.exports = async (config) => {
         }
 
         const data = await test_attemps_db.get(id);
+        data.sourceFiles = await db_utils.getAllAttachments(test_attemps_db, id);
         res.json({data});
     });
 
     app.post("/test/", sourceFilesHandler(config.api.limits, 10), async function(req, res, next) {
+        debug("/test/");
+        const {test_id} = req.body;
         const id = shortid.generate();
-        const insertResults = data => {
+
+        const sendResult = data =>
+            res.json({data: {
+                id,
+                sourceFiles: req.sourceFiles.map(({name, content}) => ({
+                    name, data: content.toString()
+                })),
+                compilerResult: {exitCode: undefined, stdout: ""},
+                linkerResult: {exitCode: undefined, stdout: ""},
+                runnerResult: {exitCode: undefined, stdout: ""},
+                ...data
+            }});
+
+        const insertResults = data =>
             test_attemps_db.multipart.insert({
+                test_id,
                 compilerResult: {exitCode: undefined, stdout: ""},
                 linkerResult: {exitCode: undefined, stdout: ""},
                 runnerResult: {exitCode: undefined, stdout: ""},
@@ -127,11 +144,6 @@ module.exports = async (config) => {
             }, req.sourceFiles.map(({name, content: data, content_type}) => ({
                 name, data, content_type
             })), id);
-        };
-
-        debug("/test/");
-
-        const {test_id} = req.body;
 
         if(!await db_utils.exists(tasks_db, test_id)){
             const err = new Error("Selected test does not exists");
@@ -150,8 +162,8 @@ module.exports = async (config) => {
         const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(req.sourceFiles, {working_dir});
 
         if(compilerResult.exitCode){
-            res.json({data: {id, compilerResult}});
-            await insertResults({test_id, compilerResult});
+            sendResult({compilerResult});
+            await insertResults({compilerResult});
             await sandbox.stop();
             return;
         }
@@ -174,8 +186,8 @@ module.exports = async (config) => {
         );
 
         if(linkerResult.exitCode !== 0){
-            res.json({data: {id, compilerResult, linkerResult}});
-            await insertResults({test_id, compilerResult, linkerResult});
+            sendResult({compilerResult, linkerResult});
+            await insertResults({compilerResult, linkerResult});
             await sandbox.stop();
             return;
         }
@@ -184,8 +196,8 @@ module.exports = async (config) => {
             timeout: config.timeout.run
         });
 
-        res.json({data: {id, compilerResult, linkerResult, runnerResult}});
-        await insertResults({test_id, compilerResult, linkerResult, runnerResult});
+        sendResult({compilerResult, linkerResult, runnerResult});
+        await insertResults({compilerResult, linkerResult, runnerResult});
 
         await sandbox.stop();
     });

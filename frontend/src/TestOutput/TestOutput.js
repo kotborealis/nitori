@@ -4,6 +4,7 @@ import React, {useEffect, useState} from 'react';
 import {TestOutputDefaultState} from '../utils/TestOutputDefaultState';
 
 export const TestOutput = ({
+                               sourceFiles = [],
                                compilerResult = {},
                                linkerResult = {},
                                runnerResult = {}
@@ -34,6 +35,12 @@ export const TestOutput = ({
 
     return (<div>
         <Tabs activeKey={tab} onSelect={setTab}>
+            <Tab title={"Исходный код"} eventKey={"sourceFiles"}>
+                {sourceFiles.map(({name, data}) => <div>
+                    <b>{name}</b>
+                    <pre>{data}</pre>
+                </div>)}
+            </Tab>
             <Tab title={"Компиляция"} eventKey={"compilation"}>
                 <AnsiRenderer {...compilerResult} title={"Результат компиляции:"}/>
             </Tab>

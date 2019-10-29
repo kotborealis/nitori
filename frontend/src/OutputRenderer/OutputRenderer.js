@@ -17,7 +17,7 @@ export default ({exitCode, title="", stdout=""}) => {
                 stdout.replace(/\r/g, '')
             }</Ansi>
         </pre>);
-    };
+    }
 
     return (<div className="output-renderer">
         <Alert variant={exitCodeToAlertVariant(exitCode)} className={style.title}>
