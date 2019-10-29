@@ -1,9 +1,7 @@
 require('debug').enable("nitori*");
 const debug = require('debug')('nitori:precompileTests');
 
-const {fs} = require('./utils/async-fs');
-const glob = require('./utils/async-glob');
-const path = require('path');
+const db_utils = require('./database/utils');
 
 const md5 = require('md5');
 
@@ -13,6 +11,10 @@ const {ObjectCache} = require('./ObjectCache');
 const {Compiler} = require('./gnu_utils');
 
 const precompileTests = async (config) => {
+    debug("Start test precompilation");
+
+    const tasks_db = require('nano')(config.database).use("tasks");
+
     const working_dir = config.sandbox.working_dir;
 
     const docker = new Docker(config.docker);
@@ -22,24 +24,31 @@ const precompileTests = async (config) => {
 
     const compiler = new Compiler(sandbox, config.timeout.precompilation);
 
-    const tests = await glob(path.join(config.testing.dir, '/**/*'));
+    const {rows} = await tasks_db.view("task", "by_wid");
+    const tests = rows.map(({value: {_id}}) => _id);
 
     for await (const test of tests) {
         debug("Precompile test", test);
 
-        const content = await fs.readFile(test);
+        const content = await db_utils.getFirstAttachment(tasks_db, test);
 
         const cache_key = md5(content);
+
+        debug("cache key", cache_key);
 
         if(objectCache.has(cache_key)){
             debug(`Test ${test} already precompiled, skipping...`);
             continue;
         }
 
+        debug("Compiling");
+
         const {exec: {exitCode}} = await compiler.compile(
-            [{name: config.testing.test_src_name, content}],
+            [{name: config.testing.test_src_name, content: "sosatb"}],
             {working_dir, I: ["/opt/nitori/"]}
         );
+
+        debug("Compiled");
 
         if(exitCode){
             debug("Failed to precompile test", test);

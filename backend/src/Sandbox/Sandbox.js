@@ -121,6 +121,7 @@ class Sandbox {
      * @returns {Promise<Object>}
      */
     async fs_put(tarball, path = '/') {
+        debug("fs put", path);
         return this.container.fs.put(tarball, {path});
     }
 

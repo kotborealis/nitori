@@ -1,4 +1,5 @@
 const tar = require('tar-stream');
+const debug = require('debug')('nitori:gnu_utils:compiler');
 
 class Compiler {
     sandbox;
@@ -39,13 +40,19 @@ class Compiler {
         const obj_file_names = cpp_file_names
             .map((name) => name.slice(0, name.lastIndexOf(".")) + ".o");
 
+        debug("creating tarball");
+
         const tarball = tar.pack();
         source_files.forEach(({name, data}) => {
             tarball.entry({name: `${working_dir}/${name}`}, data);
         });
         tarball.finalize();
 
+        debug("created tarball");
+
         await sandbox.fs_put(tarball);
+
+        debug("uploaded tarball");
 
         const res = await sandbox.exec([
             this.compiler_name,

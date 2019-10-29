@@ -5,9 +5,10 @@ const databases = require('./db');
 const db_views = require('./db_views');
 
 module.exports = async ({database}) => {
+    debug("Initializing couchdb");
+
     const nano = Nano(database);
 
-    debug("Initializing couchdb");
     debug("Creating databases");
 
     for await (let database of databases) {

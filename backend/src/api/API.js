@@ -1,5 +1,4 @@
 const fs = require('fs');
-const glob = require('../utils/async-glob');
 const path = require('path');
 const md5 = require('md5');
 const cors = require('cors');
@@ -13,9 +12,9 @@ const sourceFilesHandler = require('./sourceFilesHandler');
 const debug = require('debug')('nitori:api');
 const express = require('express');
 const fileUpload = require('express-fileupload');
-const {precompileTests} = require('../precompileTests');
 
 const Nano = require('nano');
+const db_utils = require('../database/utils');
 
 const {Docker} = require('node-docker-api');
 
@@ -31,8 +30,6 @@ module.exports = async (config) => {
 
     const tasksEvents = new EventEmitter;
     const tasks = new Set;
-
-    await precompileTests(config);
 
     const port = config.api.port;
     const working_dir = config.sandbox.working_dir;
@@ -74,8 +71,8 @@ module.exports = async (config) => {
         const {name, description = "", wid} = req.body;
 
         const {rows: [row]} = await tasks_db.view("task", "by_wid_and_name", {
-            'key': [wid, name],
-            'include_docs': true
+            key: [wid, name],
+            include_docs: true
         });
 
         let _rev = undefined;
@@ -106,17 +103,14 @@ module.exports = async (config) => {
         res.status(200).end();
     });
 
-    app.get("/task/", async function(req, res) {
+    app.get("/task/:wid", async function(req, res) {
         debug("/task/");
 
-        //const tests = await glob(config.testing.dir + '/**/*');
-        //res.json({
-        //    data:
-        //        tests.map(i => path.basename(i)) // FIXME
-        //});
+        const {rows} = await tasks_db.view("task", "by_wid", {key: req.params.wid});
+        res.json({data: rows.map(({value}) => value)});
     });
 
-    app.get('/task/:filename', function(req, res) {
+    app.get('/task/content/:id', function(req, res) {
         const file = path.join(config.testing.dir, req.params.filename);
 
         if(!fs.existsSync(file)){
@@ -167,7 +161,7 @@ module.exports = async (config) => {
         res.json({data: {taskId: res.task_id}});
 
         const {test_id} = req.body;
-        const test_source = fs.readFileSync(path.join(config.testing.dir, test_id));
+        const test_source = await db_utils.getFirstAttachment(tasks_db, test_id);
         const cache_key = md5(test_source);
 
         const sandbox = new Sandbox(docker, config);

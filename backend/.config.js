@@ -27,7 +27,6 @@ module.exports = {
         working_dir: "/sandbox/"
     },
     testing: {
-        dir: "./data/tests/",
         libs: "/opt/testing_libs",
         hijack_main: "__NITORI_HIJACK_MAIN__",
         test_src_name: "__nitori_test.cpp",

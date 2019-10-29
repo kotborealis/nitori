@@ -10,7 +10,7 @@ import TestingProgressbar from '../TestingProgressbar/TestingProgressbar';
 
 const App = () => {
     const [userData, userDataLoading, userDataStatus] = useFetch("/auth/user_data.php");
-    const [tasksList, taskListLoading] = useFetch(API_URL + "/task/");
+    const [tasksList, taskListLoading] = useFetch(API_URL + "/task/0");
 
     const [outputState, setOutputState] = useState(TestOutputDefaultState());
     const [outputStateLoading, setOutputStateLoading] = useState(false);

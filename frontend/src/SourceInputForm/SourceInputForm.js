@@ -28,7 +28,7 @@ export const SourceInput = ({onSubmit = () => 0, disabled = false, tasksList = [
                     onChange={({target: {value: task}}) => setFormState({...formState, task})}
                 >
                     <option/>
-                    {tasksList.data ? tasksList.data.map(i => <option value={i} key={i}>{i}</option>) : null}
+                    {tasksList.data ? tasksList.data.map(({name, _id}) => <option value={_id} key={_id}>{name}</option>) : null}
                 </Form.Control>
             </Form.Group>
         </Form.Row>
