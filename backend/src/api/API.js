@@ -26,6 +26,7 @@ const {Compiler, Objcopy} = require('../gnu_utils');
 module.exports = async (config) => {
     const nano = Nano(config.database);
     const tasks_db = nano.use('tasks');
+    const test_attemps_db = nano.use('test_attempts');
 
     const port = config.api.port;
     const working_dir = config.sandbox.working_dir;
@@ -103,14 +104,37 @@ module.exports = async (config) => {
         fs.createReadStream(file).pipe(res);
     });
 
+    app.get("/test/:id", async function(req, res, next) {
+        const {id} = req.params;
+        if(!await db_utils.exists(test_attemps_db, id)){
+            const err = new Error("Specified test attempt does not exists");
+            err.status = 404;
+            next(err);
+            return;
+        }
+
+        const data = await test_attemps_db.get(id);
+        res.json({data});
+    });
+
     app.post("/test/", sourceFilesHandler(config.api.limits, 10), async function(req, res, next) {
+        const id = shortid.generate();
+        const insertResults = data => {
+            test_attemps_db.insert({
+                compilerResult: {exitCode: undefined, stdout: ""},
+                linkerResult: {exitCode: undefined, stdout: ""},
+                runnerResult: {exitCode: undefined, stdout: ""},
+                ...data
+            }, id);
+        };
+
         debug("/test/");
 
         const {test_id} = req.body;
 
         if(!await db_utils.exists(tasks_db, test_id)){
             const err = new Error("Selected test does not exists");
-            err.status = 400;
+            err.status = 404;
             next(err);
             return;
         }
@@ -125,7 +149,8 @@ module.exports = async (config) => {
         const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(req.sourceFiles, {working_dir});
 
         if(compilerResult.exitCode){
-            res.json({data: {compilerResult}});
+            res.json({data: {id, compilerResult}});
+            await insertResults({test_id, compilerResult});
             await sandbox.stop();
             return;
         }
@@ -148,7 +173,8 @@ module.exports = async (config) => {
         );
 
         if(linkerResult.exitCode !== 0){
-            res.json({data: {compilerResult, linkerResult}});
+            res.json({data: {id, compilerResult, linkerResult}});
+            await insertResults({test_id, compilerResult, linkerResult});
             await sandbox.stop();
             return;
         }
@@ -157,7 +183,8 @@ module.exports = async (config) => {
             timeout: config.timeout.run
         });
 
-        res.json({data: {compilerResult, linkerResult, runnerResult}});
+        res.json({data: {id, compilerResult, linkerResult, runnerResult}});
+        await insertResults({test_id, compilerResult, linkerResult, runnerResult});
 
         await sandbox.stop();
     });

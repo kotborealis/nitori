@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Col, Container, Row, ProgressBar} from 'react-bootstrap';
 import {SourceInput} from '../SourceInputForm/SourceInputForm';
 import {TestOutput} from '../TestOutput/TestOutput';
@@ -14,6 +14,27 @@ const App = () => {
 
     const [outputState, setOutputState] = useState(TestOutputDefaultState());
     const [outputStateLoading, setOutputStateLoading] = useState(false);
+
+    useEffect(() => {
+        const hash = window.location.hash.slice(1);
+        if(hash){
+            (async () => {
+                const res = await fetch(API_URL + "/test/" + hash);
+                const {data, error} = await res.json();
+                if(error){
+                    alert(JSON.stringify(error));
+                    setOutputStateLoading(false);
+                }
+                else{
+                    setOutputState({
+                        ...TestOutputDefaultState(),
+                        ...data
+                    });
+                    setOutputStateLoading(false);
+                }
+            })();
+        }
+    }, []);
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -40,6 +61,9 @@ const App = () => {
                 ...data
             });
             setOutputStateLoading(false);
+
+            const {id} = data;
+            window.location.hash = id;
         }
     };
 
