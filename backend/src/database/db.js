@@ -1,1 +1,1 @@
-module.exports = ['tasks'];
+module.exports = ['tasks', 'test_attempts'];

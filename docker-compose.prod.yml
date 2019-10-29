@@ -13,5 +13,3 @@ services:
         PUBLIC_PATH: /testcpp/
     ports:
       - "3050:80"
-  database:
-    ports:
