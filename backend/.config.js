@@ -40,5 +40,8 @@ module.exports = {
         compilation: 1000 * 60,
         precompilation: 0,
         run: 1000 * 10
+    },
+    database: {
+        url: 'http://admin:123qwe@localhost:5984'
     }
 };

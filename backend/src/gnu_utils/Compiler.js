@@ -40,8 +40,8 @@ class Compiler {
             .map((name) => name.slice(0, name.lastIndexOf(".")) + ".o");
 
         const tarball = tar.pack();
-        source_files.forEach(({name, content}) => {
-            tarball.entry({name: `${working_dir}/${name}`}, content);
+        source_files.forEach(({name, data}) => {
+            tarball.entry({name: `${working_dir}/${name}`}, data);
         });
         tarball.finalize();
 

@@ -15,6 +15,8 @@ const express = require('express');
 const fileUpload = require('express-fileupload');
 const {precompileTests} = require('../precompileTests');
 
+const Nano = require('nano');
+
 const {Docker} = require('node-docker-api');
 
 const {Sandbox} = require('../Sandbox');
@@ -24,6 +26,9 @@ const {Compiler, Objcopy} = require('../gnu_utils');
 const {sse_req_handler, sse_err_handler} = require('../sse/SSE');
 
 module.exports = async (config) => {
+    const nano = Nano(config.database);
+    const tasks_db = nano.use('tasks');
+
     const tasksEvents = new EventEmitter;
     const tasks = new Set;
 
@@ -48,6 +53,59 @@ module.exports = async (config) => {
         }
     }));
 
+    app.post("/task/", sourceFilesHandler, async function(req, res) {
+        if(!req.sourceFiles){
+            const err = new Error("No source files specified");
+            err.reason = "no source files";
+            err.status = 400;
+            next(err);
+            return;
+        }
+
+        if(req.sourceFiles.length !== 1) {
+            const err = new Error("Only one source file must be specified");
+            err.reason = "Only one source file must be specified";
+            err.status = 400;
+            next(err);
+            return;
+        }
+
+        const file = req.sourceFiles[0];
+        const {name, description = "", wid} = req.body;
+
+        const {docs: [doc]} = await tasks_db.find({
+            selector: {name, wid},
+            fields: ["_rev", "_id"]
+        });
+
+        let _rev = undefined;
+        let _id = shortid.generate();
+
+        if(doc){
+            debug("Updating existing doc", doc);
+            _rev = doc._rev;
+            _id = doc._id;
+        }
+        else{
+            debug("Inserting new doc");
+        }
+
+        try{
+            await tasks_db.multipart.insert({
+                _rev,
+                name,
+                wid,
+                description
+            }, [file], _id);
+        }
+        catch(e){
+            debug(e);
+            res.status(500).end();
+        }
+
+        res.status(200).end();
+    });
+
     app.get("/task/", async function(req, res) {
         debug("/task/");
         const tests = await glob(config.testing.dir + '/**/*');
@@ -69,7 +127,7 @@ module.exports = async (config) => {
         fs.createReadStream(file).pipe(res);
     });
 
-    app.get("/test/:id", sse_req_handler(1000, 1000), async function(req, res, next) {
+    app.get("/test/:id", sse_req_handler(5000, 5000), async function(req, res, next) {
         debug("/test/:id");
 
         const {id} = req.params;
