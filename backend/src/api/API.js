@@ -73,18 +73,18 @@ module.exports = async (config) => {
         const file = req.sourceFiles[0];
         const {name, description = "", wid} = req.body;
 
-        const {docs: [doc]} = await tasks_db.find({
-            selector: {name, wid},
-            fields: ["_rev", "_id"]
+        const {rows: [row]} = await tasks_db.view("task", "by_wid_and_name", {
+            'key': [wid, name],
+            'include_docs': true
         });
 
         let _rev = undefined;
         let _id = shortid.generate();
 
-        if(doc){
-            debug("Updating existing doc", doc);
-            _rev = doc._rev;
-            _id = doc._id;
+        if(row){
+            debug("Updating existing doc", row.doc);
+            _rev = row.doc._rev;
+            _id = row.doc._id;
         }
         else{
             debug("Inserting new doc");
@@ -108,11 +108,12 @@ module.exports = async (config) => {
 
     app.get("/task/", async function(req, res) {
         debug("/task/");
-        const tests = await glob(config.testing.dir + '/**/*');
-        res.json({
-            data:
-                tests.map(i => path.basename(i)) // FIXME
-        });
+
+        //const tests = await glob(config.testing.dir + '/**/*');
+        //res.json({
+        //    data:
+        //        tests.map(i => path.basename(i)) // FIXME
+        //});
     });
 
     app.get('/task/:filename', function(req, res) {
