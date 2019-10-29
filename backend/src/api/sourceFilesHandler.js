@@ -23,6 +23,14 @@ module.exports = (limits, maxFiles = 0) => function(req, res, next) {
         return;
     }
 
+    if(!files["sources"]){
+        const err = new Error(`Expected files in "sources"`);
+        err.reason = 'Expected files in "sources"';
+        err.status = 400;
+        next(err);
+        return;
+    }
+
     const sourceFiles = (Array.isArray(files["sources"]) ? files["sources"] : [files["sources"]]);
 
     req.sourceFiles = sourceFiles.map(({name, data: content, mimetype: content_type}) => ({

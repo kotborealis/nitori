@@ -3,14 +3,14 @@ import {Col, Container, Row, ProgressBar} from 'react-bootstrap';
 import {SourceInput} from '../SourceInputForm/SourceInputForm';
 import {TestOutput} from '../TestOutput/TestOutput';
 import styles from './App.css';
-import {API_URL} from '../config';
-import {useFetch} from '../hooks/useFetch';
+import {api, useApi} from '../api/';
 import {TestOutputDefaultState} from '../utils/TestOutputDefaultState';
 import TestingProgressbar from '../TestingProgressbar/TestingProgressbar';
+import {useFetch} from '../hooks/useFetch';
 
 const App = () => {
     const [userData, userDataLoading, userDataStatus] = useFetch("/auth/user_data.php");
-    const [tasksList, taskListLoading] = useFetch(API_URL + "/task/0");
+    const [tasksList, taskListLoading] = useApi(["task", "0"]);
 
     const [outputState, setOutputState] = useState(TestOutputDefaultState());
     const [outputStateLoading, setOutputStateLoading] = useState(false);
@@ -19,7 +19,7 @@ const App = () => {
         const hash = window.location.hash.slice(1);
         if(hash){
             (async () => {
-                const res = await fetch(API_URL + "/test/" + hash);
+                const res = await api(["test", hash]);
                 const {data, error} = await res.json();
                 if(error){
                     alert(JSON.stringify(error));
@@ -44,7 +44,7 @@ const App = () => {
         const formData = new FormData(event.target);
 
         setOutputStateLoading(true);
-        const res = await fetch(API_URL + "/test/", {
+        const res = await api("test", {
             method: "POST",
             body: formData
         });

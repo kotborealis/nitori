@@ -191,7 +191,7 @@ module.exports = async (config) => {
 
     //noinspection JSUnusedLocalSymbols
     app.use(function(err, req, res, next) {
-        debug("Error handler: ", err.message);
+        debug("Error handler: ", err);
 
         res.status(err.status).json({
             error: {
