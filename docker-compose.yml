@@ -30,3 +30,5 @@ services:
     image: couchdb:latest
     volumes:
       - database:/opt/couchdb/data
+    ports:
+      - "5984:5984"

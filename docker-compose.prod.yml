@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  backend:
+    entrypoint:
+      - node
+      - src/index
+      - --api
+      - --config=./.config.prod.js
+  frontend:
+    build:
+      args:
+        PUBLIC_PATH: /testcpp/
+    ports:
+      - "3050:80"
+  database:
+    ports:
