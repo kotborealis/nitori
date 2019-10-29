@@ -50,7 +50,7 @@ module.exports = async (config) => {
         }
     }));
 
-    app.post("/task/", sourceFilesHandler, async function(req, res) {
+    app.post("/task/", sourceFilesHandler(config.api.limits, 1), async function(req, res) {
         if(!req.sourceFiles){
             const err = new Error("No source files specified");
             err.reason = "no source files";
@@ -59,7 +59,7 @@ module.exports = async (config) => {
             return;
         }
 
-        if(req.sourceFiles.length !== 1) {
+        if(req.sourceFiles.length !== 1){
             const err = new Error("Only one source file must be specified");
             err.reason = "Only one source file must be specified";
             err.status = 400;
@@ -75,34 +75,15 @@ module.exports = async (config) => {
             include_docs: true
         });
 
-        let _rev = undefined;
-        let _id = shortid.generate();
+        let id = row ? row.doc._id : shortid.generate();
 
-        if(row){
-            debug("Updating existing doc", row.doc);
-            _rev = row.doc._rev;
-            _id = row.doc._id;
-        }
-        else{
-            debug("Inserting new doc");
-        }
+        db_utils.multipartUpdate(tasks_db, {name, wid, description}, [{
+            name: file.name,
+            data: file.content,
+            content_type: file.content_type
+        }], id);
 
-        try{
-            await tasks_db.multipart.insert({
-                _rev,
-                name,
-                wid,
-                description
-            }, [{
-                name: file.name,
-                data: file.content,
-                content_type: file.content_type
-            }], _id);
-        }
-        catch(e){
-            debug(e);
-            res.status(500).end();
-        }
+        // precompile
 
         res.status(200).end();
     });
@@ -131,7 +112,7 @@ module.exports = async (config) => {
 
         const {id} = req.params;
 
-        if(!tasks.has(id)) {
+        if(!tasks.has(id)){
             const err = new Error("No such task");
             err.reason = "No such task";
             err.status = 400;
@@ -142,18 +123,20 @@ module.exports = async (config) => {
         tasksEvents.on(id, ({event, data, error}) => {
             res.sse.emit(event, {data, error});
 
-            if(event === 'stop') {
+            if(event === 'stop'){
                 tasksEvents.removeAllListeners(id);
                 res.sse.end();
             }
         });
     });
 
-    app.post("/test/", sourceFilesHandler, async function(req, res, next) {
+    app.post("/test/", sourceFilesHandler(config.api.limits, 10), async function(req, res, next) {
         debug("/test/");
-        if(!req.sourceFiles){
-            const err = new Error("No source files specified");
-            err.reason = "no source files";
+
+        const {test_id} = req.body;
+
+        if(!await db_utils.exists(tasks_db, test_id)){
+            const err = new Error("Selected test does not exists");
             err.status = 400;
             next(err);
             return;
@@ -164,7 +147,6 @@ module.exports = async (config) => {
 
         res.json({data: {taskId: res.task_id}});
 
-        const {test_id} = req.body;
         const test_source = await db_utils.getFirstAttachment(tasks_db, test_id);
         const cache_key = md5(test_source);
 
@@ -190,7 +172,7 @@ module.exports = async (config) => {
         await objcopy.redefine_sym(targetBinaries, "main", config.testing.hijack_main, {working_dir});
 
         if(!objectCache.has(cache_key)){
-            const err = new Error("Failed to fetch test binary from cache; please run --precompile");
+            const err = new Error("Failed to fetch test binary from cache; please run --precompile_all");
             err.status = 500;
             next(err);
             tasks.delete(res.task_id);
@@ -271,7 +253,7 @@ module.exports = async (config) => {
 
     process.on('SIGINT', async () => {
         server.close();
-        try {
+        try{
             await Sandbox.destroy_all(docker);
             process.exit(0);
         }
