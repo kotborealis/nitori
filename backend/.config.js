@@ -41,7 +41,8 @@ module.exports = {
         run: 1000 * 10
     },
     database: {
-        url: 'http://admin:123qwe@localhost:5984'
+        url: 'http://admin:123qwe@localhost:5984',
+        name: 'nitori'
     },
     auth: {
         url: 'http://127.0.0.1:8080/auth/user_data.php'

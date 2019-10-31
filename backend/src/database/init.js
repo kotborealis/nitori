@@ -1,53 +1,64 @@
 const debug = require('debug')('nitori:database:init');
+const path = require('path');
 const Nano = require('nano');
-
-const databases = require('./db');
-const db_views = require('./db_views');
+const glob = require('glob');
 
 module.exports = async ({database}) => {
     debug("Initializing couchdb");
 
     const nano = Nano(database);
 
-    debug("Creating databases");
+    debug("Creating database");
 
-    for await (let database of databases) {
-        debug("Creating db", database);
-
-        try{
-            await nano.db.create(database);
-            debug("Created db", database);
+    try{
+        await nano.db.create(database.name);
+        debug("Created db", database.name);
+    }
+    catch(err){
+        const {statusCode} = err;
+        if(statusCode === 412){
+            debug("Database already exists, continuing");
         }
-        catch(err){
-            const {statusCode} = err;
-            if(statusCode === 412) {
-                debug("Database already exists, continuing");
-            }
-            else{
-                debug("Error while creating db", err);
-            }
+        else{
+            debug("Error while creating db", err);
         }
     }
 
-    debug("Creating/updating views");
+    const db = nano.db.use(database.name);
 
-    for (let database in db_views) {
-        debug("Creating views for db", database);
+    debug("Creating designs and views");
 
-        const db = nano.use(database);
-        const views = db_views[database];
-        for await (let view of views) {
-            try{
-                const {etag} = await db.head(view._id);
-                debug("Update view");
-                await db.insert({
-                    ...view,
-                    _rev: JSON.parse(etag)
-                }, view._id);
-            }
-            catch(e){
-                await db.insert(view, view._id);
-            }
+    const designPaths = glob.sync('./src/database/designs/*');
+
+    for(let designPath of designPaths){
+        const designName = path.basename(designPath, '');
+
+        debug("Processing design", designName);
+
+        const views = {};
+
+        const viewPaths = glob.sync(`./src/database/designs/${designName}/*.js`);
+
+        for(let viewPath of viewPaths){
+            const view = path.basename(viewPath, '.js');
+            debug("Processing view", view);
+            views[view] = require(`./designs/${designName}/${view}.js`);
+        }
+
+        const design = {
+            _id: `_design/${designName}`,
+            views
+        };
+
+        try{
+            const {etag} = await db.head(design._id);
+            await db.insert({
+                ...design,
+                _rev: JSON.parse(etag)
+            }, design._id);
+        }
+        catch(e){
+            await db.insert(design, design._id);
         }
     }
 };

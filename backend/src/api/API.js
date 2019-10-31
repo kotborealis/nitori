@@ -14,7 +14,6 @@ const debug = require('debug')('nitori:api');
 const express = require('express');
 const fileUpload = require('express-fileupload');
 
-const Nano = require('nano');
 const db_utils = require('../database/utils');
 const {precompile} = require('../precompile/precompile');
 
@@ -26,9 +25,7 @@ const {Compiler, Objcopy} = require('../gnu_utils');
 
 module.exports = async (config) => {
     const auth = require('../auth')(config.auth);
-    const nano = Nano(config.database);
-    const tasks_db = nano.use('tasks');
-    const test_attemps_db = nano.use('test_attempts');
+    const db = require('nano')(config.database).use(config.database.name);
 
     const port = config.api.port;
     const working_dir = config.sandbox.working_dir;
@@ -71,14 +68,19 @@ module.exports = async (config) => {
         const file = req.sourceFiles[0];
         const {name, description = "", wid} = req.body;
 
-        const {rows: [row]} = await tasks_db.view("task", "by_wid_and_name", {
+        const {rows: [row]} = await db.view("task", "by_wid_and_name", {
             key: [wid, name],
             include_docs: true
         });
 
         let id = row ? row.doc._id : shortid.generate();
 
-        db_utils.multipartUpdate(tasks_db, {name, wid, description}, [{
+        db_utils.multipartUpdate(db, {
+            type: "task",
+            name,
+            wid,
+            description
+        }, [{
             name: file.name,
             data: file.content,
             content_type: file.content_type
@@ -92,33 +94,27 @@ module.exports = async (config) => {
     app.get("/task/:wid", async function(req, res) {
         debug("/task/");
 
-        const {rows} = await tasks_db.view("task", "by_wid", {key: req.params.wid});
-        res.json({data: rows.map(({value}) => value)});
-    });
-
-    app.get('/task/content/:id', function(req, res) {
-        const file = path.join(config.testing.dir, req.params.filename);
-
-        if(!fs.existsSync(file)){
-            debug("requested file does not exists", file);
-            res.status(404).end();
-            return;
-        }
-
-        fs.createReadStream(file).pipe(res);
+        const {rows} = await db.view("task", "by_wid", {
+            key: req.params.wid,
+            include_docs: true
+        });
+        res.json({data: rows.map(({doc}) => doc)});
     });
 
     app.get("/test/:id", async function(req, res, next) {
         const {id} = req.params;
-        if(!await db_utils.exists(test_attemps_db, id)){
+
+        const {rows: [test]} = await db.view('test', 'by_id', {key: id, include_docs: true});
+
+        if(!test) {
             const err = new Error("Specified test attempt does not exists");
             err.status = 404;
             next(err);
             return;
         }
 
-        const data = await test_attemps_db.get(id);
-        data.sourceFiles = await db_utils.getAllAttachments(test_attemps_db, id);
+        const data = test.doc;
+        data.sourceFiles = await db_utils.getAllAttachments(db, id);
         res.json({data});
     });
 
@@ -134,7 +130,8 @@ module.exports = async (config) => {
                 name, data, content_type
             }));
 
-            await test_attemps_db.multipart.insert({
+            await db.multipart.insert({
+                type: "test",
                 timestamp: Date.now(),
                 userData,
                 test_id,
@@ -144,7 +141,7 @@ module.exports = async (config) => {
                 ...data
             }, sources, id);
 
-            const attempt = await test_attemps_db.get(id);
+            const attempt = await db.get(id);
             attempt.sourceFiles = sources.map(file => {
                 file.data = file.data.toString();
                 return file;
@@ -152,14 +149,14 @@ module.exports = async (config) => {
             res.json({data: attempt});
         };
 
-        if(!await db_utils.exists(tasks_db, test_id)){
+        if(!await db_utils.exists(db, test_id)){
             const err = new Error("Selected test does not exists");
             err.status = 404;
             next(err);
             return;
         }
 
-        const test_source = await db_utils.getFirstAttachment(tasks_db, test_id);
+        const test_source = await db_utils.getFirstAttachment(db, test_id);
         const cache_key = md5(test_source);
 
         const sandbox = new Sandbox(docker, config);

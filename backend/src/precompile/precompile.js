@@ -13,7 +13,7 @@ const {Compiler} = require('../gnu_utils');
 const precompile = async (config, id) => {
     debug("Test precompilation for", id);
 
-    const tasks_db = require('nano')(config.database).use("tasks");
+    const db = require('nano')(config.database).use(config.database.name);
     const working_dir = config.sandbox.working_dir;
 
     const docker = new Docker(config.docker);
@@ -23,7 +23,7 @@ const precompile = async (config, id) => {
 
     const compiler = new Compiler(sandbox, config.timeout.precompilation);
 
-    const content = await db_utils.getFirstAttachment(tasks_db, id);
+    const content = await db_utils.getFirstAttachment(db, id);
 
     const cache_key = md5(content);
 
@@ -60,8 +60,8 @@ const precompile = async (config, id) => {
 const precompile_all = async (config) => {
     debug("Start tests precompilation");
 
-    const tasks_db = require('nano')(config.database).use("tasks");
-    const {rows} = await tasks_db.view("task", "by_wid");
+    const db = require('nano')(config.database).use(config.database.name);
+    const {rows} = await db.view("task", "by_wid", {include_docs: true});
     const tests = rows.map(({value: {_id}}) => _id);
 
     for await (const test of tests) await precompile(config, test);
