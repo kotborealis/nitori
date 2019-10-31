@@ -11,6 +11,7 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "chen.js": "^1.0.24",
+    "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
     "debug": "^4.1.1",
     "docker-modem": "^2.0.3",
@@ -20,6 +21,8 @@
     "md5": "^2.2.1",
     "nano": "^8.1.0",
     "node-docker-api": "^1.1.22",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7",
     "shortid": "^2.2.15",
     "tar-stream": "^2.1.0"
   }

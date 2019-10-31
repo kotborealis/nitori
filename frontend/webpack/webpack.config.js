@@ -159,7 +159,10 @@ module.exports = (env = {prod: false}) => {
             proxy: {
                 '/api/v1': {
                     target: 'http://127.0.0.1:3000',
-                    pathRewrite: {'^/api/v1' : ''}
+                    pathRewrite: {'^/api/v1' : ''},
+                    headers: {
+                        Cookie: 'PHPSESSID=qwerty'
+                    }
                 },
                 ...mockApi
             },

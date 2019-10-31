@@ -29,7 +29,7 @@ const App = () => {
                     setOutputState({
                         ...TestOutputDefaultState(),
                         ...data
-                    });
+                    });wi
                     setOutputStateLoading(false);
                 }
             })();
@@ -62,8 +62,7 @@ const App = () => {
             });
             setOutputStateLoading(false);
 
-            const {id} = data;
-            window.location.hash = id;
+            window.location.hash = data._id;
         }
     };
 

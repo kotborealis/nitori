@@ -42,5 +42,8 @@ module.exports = {
     },
     database: {
         url: 'http://admin:123qwe@localhost:5984'
+    },
+    auth: {
+        url: 'http://127.0.0.1:8080/auth/user_data.php'
     }
 };

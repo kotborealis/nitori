@@ -1,8 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const md5 = require('md5');
+
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 const shortid = require('shortid');
 
@@ -23,6 +25,7 @@ const {ObjectCache} = require('../ObjectCache');
 const {Compiler, Objcopy} = require('../gnu_utils');
 
 module.exports = async (config) => {
+    const auth = require('../auth')(config.auth);
     const nano = Nano(config.database);
     const tasks_db = nano.use('tasks');
     const test_attemps_db = nano.use('test_attempts');
@@ -39,6 +42,8 @@ module.exports = async (config) => {
 
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: true}));
+
+    app.use(cookieParser());
 
     app.use(fileUpload({
         limits: {
@@ -119,31 +124,33 @@ module.exports = async (config) => {
 
     app.post("/test/", sourceFilesHandler(config.api.limits, 10), async function(req, res, next) {
         debug("/test/");
+        const userData = await auth(req.cookies.PHPSESSID);
+
         const {test_id} = req.body;
         const id = shortid.generate();
 
-        const sendResult = data =>
-            res.json({data: {
-                id,
-                sourceFiles: req.sourceFiles.map(({name, content}) => ({
-                    name, data: content.toString()
-                })),
-                compilerResult: {exitCode: undefined, stdout: ""},
-                linkerResult: {exitCode: undefined, stdout: ""},
-                runnerResult: {exitCode: undefined, stdout: ""},
-                ...data
-            }});
+        const insertResults = async (data) => {
+            const sources = req.sourceFiles.map(({name, content: data, content_type}) => ({
+                name, data, content_type
+            }));
 
-        const insertResults = data =>
-            test_attemps_db.multipart.insert({
+            await test_attemps_db.multipart.insert({
+                timestamp: Date.now(),
+                userData,
                 test_id,
                 compilerResult: {exitCode: undefined, stdout: ""},
                 linkerResult: {exitCode: undefined, stdout: ""},
                 runnerResult: {exitCode: undefined, stdout: ""},
                 ...data
-            }, req.sourceFiles.map(({name, content: data, content_type}) => ({
-                name, data, content_type
-            })), id);
+            }, sources, id);
+
+            const attempt = await test_attemps_db.get(id);
+            attempt.sourceFiles = sources.map(file => {
+                file.data = file.data.toString();
+                return file;
+            });
+            res.json({data: attempt});
+        };
 
         if(!await db_utils.exists(tasks_db, test_id)){
             const err = new Error("Selected test does not exists");
@@ -162,7 +169,6 @@ module.exports = async (config) => {
         const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(req.sourceFiles, {working_dir});
 
         if(compilerResult.exitCode){
-            sendResult({compilerResult});
             await insertResults({compilerResult});
             await sandbox.stop();
             return;
@@ -186,7 +192,6 @@ module.exports = async (config) => {
         );
 
         if(linkerResult.exitCode !== 0){
-            sendResult({compilerResult, linkerResult});
             await insertResults({compilerResult, linkerResult});
             await sandbox.stop();
             return;
@@ -196,7 +201,6 @@ module.exports = async (config) => {
             timeout: config.timeout.run
         });
 
-        sendResult({compilerResult, linkerResult, runnerResult});
         await insertResults({compilerResult, linkerResult, runnerResult});
 
         await sandbox.stop();

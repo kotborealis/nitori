@@ -4,6 +4,8 @@ import React, {useEffect, useState} from 'react';
 import {TestOutputDefaultState} from '../utils/TestOutputDefaultState';
 
 export const TestOutput = ({
+                               userData,
+                               timestamp,
                                sourceFiles = [],
                                compilerResult = {},
                                linkerResult = {},
@@ -35,6 +37,12 @@ export const TestOutput = ({
 
     return (<div>
         <Tabs activeKey={tab} onSelect={setTab}>
+            <Tab title={"Инфо"} eventKey={"info"}>
+                {userData === null || userData === undefined ? null : <div>
+                    <div>{userData.login} ({userData.name}), группа {userData.groupName}</div>
+                    <div>{(new Date(timestamp)).toString()}</div>
+                </div>}
+            </Tab>
             <Tab title={"Исходный код"} eventKey={"sourceFiles"}>
                 {sourceFiles.map(({name, data}) => <div>
                     <b>{name}</b>
