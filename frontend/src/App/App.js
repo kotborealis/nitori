@@ -1,16 +1,17 @@
 import React, {useState, useEffect} from 'react';
-import {Col, Container, Row} from 'react-bootstrap';
+import {Alert, Col, Container, Row} from 'react-bootstrap';
 import {SourceInput} from '../SourceInputForm/SourceInputForm';
 import {TestOutput} from '../TestOutput/TestOutput';
 import styles from './App.css';
-import {api, useApi} from '../api/';
+import {api} from '../api/';
 import {TestOutputDefaultState} from '../utils/TestOutputDefaultState';
 import TestingProgressbar from '../TestingProgressbar/TestingProgressbar';
 import {useFetch} from '../hooks/useFetch';
+import {useApi} from '../hooks/useApi';
 
 const App = () => {
-    const [userData, userDataLoading, userDataStatus] = useFetch("/auth/user_data.php");
-    const [tasksList, taskListLoading] = useApi(["task", "0"]);
+    const [userData = null, userDataLoading, /* userError */, userDataStatus] = useFetch("/auth/user_data.php");
+    const [tasksList = [], taskListLoading, tasksListError] = useApi(["task", "0"]);
 
     const [outputState, setOutputState] = useState(TestOutputDefaultState());
     const [outputStateLoading, setOutputStateLoading] = useState(false);
@@ -99,22 +100,15 @@ const App = () => {
         }
     };
 
-    const userGreeter = (() => {
-        if(userDataLoading) return null;
-        if(userDataStatus === 400) return (<div>
-            Добро пожаловать. Снова.
-        </div>);
-        else return (<div>
-            Добро пожаловать, {userData.name}. Снова.
-        </div>);
-    })();
-
     return (<Container className={styles.container}>
-        <Row className={styles.row}>
+        {userData === null && !userDataLoading ? (<Row className={styles.row}>
             <Col>
-                {userGreeter}
+                <Alert variant={"danger"}>
+                    <Alert.Heading>Требуется аутентификация</Alert.Heading>
+                    <p><a href={"#login.php"}>Аутентификация</a></p>
+                </Alert>
             </Col>
-        </Row>
+        </Row>) : null}
         <Row className={styles.row}>
             <Col>
                 <SourceInput {...{onSubmit, tasksList}} disabled={outputStateLoading || taskListLoading}/>

@@ -23,7 +23,8 @@ const {ObjectCache} = require('../ObjectCache');
 const {Compiler, Objcopy} = require('../gnu_utils');
 
 module.exports = async (config) => {
-    const auth = require('../auth')(config.auth);
+    const auth = require('../auth').auth(config.auth.url);
+    const authHandler = require('../auth').middleware(config.auth.url);
     const db = require('nano')(config.database).use(config.database.name);
 
     const port = config.api.port;
@@ -47,7 +48,12 @@ module.exports = async (config) => {
         }
     }));
 
-    app.post("/task/", sourceFilesHandler(config.api.limits, 1), async function(req, res) {
+    app.use(authHandler());
+
+    app.post("/task/",
+        authHandler([({isAdmin}) => isAdmin === true]),
+        sourceFilesHandler(config.api.limits, 1),
+        async function(req, res) {
         if(!req.sourceFiles){
             const err = new Error("No source files specified");
             err.reason = "no source files";
