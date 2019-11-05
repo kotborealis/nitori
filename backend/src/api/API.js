@@ -51,7 +51,7 @@ module.exports = async (config) => {
     app.use(authHandler());
 
     app.post("/task/",
-        authHandler([({isAdmin}) => isAdmin === true]),
+        //authHandler([({isAdmin}) => isAdmin === true]),
         sourceFilesHandler(config.api.limits, 1),
         async function(req, res) {
         if(!req.sourceFiles){
