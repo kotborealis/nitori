@@ -4,7 +4,7 @@ module.exports = {
         socketPath: '/var/run/docker.sock'
     },
     database: {
-        ...require('./.config.js').database,
-        url: 'http://admin:123qwe@database:5984'
+        url: 'http://admin:123qwe@database:5984',
+        name: 'nitori'
     }
 };
