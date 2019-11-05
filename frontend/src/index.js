@@ -6,7 +6,7 @@ import SubmitTest from './views/SubmitTest/SubmitTest';
 import SubmitTask from './views/SubmitTask/SubmitTask';
 
 render(
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_PATH}>
         <Switch>
             <Route exact path="/">
                 <SubmitTest/>
