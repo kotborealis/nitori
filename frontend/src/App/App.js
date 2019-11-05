@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Col, Container, Row, ProgressBar} from 'react-bootstrap';
+import {Col, Container, Row} from 'react-bootstrap';
 import {SourceInput} from '../SourceInputForm/SourceInputForm';
 import {TestOutput} from '../TestOutput/TestOutput';
 import styles from './App.css';
@@ -15,6 +15,37 @@ const App = () => {
     const [outputState, setOutputState] = useState(TestOutputDefaultState());
     const [outputStateLoading, setOutputStateLoading] = useState(false);
 
+    const [testId, setTestId] = useState("");
+
+    useEffect(() => {
+        if(window.location.hash.length > 1){
+            const hash = window.location.hash.slice(1);
+            setTestId(hash);
+
+            (async () => {
+                const res = await api(["test", hash]);
+                const {data, error} = await res.json();
+                if(error){
+                    alert(JSON.stringify(error));
+                    setOutputStateLoading(false);
+                }
+                else{
+                    setOutputState({
+                        ...TestOutputDefaultState(),
+                        ...data
+                    });
+                    setOutputStateLoading(false);
+                }
+            })();
+        }
+    }, []);
+
+    useEffect(() => {
+        window.location.hash = testId;
+
+        return () => window.location.hash = "";
+    }, [testId]);
+
     useEffect(() => {
         const hash = window.location.hash.slice(1);
         if(hash){
@@ -29,7 +60,7 @@ const App = () => {
                     setOutputState({
                         ...TestOutputDefaultState(),
                         ...data
-                    });wi
+                    });
                     setOutputStateLoading(false);
                 }
             })();
@@ -40,6 +71,8 @@ const App = () => {
         event.preventDefault();
 
         setOutputState(TestOutputDefaultState());
+
+        setTestId("");
 
         const formData = new FormData(event.target);
 
@@ -62,7 +95,7 @@ const App = () => {
             });
             setOutputStateLoading(false);
 
-            window.location.hash = data._id;
+            setTestId(data._id);
         }
     };
 
