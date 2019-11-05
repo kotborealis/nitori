@@ -18,6 +18,15 @@ export default () => {
             method: "POST",
             body: formData
         });
+
+        const {data, error} = await res.json();
+
+        if(error){
+            alert(JSON.stringify(error));
+        }
+        else{
+            alert(JSON.stringify(data));
+        }
     };
 
     return (<Container className={styles.container}>

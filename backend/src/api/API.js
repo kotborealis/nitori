@@ -93,7 +93,7 @@ module.exports = async (config) => {
 
         await precompile(config, id);
 
-        res.status(200).end();
+        res.status(200).json({data: {}});
     });
 
     app.get("/task/:wid", async function(req, res) {
