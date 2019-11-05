@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const md5 = require('md5');
 
 const cors = require('cors');
@@ -7,6 +5,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 const shortid = require('shortid');
+shortid.characters("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-.");
 
 const sourceFilesHandler = require('./sourceFilesHandler');
 
