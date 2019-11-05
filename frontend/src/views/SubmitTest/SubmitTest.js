@@ -1,15 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import {Alert, Col, Container, Row} from 'react-bootstrap';
-import {SourceInput} from '../SourceInputForm/SourceInputForm';
-import {TestOutput} from '../TestOutput/TestOutput';
-import styles from './App.css';
-import {api} from '../api/';
-import {TestOutputDefaultState} from '../utils/TestOutputDefaultState';
-import TestingProgressbar from '../TestingProgressbar/TestingProgressbar';
-import {useFetch} from '../hooks/useFetch';
-import {useApi} from '../hooks/useApi';
+import {SourceInput} from '../../SourceInputForm/SourceInputForm';
+import {TestOutput} from '../../TestOutput/TestOutput';
+import styles from './SubmitTest.css';
+import {api} from '../../api';
+import {TestOutputDefaultState} from '../../utils/TestOutputDefaultState';
+import TestingProgressbar from '../../TestingProgressbar/TestingProgressbar';
+import {useFetch} from '../../hooks/useFetch';
+import {useApi} from '../../hooks/useApi';
 
-const App = () => {
+const SubmitTest = () => {
     const [userData = null, userDataLoading, /* userError */, userDataStatus] = useFetch("/auth/user_data.php");
     const [tasksList = [], taskListLoading, tasksListError] = useApi(["task", "0"]);
 
@@ -127,4 +127,4 @@ const App = () => {
     </Container>);
 };
 
-export default App;
+export default SubmitTest;

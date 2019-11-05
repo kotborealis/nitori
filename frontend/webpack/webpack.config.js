@@ -151,21 +151,12 @@ module.exports = (env = {prod: false}) => {
             public: `localhost:8080`,
             contentBase: path.join(__dirname, '../build/'),
             disableHostCheck: true,
-            historyApiFallback: true,
             inline: true,
             open: true,
             openPage: '',
             overlay: true,
-            proxy: {
-                '/api/v1': {
-                    target: 'http://127.0.0.1:3000',
-                    pathRewrite: {'^/api/v1' : ''},
-                    headers: {
-                        Cookie: 'PHPSESSID=qwerty'
-                    }
-                },
-                ...mockApi
-            },
+            proxy: mockApi,
+            historyApiFallback: true
         }
     };
 
