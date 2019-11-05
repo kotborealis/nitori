@@ -3,7 +3,7 @@
 🔑 Contest-like system for testing simple C++ programs w/ unit-tests inside docker 🐳
 
 It's made specifically to make teaching C++ easier,
-automating such as checking solutions for C++ assignments.
+automating such tasks as checking and testing solutions for C++ assignments.
 
 Usual workflow is:
 
