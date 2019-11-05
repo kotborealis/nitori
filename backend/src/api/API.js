@@ -91,9 +91,11 @@ module.exports = async (config) => {
             content_type: file.content_type
         }], id);
 
-        await precompile(config, id);
+        const compilerResult = await precompile(config, id);
 
-        res.status(200).json({data: {}});
+        res.status(200).json({data: {
+            compilerResult
+        }});
     });
 
     app.get("/task/:wid", async function(req, res) {

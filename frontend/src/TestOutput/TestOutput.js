@@ -37,27 +37,37 @@ export const TestOutput = ({
 
     return (<div>
         <Tabs activeKey={tab} onSelect={setTab}>
-            <Tab title={"Инфо"} eventKey={"info"}>
-                {userData === null || userData === undefined ? null : <div>
-                    <div>{userData.login} ({userData.name}), группа {userData.groupName}</div>
-                    <div>{(new Date(timestamp)).toString()}</div>
-                </div>}
-            </Tab>
-            <Tab title={"Исходный код"} eventKey={"sourceFiles"}>
-                {sourceFiles.map(({name, data}) => <div>
-                    <b>{name}</b>
-                    <pre>{data}</pre>
-                </div>)}
-            </Tab>
-            <Tab title={"Компиляция"} eventKey={"compilation"}>
-                <AnsiRenderer {...compilerResult} title={"Результат компиляции:"}/>
-            </Tab>
-            <Tab title={"Линковка"} eventKey={"linking"}>
-                <AnsiRenderer {...linkerResult} title={"Результат линковки:"}/>
-            </Tab>
-            <Tab title={"Тестирование"} eventKey={"testing"}>
-                <AnsiRenderer {...runnerResult} title={"Результат тестирования:"}/>
-            </Tab>
+            {userData === undefined ? null :
+                <Tab title={"Инфо"} eventKey={"info"}>
+                    {userData === null || userData === undefined ? null : <div>
+                        <div>{userData.login} ({userData.name}), группа {userData.groupName}</div>
+                        <div>{(new Date(timestamp)).toString()}</div>
+                    </div>}
+                </Tab>
+            }
+            {sourceFiles === undefined ? null :
+                <Tab title={"Исходный код"} eventKey={"sourceFiles"}>
+                    {sourceFiles.map(({name, data}) => <div>
+                        <b>{name}</b>
+                        <pre>{data}</pre>
+                    </div>)}
+                </Tab>
+            }
+            {compilerResult === undefined ? null :
+                <Tab title={"Компиляция"} eventKey={"compilation"}>
+                    <AnsiRenderer {...compilerResult} title={"Результат компиляции:"}/>
+                </Tab>
+            }
+            {linkerResult === undefined ? null :
+                <Tab title={"Линковка"} eventKey={"linking"}>
+                    <AnsiRenderer {...linkerResult} title={"Результат линковки:"}/>
+                </Tab>
+            }
+            {runnerResult === undefined ? null :
+                <Tab title={"Тестирование"} eventKey={"testing"}>
+                    <AnsiRenderer {...runnerResult} title={"Результат тестирования:"}/>
+                </Tab>
+            }
         </Tabs>
     </div>);
 };

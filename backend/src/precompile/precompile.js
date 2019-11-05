@@ -16,12 +16,7 @@ const precompile = async (config, id) => {
     const db = require('nano')(config.database).use(config.database.name);
     const working_dir = config.sandbox.working_dir;
 
-    const docker = new Docker(config.docker);
     const objectCache = new ObjectCache(config.cache.dir);
-    const sandbox = new Sandbox(docker, config);
-    await sandbox.start();
-
-    const compiler = new Compiler(sandbox, config.timeout.precompilation);
 
     const content = await db_utils.getFirstAttachment(db, id);
 
@@ -31,23 +26,26 @@ const precompile = async (config, id) => {
 
     if(objectCache.has(cache_key)){
         debug(`Test ${id} already precompiled, skipping...`);
-        return;
+        return {exitCode: 0, stdout: "Loaded from cache", stderr: ""};
     }
 
     debug("Compiling");
 
-    const {exec: {exitCode}} = await compiler.compile(
+    const docker = new Docker(config.docker);
+    const sandbox = new Sandbox(docker, config);
+    await sandbox.start();
+
+    const compiler = new Compiler(sandbox, config.timeout.precompilation);
+
+    const {exec} = await compiler.compile(
         [{name: config.testing.test_src_name, content}],
         {working_dir, I: ["/opt/nitori/"]}
     );
 
     debug("Compiled");
 
-    if(exitCode){
-        debug("Failed to precompile_all test", id);
-        const err = new Error(`Failed to compile test ${id}`);
-        err.exec = exec;
-        throw err;
+    if(exec.exitCode){
+        return exec;
     }
 
     const testObjStream = await sandbox.fs_get(working_dir + "/" + config.testing.test_obj_name);
@@ -55,6 +53,8 @@ const precompile = async (config, id) => {
     debug(`Precompiled test ${id} with cache key ${cache_key}`);
 
     await sandbox.stop();
+
+    return exec;
 };
 
 const precompile_all = async (config) => {

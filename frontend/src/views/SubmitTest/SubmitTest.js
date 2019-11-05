@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Alert, Col, Container, Row} from 'react-bootstrap';
-import {SourceInput} from '../../SourceInputForm/SourceInputForm';
+import {SourceInputForm} from '../../SourceInputForm/SourceInputForm';
 import {TestOutput} from '../../TestOutput/TestOutput';
 import styles from './SubmitTest.css';
 import {api} from '../../api';
@@ -111,7 +111,7 @@ const SubmitTest = () => {
         </Row>) : null}
         <Row className={styles.row}>
             <Col>
-                <SourceInput {...{onSubmit, tasksList}} disabled={outputStateLoading || taskListLoading}/>
+                <SourceInputForm {...{onSubmit, tasksList}} disabled={outputStateLoading || taskListLoading}/>
             </Col>
         </Row>
         <Row className={styles.row}>

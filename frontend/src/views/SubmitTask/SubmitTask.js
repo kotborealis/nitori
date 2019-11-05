@@ -2,6 +2,10 @@ import {Button, Container, Form, Row, Col} from 'react-bootstrap';
 import React, {useState} from 'react';
 import styles from './SubmitTask.css';
 import {api} from '../../api';
+import {SourceInputForm} from '../../SourceInputForm/SourceInputForm';
+import TestingProgressbar from '../../TestingProgressbar/TestingProgressbar';
+import {TestOutput} from '../../TestOutput/TestOutput';
+import {TestOutputDefaultState} from '../../utils/TestOutputDefaultState';
 
 export default () => {
     const [formState, setFormState] = useState({
@@ -10,10 +14,17 @@ export default () => {
         name: "",
     });
 
+    const [outputState, setOutputState] = useState(TestOutputDefaultState());
+    const [outputStateLoading, setOutputStateLoading] = useState(false);
+
     const onSubmit = async (event) => {
         event.preventDefault();
 
+        setOutputState(TestOutputDefaultState());
+
         const formData = new FormData(event.target);
+
+        setOutputStateLoading(true);
         const res = await api("task", {
             method: "POST",
             body: formData
@@ -23,9 +34,14 @@ export default () => {
 
         if(error){
             alert(JSON.stringify(error));
+            setOutputStateLoading(false);
         }
         else{
-            alert(JSON.stringify(data));
+            setOutputState({
+                ...TestOutputDefaultState(),
+                ...data
+            });
+            setOutputStateLoading(false);
         }
     };
 
@@ -71,6 +87,16 @@ export default () => {
                         </Button>
                     </Form.Row>
                 </Form>
+            </Col>
+        </Row>
+        <Row className={styles.row}>
+            <Col>
+                <TestingProgressbar state={outputState} loading={outputStateLoading}/>
+            </Col>
+        </Row>
+        <Row className={styles.row}>
+            <Col>
+                <TestOutput {...outputState}/>
             </Col>
         </Row>
     </Container>);

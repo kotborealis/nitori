@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 
-export const SourceInput = ({onSubmit = () => 0, disabled = false, tasksList = []}) => {
+export const SourceInputForm = ({onSubmit = () => 0, disabled = false, tasksList = []}) => {
     const [formState, setFormState] = useState({
         files: undefined,
         task: ""
