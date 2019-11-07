@@ -2,8 +2,7 @@ import {Button, Container, Form, Row, Col} from 'react-bootstrap';
 import React, {useState} from 'react';
 import styles from './SubmitTask.css';
 import {api} from '../../api';
-import {SourceInputForm} from '../../components/SourceInputForm/SourceInputForm';
-import TestingProgressbar, {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
+import {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
 import {TestOutput} from '../../components/TestOutput/TestOutput';
 import {TestOutputDefaultState} from '../../components/TestOutput/TestOutputDefaultState';
 
@@ -63,7 +62,8 @@ export default () => {
                                 name={"sources"}
                                 type={"file"}
                                 multiple={true}
-                                onChange={({target}) => setFormState({...formState, files: target.files})}
+                                // @ts-ignore
+                                onChange={({target: {files}}) => setFormState({...formState, files})}
                             />
                         </Form.Group>
                         <Form.Group>
@@ -71,7 +71,8 @@ export default () => {
                             <Form.Control
                                 name={"wid"}
                                 type={"text"}
-                                onChange={({target}) => setFormState({...formState, wid: target.value.wid})}
+                                // @ts-ignore
+                                onChange={({target: {value: wid}}) => setFormState({...formState, wid})}
                                 value={formState.wid}
                             />
                         </Form.Group>
@@ -80,7 +81,8 @@ export default () => {
                             <Form.Control
                                 name={"name"}
                                 type={"text"}
-                                onChange={({target}) => setFormState({...formState, name: target.value.name})}
+                                // @ts-ignore
+                                onChange={({target: {value: {name}}}) => setFormState({...formState, name})}
                                 value={formState.name}
                             />
                         </Form.Group>

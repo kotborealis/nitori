@@ -16,9 +16,8 @@ export const SourceInputForm = ({onSubmit = undefined, disabled = false, tasksLi
                     type={"file"}
                     multiple={true}
                     disabled={disabled}
-                    onChange={({target}) => {
-                        setFormState({...formState, files: target.files});
-                    }}
+                    // @ts-ignore
+                    onChange={({target: {files}}) => setFormState({...formState, files})}
                 />
             </Form.Group>
             <Form.Group>
@@ -27,7 +26,8 @@ export const SourceInputForm = ({onSubmit = undefined, disabled = false, tasksLi
                     name={"test_id"}
                     as="select"
                     disabled={disabled}
-                    onChange={({target}) => setFormState({...formState, task: target["value"]})}
+                    // @ts-ignore
+                    onChange={({target: {value: task}}) => setFormState({...formState, task})}
                 >
                     <option/>
                     {tasksList.map(({name, _id}) => <option value={_id} key={_id}>{name}</option>)}
