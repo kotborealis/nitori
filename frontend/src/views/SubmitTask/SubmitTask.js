@@ -2,10 +2,10 @@ import {Button, Container, Form, Row, Col} from 'react-bootstrap';
 import React, {useState} from 'react';
 import styles from './SubmitTask.css';
 import {api} from '../../api';
-import {SourceInputForm} from '../../SourceInputForm/SourceInputForm';
-import TestingProgressbar from '../../TestingProgressbar/TestingProgressbar';
-import {TestOutput} from '../../TestOutput/TestOutput';
-import {TestOutputDefaultState} from '../../utils/TestOutputDefaultState';
+import {SourceInputForm} from '../../components/SourceInputForm/SourceInputForm';
+import TestingProgressbar, {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
+import {TestOutput} from '../../components/TestOutput/TestOutput';
+import {TestOutputDefaultState} from '../../components/TestOutput/TestOutputDefaultState';
 
 export default () => {
     const [formState, setFormState] = useState({
@@ -45,6 +45,13 @@ export default () => {
         }
     };
 
+    const progressStages = [
+        outputState.compilerResult && {
+            variant: outputState.compilerResult.exitCode === 0 ? "success": "danger",
+            size: 100
+        },
+    ].filter(id => id);
+
     return (<Container className={styles.container}>
         <Row className={styles.row}>
             <Col>
@@ -56,7 +63,7 @@ export default () => {
                                 name={"sources"}
                                 type={"file"}
                                 multiple={true}
-                                onChange={({target: {files}}) => setFormState({...formState, files})}
+                                onChange={({target}) => setFormState({...formState, files: target.files})}
                             />
                         </Form.Group>
                         <Form.Group>
@@ -64,7 +71,7 @@ export default () => {
                             <Form.Control
                                 name={"wid"}
                                 type={"text"}
-                                onChange={({target: {value: wid}}) => setFormState({...formState, wid})}
+                                onChange={({target}) => setFormState({...formState, wid: target.value.wid})}
                                 value={formState.wid}
                             />
                         </Form.Group>
@@ -73,7 +80,7 @@ export default () => {
                             <Form.Control
                                 name={"name"}
                                 type={"text"}
-                                onChange={({target: {value: name}}) => setFormState({...formState, name})}
+                                onChange={({target}) => setFormState({...formState, name: target.value.name})}
                                 value={formState.name}
                             />
                         </Form.Group>
@@ -91,7 +98,7 @@ export default () => {
         </Row>
         <Row className={styles.row}>
             <Col>
-                <TestingProgressbar state={outputState} loading={outputStateLoading}/>
+                <ProgressbarStages state={progressStages} loading={outputStateLoading}/>
             </Col>
         </Row>
         <Row className={styles.row}>

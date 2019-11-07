@@ -9,11 +9,11 @@ const exitCodeToAlertVariant = (code) => {
     return 'danger';
 };
 
-export default ({exitCode, title="", stdout=""}) => {
+export default ({exitCode = undefined, title="", stdout=""}) => {
     let pre;
     if(exitCode !== undefined) {
         pre = (<pre>
-            <Ansi useClasses>{
+            <Ansi useClasses linkify={false}>{
                 stdout.replace(/\r/g, '')
             }</Ansi>
         </pre>);

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "plugins": [{
+      "name": "typescript-plugin-css-modules",
+      "options": {
+        "customMatcher": "\\.css$"
+      }
+    }],
+    "strict": false,
+    "esModuleInterop": true,
+    "rootDir": ".",
+    "outDir": "build",
+    "allowJs": true,
+    "checkJs": true,
+    "jsx": "react"
+  },
+  "exclude": ["node_modules", "build"]
+}

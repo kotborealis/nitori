@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 
-export const SourceInputForm = ({onSubmit = () => 0, disabled = false, tasksList = []}) => {
+export const SourceInputForm = ({onSubmit = undefined, disabled = false, tasksList = []}) => {
     const [formState, setFormState] = useState({
         files: undefined,
         task: ""
@@ -16,7 +16,9 @@ export const SourceInputForm = ({onSubmit = () => 0, disabled = false, tasksList
                     type={"file"}
                     multiple={true}
                     disabled={disabled}
-                    onChange={({target: {files}}) => setFormState({...formState, files})}
+                    onChange={({target}) => {
+                        setFormState({...formState, files: target.files});
+                    }}
                 />
             </Form.Group>
             <Form.Group>
@@ -25,10 +27,10 @@ export const SourceInputForm = ({onSubmit = () => 0, disabled = false, tasksList
                     name={"test_id"}
                     as="select"
                     disabled={disabled}
-                    onChange={({target: {value: task}}) => setFormState({...formState, task})}
+                    onChange={({target}) => setFormState({...formState, task: target["value"]})}
                 >
                     <option/>
-                    {tasksList.data ? tasksList.data.map(({name, _id}) => <option value={_id} key={_id}>{name}</option>) : null}
+                    {tasksList.map(({name, _id}) => <option value={_id} key={_id}>{name}</option>)}
                 </Form.Control>
             </Form.Group>
         </Form.Row>

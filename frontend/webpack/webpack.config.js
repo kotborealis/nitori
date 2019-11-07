@@ -62,7 +62,7 @@ module.exports = (env = {prod: false}) => {
                     ]
                 },
                 {
-                    test: /\.css/,
+                    test: /\.css$/,
                     use: [
                         'style-loader',
                         {

@@ -1,0 +1,1 @@
+export declare function useFetch(url: Array<string> | string, options?: object): [any, boolean, any, number];

@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import urljoin from 'url-join';
 
 export const useFetch = (url, options) => {
-    const [data, setData] = useState(undefined);
-    const [error, setError] = useState(undefined);
+    const [data, setData] = useState({});
+    const [error, setError] = useState({});
     const [status, setStatus] = useState(undefined);
     const [loading, setLoading] = useState(true);
 

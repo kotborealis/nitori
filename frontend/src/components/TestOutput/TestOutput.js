@@ -1,16 +1,15 @@
 import {Tab, Tabs} from 'react-bootstrap';
-import AnsiRenderer from '../OutputRenderer/OutputRenderer';
+import OutputRenderer from '../OutputRenderer/OutputRenderer';
 import React, {useEffect, useState} from 'react';
-import {TestOutputDefaultState} from '../utils/TestOutputDefaultState';
 
 export const TestOutput = ({
-                               userData,
-                               timestamp,
+                               userData = undefined,
+                               timestamp = undefined,
                                sourceFiles = [],
                                compilerResult = {},
                                linkerResult = {},
                                runnerResult = {}
-                           } = TestOutputDefaultState()) => {
+                           } = {}) => {
 
     const exitCodeToAlertVariant = (code) => {
         if(code === 0) return 'success';
@@ -36,8 +35,8 @@ export const TestOutput = ({
     }, [compilerResult.exitCode, linkerResult.exitCode, runnerResult.exitCode]);
 
     return (<div>
-        <Tabs activeKey={tab} onSelect={setTab}>
-            {userData === undefined ? null :
+        <Tabs activeKey={tab} onSelect={setTab} id={"0"}>
+            {userData !== undefined &&
                 <Tab title={"Инфо"} eventKey={"info"}>
                     {userData === null || userData === undefined ? null : <div>
                         <div>{userData.login} ({userData.name}), группа {userData.groupName}</div>
@@ -45,7 +44,7 @@ export const TestOutput = ({
                     </div>}
                 </Tab>
             }
-            {sourceFiles === undefined ? null :
+            {sourceFiles !== undefined &&
                 <Tab title={"Исходный код"} eventKey={"sourceFiles"}>
                     {sourceFiles.map(({name, data}) => <div>
                         <b>{name}</b>
@@ -53,19 +52,19 @@ export const TestOutput = ({
                     </div>)}
                 </Tab>
             }
-            {compilerResult === undefined ? null :
+            {compilerResult !== undefined &&
                 <Tab title={"Компиляция"} eventKey={"compilation"}>
-                    <AnsiRenderer {...compilerResult} title={"Результат компиляции:"}/>
+                    <OutputRenderer {...compilerResult} title={"Результат компиляции:"}/>
                 </Tab>
             }
-            {linkerResult === undefined ? null :
+            {linkerResult !== undefined &&
                 <Tab title={"Линковка"} eventKey={"linking"}>
-                    <AnsiRenderer {...linkerResult} title={"Результат линковки:"}/>
+                    <OutputRenderer {...linkerResult} title={"Результат линковки:"}/>
                 </Tab>
             }
-            {runnerResult === undefined ? null :
+            {runnerResult !== undefined &&
                 <Tab title={"Тестирование"} eventKey={"testing"}>
-                    <AnsiRenderer {...runnerResult} title={"Результат тестирования:"}/>
+                    <OutputRenderer {...runnerResult} title={"Результат тестирования:"}/>
                 </Tab>
             }
         </Tabs>

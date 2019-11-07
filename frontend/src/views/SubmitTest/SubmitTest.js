@@ -1,19 +1,23 @@
 import React, {useState, useEffect} from 'react';
 import {Alert, Col, Container, Row} from 'react-bootstrap';
-import {SourceInputForm} from '../../SourceInputForm/SourceInputForm';
-import {TestOutput} from '../../TestOutput/TestOutput';
+import {SourceInputForm} from '../../components/SourceInputForm/SourceInputForm';
+import {TestOutput} from '../../components/TestOutput/TestOutput';
 import styles from './SubmitTest.css';
 import {api} from '../../api';
-import {TestOutputDefaultState} from '../../utils/TestOutputDefaultState';
-import TestingProgressbar from '../../TestingProgressbar/TestingProgressbar';
+import {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
 import {useFetch} from '../../hooks/useFetch';
 import {useApi} from '../../hooks/useApi';
 
 const SubmitTest = () => {
-    const [userData = null, userDataLoading, /* userError */, userDataStatus] = useFetch("/auth/user_data.php");
-    const [tasksList = [], taskListLoading, tasksListError] = useApi(["task", "0"]);
+    const [userData = null, userDataLoading] = useFetch("/auth/user_data.php");
+    const [{data: tasksList}, taskListLoading] = useApi(["task", "0"]);
 
-    const [outputState, setOutputState] = useState(TestOutputDefaultState());
+    const [outputState, setOutputState] = useState({
+        compilerResult: undefined,
+        linkerResult: undefined,
+        runnerResult: undefined
+    });
+
     const [outputStateLoading, setOutputStateLoading] = useState(false);
 
     const [testId, setTestId] = useState("");
@@ -31,20 +35,19 @@ const SubmitTest = () => {
                     setOutputStateLoading(false);
                 }
                 else{
-                    setOutputState({
-                        ...TestOutputDefaultState(),
-                        ...data
-                    });
+                    setOutputState(data);
                     setOutputStateLoading(false);
                 }
             })();
         }
-    }, []);
+    }, [null]);
 
     useEffect(() => {
         window.location.hash = testId;
 
-        return () => window.location.hash = "";
+        return () => {
+            window.location.hash = "";
+        };
     }, [testId]);
 
     useEffect(() => {
@@ -58,10 +61,7 @@ const SubmitTest = () => {
                     setOutputStateLoading(false);
                 }
                 else{
-                    setOutputState({
-                        ...TestOutputDefaultState(),
-                        ...data
-                    });
+                    setOutputState(data);
                     setOutputStateLoading(false);
                 }
             })();
@@ -71,7 +71,11 @@ const SubmitTest = () => {
     const onSubmit = async (event) => {
         event.preventDefault();
 
-        setOutputState(TestOutputDefaultState());
+        setOutputState({
+            compilerResult: undefined,
+            linkerResult: undefined,
+            runnerResult: undefined
+        });
 
         setTestId("");
 
@@ -90,15 +94,27 @@ const SubmitTest = () => {
             setOutputStateLoading(false);
         }
         else{
-            setOutputState({
-                ...TestOutputDefaultState(),
-                ...data
-            });
+            setOutputState(data);
             setOutputStateLoading(false);
 
             setTestId(data._id);
         }
     };
+
+    const progressStages = [
+        outputState.compilerResult && {
+            variant: outputState.compilerResult.exitCode === 0 ? "success": "danger",
+            size: 100/3
+        },
+        outputState.linkerResult && {
+            variant: outputState.linkerResult.exitCode === 0 ? "success" : "danger",
+            size: 100/3
+        },
+        outputState.runnerResult && {
+            variant: outputState.runnerResult.exitCode === 0 ? "success" : "danger",
+            size: 100/3
+        },
+    ].filter(id => id);
 
     return (<Container className={styles.container}>
         {userData === null && !userDataLoading ? (<Row className={styles.row}>
@@ -116,7 +132,7 @@ const SubmitTest = () => {
         </Row>
         <Row className={styles.row}>
             <Col>
-                <TestingProgressbar state={outputState} loading={outputStateLoading}/>
+                <ProgressbarStages state={progressStages} loading={outputStateLoading}/>
             </Col>
         </Row>
         <Row className={styles.row}>
