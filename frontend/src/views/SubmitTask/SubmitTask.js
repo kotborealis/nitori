@@ -62,7 +62,6 @@ export default () => {
                                 name={"sources"}
                                 type={"file"}
                                 multiple={true}
-                                // @ts-ignore
                                 onChange={({target: {files}}) => setFormState({...formState, files})}
                             />
                         </Form.Group>
@@ -71,7 +70,6 @@ export default () => {
                             <Form.Control
                                 name={"wid"}
                                 type={"text"}
-                                // @ts-ignore
                                 onChange={({target: {value: wid}}) => setFormState({...formState, wid})}
                                 value={formState.wid}
                             />
@@ -81,7 +79,6 @@ export default () => {
                             <Form.Control
                                 name={"name"}
                                 type={"text"}
-                                // @ts-ignore
                                 onChange={({target: {value: {name}}}) => setFormState({...formState, name})}
                                 value={formState.name}
                             />

@@ -40,7 +40,7 @@ const SubmitTest = () => {
                 }
             })();
         }
-    }, [null]);
+    }, [0]);
 
     useEffect(() => {
         window.location.hash = testId;

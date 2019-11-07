@@ -16,7 +16,6 @@ export const SourceInputForm = ({onSubmit = undefined, disabled = false, tasksLi
                     type={"file"}
                     multiple={true}
                     disabled={disabled}
-                    // @ts-ignore
                     onChange={({target: {files}}) => setFormState({...formState, files})}
                 />
             </Form.Group>
@@ -26,7 +25,6 @@ export const SourceInputForm = ({onSubmit = undefined, disabled = false, tasksLi
                     name={"test_id"}
                     as="select"
                     disabled={disabled}
-                    // @ts-ignore
                     onChange={({target: {value: task}}) => setFormState({...formState, task})}
                 >
                     <option/>
