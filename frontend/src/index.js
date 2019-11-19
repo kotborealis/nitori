@@ -1,7 +1,7 @@
 import React from 'react';
 import {render} from 'react-dom';
 import "!style-loader!css-loader!bootstrap/dist/css/bootstrap.min.css";
-import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import TestTarget from './views/TestTarget/TestTarget';
 import TestSpec from './views/TestSpec/TestSpec';
 
@@ -16,5 +16,5 @@ render(
             </Route>
         </Switch>
     </BrowserRouter>,
-document.getElementById('App')
+    document.getElementById('App')
 );
