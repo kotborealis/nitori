@@ -22,7 +22,7 @@ export const SourceInputForm = ({onSubmit = undefined, disabled = false, tasksLi
             <Form.Group>
                 <Form.Label>Задание:</Form.Label>
                 <Form.Control
-                    name={"test_id"}
+                    name={"testSpecId"}
                     as="select"
                     disabled={disabled}
                     onChange={({target: {value: task}}) => setFormState({...formState, task})}

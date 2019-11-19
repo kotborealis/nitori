@@ -1,0 +1,155 @@
+openapi: '3.0.0'
+
+info:
+  version: 1.0.0
+  title: Nitori API
+  description: API for cpp testing
+
+servers:
+  - url: http://127.0.0.1:3000/
+    description: Dev-server
+  - url: http://127.0.0.1:8080/api/v1/
+    description: Webpack-dev-server
+
+paths:
+  /TestSpec:
+    get:
+      summary: Get TestSpecs by WID (Widged ID)
+      parameters:
+        - $ref: "#/components/parameters/WidgetID"
+      responses:
+        '200':
+          description: List of TestSpecs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestSpecList'
+    post:
+      summary: Add TestSpec
+      parameters:
+        - $ref: "#/components/parameters/WidgetID"
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: description
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Added TestSpec
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecOutput'
+  /TestTarget:
+    get:
+      summary: Get TestTarget info by id
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: TestTarget info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestTargetResult'
+        404:
+          description: TestTarget does not exists
+
+    post:
+      summary: Submit source code to test
+      parameters:
+        - name: testSpecId
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: TestTarget completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestTargetResult'
+
+components:
+
+  parameters:
+
+    WidgetID:
+      name: wid
+      in: query
+      description: WidgetID
+      required: true
+      schema:
+        type: string
+        default: "0"
+
+  schemas:
+
+    TestSpec:
+      type: object
+      required:
+        - name
+        - wid
+        - description
+      properties:
+        name:
+          type: string
+        wid:
+          type: string
+        description:
+          type: string
+
+    TestSpecList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TestSpec'
+
+    ExecOutput:
+      type: object
+      properties:
+        exitCode:
+          type: integer
+        stderr:
+          type: string
+        stdout:
+          type: string
+
+    UserData:
+      type: object
+      properties:
+        usedId:
+          type: number
+        isAdmin:
+          type: boolean
+        login:
+          type: string
+        name:
+          type: string
+        groupId:
+          type: number
+        groupName:
+          type: string
+
+    TestTargetResult:
+      type: object
+      properties:
+        timestamp:
+          type: integer
+        userData:
+          $ref: '#/components/schemas/UserData'
+        testSpecId:
+          type: string
+        compilerResult:
+          $ref: '#/components/schemas/ExecOutput'
+        linkerResult:
+          $ref: '#/components/schemas/ExecOutput'
+        runnerResult:
+          $ref: '#/components/schemas/ExecOutput'

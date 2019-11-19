@@ -16,7 +16,7 @@ const TestTarget = () => {
     const {
         data: tasksList,
         loading: taskListLoading
-    } = useApi("TestSpec/0");
+    } = useApi("TestSpec?wid=0", []);
 
     const [outputState, setOutputState] = useState({
         compilerResult: undefined,
@@ -29,7 +29,8 @@ const TestTarget = () => {
     const [testId, setTestId] = useState("");
 
     useEffect(() => {
-        window.location.hash = testId;
+        if(testId)
+            window.location.hash = testId;
 
         return () => {
             window.location.hash = "";
@@ -40,13 +41,14 @@ const TestTarget = () => {
         const hash = window.location.hash.slice(1);
         if(hash){
             (async () => {
-                const {data, error} = await api(`TestTarget/${hash}`);
-                if(error){
-                    alert(JSON.stringify(error));
-                    setOutputStateLoading(false);
-                }
-                else{
+                try{
+                    const {data} = await api(`TestTarget?id=${hash}`);
                     setOutputState(data);
+                }
+                catch(error){
+                    alert(JSON.stringify(error));
+                }
+                finally{
                     setOutputStateLoading(false);
                 }
             })();
@@ -67,20 +69,20 @@ const TestTarget = () => {
         const formData = new FormData(event.target);
 
         setOutputStateLoading(true);
-        const {data, error} = await api("TestTarget", {
-            method: "POST",
-            body: formData
-        });
+        try{
+            const {data} = await api(`TestTarget?testSpecId=${formData.get('testSpecId')}`, {
+                method: "POST",
+                body: formData
+            });
 
-        if(error){
-            alert(JSON.stringify(error));
-            setOutputStateLoading(false);
-        }
-        else{
             setOutputState(data);
-            setOutputStateLoading(false);
-
             setTestId(data._id);
+        }
+        catch(error){
+            alert(JSON.stringify(error));
+        }
+        finally{
+            setOutputStateLoading(false);
         }
     };
 

@@ -1,5 +1,10 @@
 const md5 = require('md5');
 
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./api.yaml');
+
+const swaggerUi = require('swagger-ui-express')
+const {OpenApiValidator} = require('express-openapi-validator');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -48,15 +53,29 @@ module.exports = async (config) => {
         }
     }));
 
-    app.use(authHandler());
+    //app.use(authHandler());
 
-    app.post("/TestSpec/",
+    app.use('/swagger/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+    new OpenApiValidator({
+        apiSpec: './api.yaml',
+        validateRequests: true,
+        validateResponses: {
+            removeAdditional: 'failing'
+        },
+        multerOpts: {
+            limits: {
+                fileSize: config.api.limits.fileSize
+            }
+        }
+    }).install(app);
+
+    app.post("/TestSpec",
         //authHandler([({isAdmin}) => isAdmin === true]),
         sourceFilesHandler(config.api.limits, 1),
-        async function(req, res) {
+        async function(req, res, next) {
         if(!req.sourceFiles){
             const err = new Error("No source files specified");
-            err.reason = "no source files";
             err.status = 400;
             next(err);
             return;
@@ -64,14 +83,14 @@ module.exports = async (config) => {
 
         if(req.sourceFiles.length !== 1){
             const err = new Error("Only one source file must be specified");
-            err.reason = "Only one source file must be specified";
             err.status = 400;
             next(err);
             return;
         }
 
         const file = req.sourceFiles[0];
-        const {name, description = "", wid} = req.body;
+        const {wid} = req.query;
+        const {name, description = ""} = req.body;
 
         const {rows: [row]} = await db.view("TestSpec", "by_wid_and_name", {
             key: [wid, name],
@@ -93,23 +112,21 @@ module.exports = async (config) => {
 
         const compilerResult = await precompile(config, id);
 
-        res.status(200).json({data: {
-            compilerResult
-        }});
+        res.json(compilerResult);
     });
 
-    app.get("/TestSpec/:wid", async function(req, res) {
+    app.get("/TestSpec", async function(req, res) {
         debug("/TestSpec/");
 
         const {rows} = await db.view("TestSpec", "by_wid", {
-            key: req.params.wid,
+            key: req.query.wid,
             include_docs: true
         });
-        res.json({data: rows.map(({doc}) => doc)});
+        res.json(rows.map(({doc}) => doc));
     });
 
-    app.get("/TestTarget/:id", async function(req, res, next) {
-        const {id} = req.params;
+    app.get("/TestTarget", async function(req, res, next) {
+        const {id} = req.query;
 
         const {rows: [test]} = await db.view('TestTarget', 'by_id', {key: id, include_docs: true});
 
@@ -122,14 +139,14 @@ module.exports = async (config) => {
 
         const data = test.doc;
         data.sourceFiles = await db_utils.getAllAttachments(db, id);
-        res.json({data});
+        res.json(data);
     });
 
     app.post("/TestTarget/", sourceFilesHandler(config.api.limits, 10), async function(req, res, next) {
         debug("/TestTarget/");
         const userData = await auth(req.cookies.PHPSESSID);
 
-        const {test_id} = req.body;
+        const {testSpecId} = req.body;
         const id = shortid.generate();
 
         const insertResults = async (data) => {
@@ -141,7 +158,7 @@ module.exports = async (config) => {
                 type: "TestTarget",
                 timestamp: Date.now(),
                 userData,
-                test_id,
+                testSpecId: testSpecId,
                 compilerResult: {exitCode: undefined, stdout: ""},
                 linkerResult: {exitCode: undefined, stdout: ""},
                 runnerResult: {exitCode: undefined, stdout: ""},
@@ -153,17 +170,17 @@ module.exports = async (config) => {
                 file.data = file.data.toString();
                 return file;
             });
-            res.json({data: attempt});
+            res.json(attempt);
         };
 
-        if(!await db_utils.exists(db, test_id)){
+        if(!await db_utils.exists(db, testSpecId)){
             const err = new Error("Selected TestSpec does not exists");
             err.status = 404;
             next(err);
             return;
         }
 
-        const test_source = await db_utils.getFirstAttachment(db, test_id);
+        const test_source = await db_utils.getFirstAttachment(db, testSpecId);
         const cache_key = md5(test_source);
 
         const sandbox = new Sandbox(docker, config);
@@ -215,11 +232,8 @@ module.exports = async (config) => {
         debug("Error handler: ", err);
 
         res.status(err.status).json({
-            error: {
-                reason: err.reason,
-                message: err.message,
-                status: err.status
-            }
+            message: err.message,
+            errors: err.errors || [err.message]
         });
     });
 

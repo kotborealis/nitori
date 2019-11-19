@@ -1,4 +1,4 @@
-import {Button, Container, Form, Row, Col} from 'react-bootstrap';
+import {Button, Col, Container, Form, Row} from 'react-bootstrap';
 import React, {useState} from 'react';
 import styles from './index.css';
 import {api} from '../../api';
@@ -24,27 +24,31 @@ export default () => {
         const formData = new FormData(event.target);
 
         setOutputStateLoading(true);
-        const {data, error} = await api("task", {
-            method: "POST",
-            body: formData
-        });
 
-        if(error){
-            alert(JSON.stringify(error));
-            setOutputStateLoading(false);
-        }
-        else{
+        try{
+            const {data} = await api(`TestSpec?wid=${0}&name=${formData.get('name')}` +
+                                     `&description=${formData.get('description')}`,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
             setOutputState({
                 ...TestOutputDefaultState(),
                 ...data
             });
+        }
+        catch(error){
+            alert(JSON.stringify(error));
+        }finally{
             setOutputStateLoading(false);
         }
     };
 
     const progressStages = [
         outputState.compilerResult && {
-            variant: outputState.compilerResult.exitCode === 0 ? "success": "danger",
+            variant: outputState.compilerResult.exitCode === 0 ? "success" : "danger",
             size: 100
         },
     ].filter(id => id);

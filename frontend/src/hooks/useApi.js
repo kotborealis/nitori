@@ -2,18 +2,20 @@ import {useFetch} from './useFetch';
 import {API_URL} from '../api';
 import urljoin from 'url-join';
 
-export const useApi = (url, options) => {
+export const useApi = (url, init, options, deps) => {
     const {
-        data: {data, error},
+        data,
         loading,
         error: fetchError,
         status
-    } = useFetch(urljoin(API_URL, url), {}, options);
+    } = useFetch(urljoin(API_URL, url), init, options, deps);
+
+
 
     return {
-        data: data,
+        data,
         loading,
-        error: fetchError || error,
+        error: fetchError || (data.errors ? data : null),
         status
     };
 };

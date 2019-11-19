@@ -17,6 +17,7 @@
     "docker-modem": "^2.0.3",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6-alpha.5",
+    "express-openapi-validator": "^2.15.1",
     "glob": "^7.1.4",
     "md5": "^2.2.1",
     "nano": "^8.1.0",
@@ -24,6 +25,8 @@
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "shortid": "^2.2.15",
-    "tar-stream": "^2.1.0"
+    "swagger-ui-express": "^4.1.2",
+    "tar-stream": "^2.1.0",
+    "yamljs": "^0.3.0"
   }
 }
