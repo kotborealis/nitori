@@ -18,7 +18,7 @@ const debug = require('debug')('nitori:api');
 const express = require('express');
 const fileUpload = require('express-fileupload');
 
-const db_utils = require('../database/utils');
+const Database = require('../database');
 const {precompile} = require('../TestSpecPrecompile/precompile');
 
 const {Docker} = require('node-docker-api');
@@ -30,7 +30,7 @@ const {Compiler, Objcopy} = require('../SandboxedGnuUtils');
 module.exports = async (config) => {
     const auth = require('../auth').auth(config.auth.url);
     const authHandler = require('../auth').middleware(config.auth.url);
-    const db = require('nano')(config.database).use(config.database.name);
+    const db = new Database(require('nano')(config.database), config.database.name);
 
     const port = config.api.port;
     const working_dir = config.sandbox.working_dir;
@@ -99,7 +99,7 @@ module.exports = async (config) => {
 
         let id = row ? row.doc._id : shortid.generate();
 
-        db_utils.multipartUpdate(db, {
+        db.multipart.update({
             type: "TestSpec",
             name,
             wid,
@@ -138,7 +138,7 @@ module.exports = async (config) => {
         }
 
         const data = test.doc;
-        data.sourceFiles = await db_utils.getAllAttachments(db, id);
+        data.sourceFiles = await db.getAllAttachments(id);
         res.json(data);
     });
 
@@ -173,14 +173,14 @@ module.exports = async (config) => {
             res.json(attempt);
         };
 
-        if(!await db_utils.exists(db, testSpecId)){
+        if(!await db.exists(testSpecId)){
             const err = new Error("Selected TestSpec does not exists");
             err.status = 404;
             next(err);
             return;
         }
 
-        const test_source = await db_utils.getFirstAttachment(db, testSpecId);
+        const test_source = await db.getFirstAttachment(testSpecId);
         const cache_key = md5(test_source);
 
         const sandbox = new Sandbox(docker, config);

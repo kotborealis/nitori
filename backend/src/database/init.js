@@ -35,19 +35,26 @@ module.exports = async ({database}) => {
 
         debug("Processing design", designName);
 
-        const views = {};
+        const processEntries = (name) => {
+            const entries = {};
+            const entriesPaths = glob.sync(`./src/database/designs/${designName}/${name}/*.js`);
 
-        const viewPaths = glob.sync(`./src/database/designs/${designName}/*.js`);
+            for(let entryPath of entriesPaths){
+                const entry = path.basename(entryPath, '.js');
+                debug(`Processing entry from ${name}`, entry);
+                entries[entry] = require(`./designs/${designName}/${name}/${entry}.js`);
+            }
 
-        for(let viewPath of viewPaths){
-            const view = path.basename(viewPath, '.js');
-            debug("Processing view", view);
-            views[view] = require(`./designs/${designName}/${view}.js`);
+            return entries;
         }
 
         const design = {
             _id: `_design/${designName}`,
-            views
+            views: processEntries('views'),
+            shows: processEntries('shows'),
+            lists: processEntries('lists'),
+            updates: processEntries('updates'),
+            filters: processEntries('filters'),
         };
 
         try{

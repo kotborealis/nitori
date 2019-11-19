@@ -1,7 +1,7 @@
 require('debug').enable("nitori*");
 const debug = require('debug')('nitori:precompile_all');
 
-const db_utils = require('../database/utils');
+const Database = require('../database');
 
 const md5 = require('md5');
 
@@ -13,12 +13,12 @@ const {Compiler} = require('../SandboxedGnuUtils');
 const precompile = async (config, id) => {
     debug("TestSpec precompilation for", id);
 
-    const db = require('nano')(config.database).use(config.database.name);
+    const db = new Database(require('nano')(config.database), config.database.name);
     const working_dir = config.sandbox.working_dir;
 
     const objectCache = new ObjectCache(config.cache.dir);
 
-    const content = await db_utils.getFirstAttachment(db, id);
+    const content = await db.getFirstAttachment(id);
 
     const cache_key = md5(content);
 
