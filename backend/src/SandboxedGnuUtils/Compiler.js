@@ -1,5 +1,5 @@
 const tar = require('tar-stream');
-const debug = require('debug')('nitori:gnu_utils:compiler');
+const debug = require('debug')('nitori:SandboxedGnuUtils:compiler');
 
 class Compiler {
     sandbox;

@@ -8,7 +8,7 @@ const md5 = require('md5');
 const {Docker} = require('node-docker-api');
 const {Sandbox} = require('../Sandbox');
 const {ObjectCache} = require('../ObjectCache');
-const {Compiler} = require('../gnu_utils');
+const {Compiler} = require('../SandboxedGnuUtils');
 
 const precompile = async (config, id) => {
     debug("TestSpec precompilation for", id);

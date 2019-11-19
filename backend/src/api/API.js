@@ -20,7 +20,7 @@ const {Docker} = require('node-docker-api');
 
 const {Sandbox} = require('../Sandbox');
 const {ObjectCache} = require('../ObjectCache');
-const {Compiler, Objcopy} = require('../gnu_utils');
+const {Compiler, Objcopy} = require('../SandboxedGnuUtils');
 
 module.exports = async (config) => {
     const auth = require('../auth').auth(config.auth.url);
