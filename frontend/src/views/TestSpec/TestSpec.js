@@ -1,6 +1,6 @@
 import {Button, Container, Form, Row, Col} from 'react-bootstrap';
 import React, {useState} from 'react';
-import styles from './SubmitTask.css';
+import styles from './index.css';
 import {api} from '../../api';
 import {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
 import {TestOutput} from '../../components/TestOutput/TestOutput';

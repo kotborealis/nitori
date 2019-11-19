@@ -1,6 +1,6 @@
 import React from 'react';
 import Ansi from 'ansi-to-react';
-import style from './OutputRenderer.css';
+import style from './TtyRenderer.css';
 import {Alert} from 'react-bootstrap';
 
 const exitCodeToAlertVariant = (code) => {

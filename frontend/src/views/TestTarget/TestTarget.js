@@ -2,13 +2,13 @@ import React, {useState, useEffect} from 'react';
 import {Alert, Col, Container, Row} from 'react-bootstrap';
 import {SourceInputForm} from '../../components/SourceInputForm/SourceInputForm';
 import {TestOutput} from '../../components/TestOutput/TestOutput';
-import styles from './SubmitTest.css';
+import styles from './index.css';
 import {api} from '../../api';
 import {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
 import {useFetch} from '../../hooks/useFetch';
 import {useApi} from '../../hooks/useApi';
 
-const SubmitTest = () => {
+const TestTarget = () => {
     const {
         status: userDataStatus
     } = useFetch("/auth/user_data.php");
@@ -126,4 +126,4 @@ const SubmitTest = () => {
     </Container>);
 };
 
-export default SubmitTest;
+export default TestTarget;

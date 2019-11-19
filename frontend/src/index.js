@@ -2,17 +2,17 @@ import React from 'react';
 import {render} from 'react-dom';
 import "!style-loader!css-loader!bootstrap/dist/css/bootstrap.min.css";
 import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
-import SubmitTest from './views/SubmitTest/SubmitTest';
-import SubmitTask from './views/SubmitTask/SubmitTask';
+import TestTarget from './views/TestTarget/TestTarget';
+import TestSpec from './views/TestSpec/TestSpec';
 
 render(
     <BrowserRouter basename={process.env.PUBLIC_PATH}>
         <Switch>
             <Route exact path="/">
-                <SubmitTest/>
+                <TestTarget/>
             </Route>
             <Route exact path="/submitTask">
-                <SubmitTask/>
+                <TestSpec/>
             </Route>
         </Switch>
     </BrowserRouter>,

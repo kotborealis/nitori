@@ -1,5 +1,5 @@
 import {Tab, Tabs} from 'react-bootstrap';
-import OutputRenderer from '../OutputRenderer/OutputRenderer';
+import TtyRenderer from '../TtyRenderer/TtyRenderer';
 import React, {useEffect, useState} from 'react';
 
 export const TestOutput = ({
@@ -54,17 +54,17 @@ export const TestOutput = ({
             }
             {compilerResult !== undefined &&
                 <Tab title={"Компиляция"} eventKey={"compilation"}>
-                    <OutputRenderer {...compilerResult} title={"Результат компиляции:"}/>
+                    <TtyRenderer {...compilerResult} title={"Результат компиляции:"}/>
                 </Tab>
             }
             {linkerResult !== undefined &&
                 <Tab title={"Линковка"} eventKey={"linking"}>
-                    <OutputRenderer {...linkerResult} title={"Результат линковки:"}/>
+                    <TtyRenderer {...linkerResult} title={"Результат линковки:"}/>
                 </Tab>
             }
             {runnerResult !== undefined &&
                 <Tab title={"Тестирование"} eventKey={"testing"}>
-                    <OutputRenderer {...runnerResult} title={"Результат тестирования:"}/>
+                    <TtyRenderer {...runnerResult} title={"Результат тестирования:"}/>
                 </Tab>
             }
         </Tabs>
