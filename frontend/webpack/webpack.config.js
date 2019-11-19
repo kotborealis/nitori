@@ -141,7 +141,8 @@ module.exports = (env = {prod: false}) => {
             })),
 
             new webpack.DefinePlugin({
-                'process.env.PUBLIC_PATH': JSON.stringify(PUBLIC_PATH),
+                'process.env.PUBLIC_PATH': JSON.stringify(process.env.PUBLIC_PATH || '/'),
+                'process.env.AUTH_PATH': JSON.stringify(process.env.AUTH_PATH || '/'),
             }),
         ]),
 

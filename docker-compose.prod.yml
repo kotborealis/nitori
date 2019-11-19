@@ -11,5 +11,6 @@ services:
     build:
       args:
         PUBLIC_PATH: /testcpp/
+        AUTH_PATH: /
     ports:
       - "3050:80"

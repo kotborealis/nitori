@@ -20,6 +20,7 @@ services:
       dockerfile: Dockerfile
       args:
         PUBLIC_PATH: /
+        AUTH_PATH: "/#"
     ports:
       - "8080:80"
     links:

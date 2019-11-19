@@ -121,7 +121,7 @@ const SubmitTest = () => {
             <Col>
                 <Alert variant={"danger"}>
                     <Alert.Heading>Требуется аутентификация</Alert.Heading>
-                    <p><a href={"#login.php"}>Аутентификация</a></p>
+                    <p><a href={process.env.AUTH_PATH}>Аутентификация</a></p>
                 </Alert>
             </Col>
         </Row>) : null}
