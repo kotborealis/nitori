@@ -1,29 +1,36 @@
 import React, {useEffect, useState} from 'react';
-import urljoin from 'url-join';
 
-export const useFetch = (url, options) => {
-    const [data, setData] = useState({});
-    const [error, setError] = useState({});
-    const [status, setStatus] = useState(undefined);
+export const useFetch = (url, init = null, options = {}, deps = [url]) => {
+    const [data, setData] = useState(init);
+    const [error, setError] = useState(null);
+    const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        (async () => {
-            const response = await fetch(urljoin(...(Array.isArray(url) ? url : [url])), options);
+        let cancel = false;
+
+        const req = async () => {
+            const response = await fetch(url, options);
             setStatus(response.status);
 
-            try{
-                const json = await response.json();
-                setData(json);
-                if(json.error) setError(json.error);
-            }
-            catch(e){
-                setError(e);
-            }
-
+            const json = await response.json();
             setLoading(false);
-        })();
-    }, []);
 
-    return [data, loading, error, status];
+            if(cancel)
+                return;
+
+            setData(json);
+        };
+
+        req().catch(setError);
+
+        return () => { cancel = true };
+    }, [...deps]);
+
+    return {
+        data,
+        loading,
+        error,
+        status
+    };
 };

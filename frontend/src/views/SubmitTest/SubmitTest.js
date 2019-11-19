@@ -9,8 +9,14 @@ import {useFetch} from '../../hooks/useFetch';
 import {useApi} from '../../hooks/useApi';
 
 const SubmitTest = () => {
-    const [userData = null, userDataLoading] = useFetch("/auth/user_data.php");
-    const [{data: tasksList}, taskListLoading] = useApi(["task", "0"]);
+    const {
+        status: userDataStatus
+    } = useFetch("/auth/user_data.php");
+
+    const {
+        data: tasksList,
+        loading: taskListLoading
+    } = useApi("task/0");
 
     const [outputState, setOutputState] = useState({
         compilerResult: undefined,
@@ -21,26 +27,6 @@ const SubmitTest = () => {
     const [outputStateLoading, setOutputStateLoading] = useState(false);
 
     const [testId, setTestId] = useState("");
-
-    useEffect(() => {
-        if(window.location.hash.length > 1){
-            const hash = window.location.hash.slice(1);
-            setTestId(hash);
-
-            (async () => {
-                const res = await api(["test", hash]);
-                const {data, error} = await res.json();
-                if(error){
-                    alert(JSON.stringify(error));
-                    setOutputStateLoading(false);
-                }
-                else{
-                    setOutputState(data);
-                    setOutputStateLoading(false);
-                }
-            })();
-        }
-    }, [0]);
 
     useEffect(() => {
         window.location.hash = testId;
@@ -54,8 +40,7 @@ const SubmitTest = () => {
         const hash = window.location.hash.slice(1);
         if(hash){
             (async () => {
-                const res = await api(["test", hash]);
-                const {data, error} = await res.json();
+                const {data, error} = await api(`test/${hash}`);
                 if(error){
                     alert(JSON.stringify(error));
                     setOutputStateLoading(false);
@@ -66,7 +51,7 @@ const SubmitTest = () => {
                 }
             })();
         }
-    }, []);
+    }, [window.location.hash]);
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -82,12 +67,10 @@ const SubmitTest = () => {
         const formData = new FormData(event.target);
 
         setOutputStateLoading(true);
-        const res = await api("test", {
+        const {data, error} = await api("test", {
             method: "POST",
             body: formData
         });
-
-        const {data, error} = await res.json();
 
         if(error){
             alert(JSON.stringify(error));
@@ -117,14 +100,14 @@ const SubmitTest = () => {
     ].filter(id => id);
 
     return (<Container className={styles.container}>
-        {userData === null && !userDataLoading ? (<Row className={styles.row}>
+        {userDataStatus !== 200 && (<Row className={styles.row}>
             <Col>
                 <Alert variant={"danger"}>
                     <Alert.Heading>Требуется аутентификация</Alert.Heading>
                     <p><a href={process.env.AUTH_PATH}>Аутентификация</a></p>
                 </Alert>
             </Col>
-        </Row>) : null}
+        </Row>)}
         <Row className={styles.row}>
             <Col>
                 <SourceInputForm {...{onSubmit, tasksList}} disabled={outputStateLoading || taskListLoading}/>

@@ -24,12 +24,10 @@ export default () => {
         const formData = new FormData(event.target);
 
         setOutputStateLoading(true);
-        const res = await api("task", {
+        const {data, error} = await api("task", {
             method: "POST",
             body: formData
         });
-
-        const {data, error} = await res.json();
 
         if(error){
             alert(JSON.stringify(error));
