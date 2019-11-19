@@ -11,7 +11,7 @@ const {ObjectCache} = require('../ObjectCache');
 const {Compiler} = require('../gnu_utils');
 
 const precompile = async (config, id) => {
-    debug("Test precompilation for", id);
+    debug("TestSpec precompilation for", id);
 
     const db = require('nano')(config.database).use(config.database.name);
     const working_dir = config.sandbox.working_dir;
@@ -58,15 +58,15 @@ const precompile = async (config, id) => {
 };
 
 const precompile_all = async (config) => {
-    debug("Start tests precompilation");
+    debug("Start TestSpecs precompilation");
 
     const db = require('nano')(config.database).use(config.database.name);
-    const {rows} = await db.view("task", "by_wid", {include_docs: true});
+    const {rows} = await db.view("TestSpec", "by_wid", {include_docs: true});
     const tests = rows.map(({value: {_id}}) => _id);
 
     for await (const test of tests) await precompile(config, test);
 
-    debug("Precompiled all tests");
+    debug("Precompiled all TestSpecs");
 };
 
 module.exports = {precompile_all, precompile};

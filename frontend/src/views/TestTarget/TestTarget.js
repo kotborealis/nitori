@@ -16,7 +16,7 @@ const TestTarget = () => {
     const {
         data: tasksList,
         loading: taskListLoading
-    } = useApi("task/0");
+    } = useApi("TestSpec/0");
 
     const [outputState, setOutputState] = useState({
         compilerResult: undefined,
@@ -40,7 +40,7 @@ const TestTarget = () => {
         const hash = window.location.hash.slice(1);
         if(hash){
             (async () => {
-                const {data, error} = await api(`test/${hash}`);
+                const {data, error} = await api(`TestTarget/${hash}`);
                 if(error){
                     alert(JSON.stringify(error));
                     setOutputStateLoading(false);
@@ -67,7 +67,7 @@ const TestTarget = () => {
         const formData = new FormData(event.target);
 
         setOutputStateLoading(true);
-        const {data, error} = await api("test", {
+        const {data, error} = await api("TestTarget", {
             method: "POST",
             body: formData
         });

@@ -14,7 +14,7 @@ const express = require('express');
 const fileUpload = require('express-fileupload');
 
 const db_utils = require('../database/utils');
-const {precompile} = require('../precompile/precompile');
+const {precompile} = require('../TestSpecPrecompile/precompile');
 
 const {Docker} = require('node-docker-api');
 
@@ -50,7 +50,7 @@ module.exports = async (config) => {
 
     app.use(authHandler());
 
-    app.post("/task/",
+    app.post("/TestSpec/",
         //authHandler([({isAdmin}) => isAdmin === true]),
         sourceFilesHandler(config.api.limits, 1),
         async function(req, res) {
@@ -73,7 +73,7 @@ module.exports = async (config) => {
         const file = req.sourceFiles[0];
         const {name, description = "", wid} = req.body;
 
-        const {rows: [row]} = await db.view("task", "by_wid_and_name", {
+        const {rows: [row]} = await db.view("TestSpec", "by_wid_and_name", {
             key: [wid, name],
             include_docs: true
         });
@@ -81,7 +81,7 @@ module.exports = async (config) => {
         let id = row ? row.doc._id : shortid.generate();
 
         db_utils.multipartUpdate(db, {
-            type: "task",
+            type: "TestSpec",
             name,
             wid,
             description
@@ -98,23 +98,23 @@ module.exports = async (config) => {
         }});
     });
 
-    app.get("/task/:wid", async function(req, res) {
-        debug("/task/");
+    app.get("/TestSpec/:wid", async function(req, res) {
+        debug("/TestSpec/");
 
-        const {rows} = await db.view("task", "by_wid", {
+        const {rows} = await db.view("TestSpec", "by_wid", {
             key: req.params.wid,
             include_docs: true
         });
         res.json({data: rows.map(({doc}) => doc)});
     });
 
-    app.get("/test/:id", async function(req, res, next) {
+    app.get("/TestTarget/:id", async function(req, res, next) {
         const {id} = req.params;
 
-        const {rows: [test]} = await db.view('test', 'by_id', {key: id, include_docs: true});
+        const {rows: [test]} = await db.view('TestTarget', 'by_id', {key: id, include_docs: true});
 
         if(!test) {
-            const err = new Error("Specified test attempt does not exists");
+            const err = new Error("Specified TestTarget does not exists");
             err.status = 404;
             next(err);
             return;
@@ -125,8 +125,8 @@ module.exports = async (config) => {
         res.json({data});
     });
 
-    app.post("/test/", sourceFilesHandler(config.api.limits, 10), async function(req, res, next) {
-        debug("/test/");
+    app.post("/TestTarget/", sourceFilesHandler(config.api.limits, 10), async function(req, res, next) {
+        debug("/TestTarget/");
         const userData = await auth(req.cookies.PHPSESSID);
 
         const {test_id} = req.body;
@@ -138,7 +138,7 @@ module.exports = async (config) => {
             }));
 
             await db.multipart.insert({
-                type: "test",
+                type: "TestTarget",
                 timestamp: Date.now(),
                 userData,
                 test_id,
@@ -157,7 +157,7 @@ module.exports = async (config) => {
         };
 
         if(!await db_utils.exists(db, test_id)){
-            const err = new Error("Selected test does not exists");
+            const err = new Error("Selected TestSpec does not exists");
             err.status = 404;
             next(err);
             return;
@@ -182,7 +182,7 @@ module.exports = async (config) => {
         await objcopy.redefine_sym(targetBinaries, "main", config.testing.hijack_main, {working_dir});
 
         if(!objectCache.has(cache_key)){
-            const err = new Error("Failed to fetch test binary from cache; please run --precompile_all");
+            const err = new Error("Failed to fetch TestSpec binary from cache");
             err.status = 500;
             next(err);
             return;
