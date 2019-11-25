@@ -26,46 +26,26 @@ module.exports = async ({database}) => {
 
     const db = nano.db.use(database.name);
 
-    debug("Creating designs and views");
+    debug("Uploading model to db");
 
-    const designPaths = glob.sync('./src/database/designs/*');
-
-    for(let designPath of designPaths){
-        const designName = path.basename(designPath, '');
-
-        debug("Processing design", designName);
-
-        const processEntries = (name) => {
-            const entries = {};
-            const entriesPaths = glob.sync(`./src/database/designs/${designName}/${name}/*.js`);
-
-            for(let entryPath of entriesPaths){
-                const entry = path.basename(entryPath, '.js');
-                debug(`Processing entry from ${name}`, entry);
-                entries[entry] = require(`./designs/${designName}/${name}/${entry}.js`);
-            }
-
-            return entries;
-        }
-
-        const design = {
-            _id: `_design/${designName}`,
-            views: processEntries('views'),
-            shows: processEntries('shows'),
-            lists: processEntries('lists'),
-            updates: processEntries('updates'),
-            filters: processEntries('filters'),
-        };
-
-        try{
-            const {etag} = await db.head(design._id);
-            await db.insert({
-                ...design,
-                _rev: JSON.parse(etag)
-            }, design._id);
-        }
-        catch(e){
-            await db.insert(design, design._id);
-        }
-    }
+    await Promise.all(
+        glob.sync('./src/database/models/*.js')
+            .map(modelPath => path.basename(modelPath, '.js'))
+            .map(name => ({
+                ...require(`./models/${name}.js`),
+                _id: `_design/${name}`
+            }))
+            .map(async (design) => {
+                try{
+                    const {etag} = await db.head(design._id);
+                    return db.insert({
+                        ...design,
+                        _rev: JSON.parse(etag)
+                    }, design._id);
+                }
+                catch(e){
+                    return db.insert(design, design._id);
+                }
+            })
+    );
 };
