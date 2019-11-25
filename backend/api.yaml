@@ -38,6 +38,17 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
       responses:
         200:
           description: Added TestSpec

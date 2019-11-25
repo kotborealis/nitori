@@ -16,7 +16,7 @@ const filesHandler = require('./filesHandler');
 
 const debug = require('debug')('nitori:api');
 const express = require('express');
-const fileUpload = require('express-fileupload');
+//const fileUpload = require('express-fileupload');
 
 const Database = require('../database');
 const {precompile} = require('../TestSpecPrecompile/precompile');
@@ -47,12 +47,6 @@ module.exports = async (config) => {
 
     app.use(cookieParser());
 
-    app.use(fileUpload({
-        limits: {
-            fileSize: config.api.limits.fileSize
-        }
-    }));
-
     //app.use(authHandler());
 
     app.use('/swagger/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -61,7 +55,7 @@ module.exports = async (config) => {
         apiSpec: './api.yaml',
         validateRequests: true,
         validateResponses: {
-            removeAdditional: 'failing'
+            removeAdditional: false
         },
         multerOpts: {
             limits: {
@@ -138,7 +132,7 @@ module.exports = async (config) => {
             const id = shortid.generate();
 
             const insertResults = async (data) => {
-                const sources = req.sourceFiles.map(({name, content: data, content_type}) => ({
+                const sources = req.files.map(({name, content: data, content_type}) => ({
                     name, data, content_type
                 }));
 
@@ -175,7 +169,7 @@ module.exports = async (config) => {
             await sandbox.start();
 
             const compiler = new Compiler(sandbox, config.timeout.compilation);
-            const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(req.sourceFiles, {working_dir});
+            const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(req.files, {working_dir});
 
             if(compilerResult.exitCode){
                 await insertResults({compilerResult});
