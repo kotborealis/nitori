@@ -1,5 +1,3 @@
-const md5 = require('md5');
-
 const YAML = require('yamljs');
 const swaggerDocument = YAML.load('./api.yaml');
 
@@ -12,17 +10,14 @@ const cookieParser = require('cookie-parser');
 const shortid = require('shortid');
 shortid.characters("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-.");
 
-const filesHandler = require('./middleware/filesMiddleware');
-
 const debug = require('debug')('nitori:api');
 const express = require('express');
 require('express-async-errors');
 
 const Database = require('../database');
-const {precompile} = require('../TestSpecPrecompile/precompile');
 
 const {Sandbox} = require('../Sandbox');
-const {Compiler, Objcopy} = require('../SandboxedGnuUtils');
+const {Docker} = require('node-docker-api');
 
 module.exports = async (config) => {
     const auth = require('../auth').auth(config.auth.url);
@@ -76,6 +71,7 @@ module.exports = async (config) => {
     process.on('SIGINT', async () => {
         server.close();
         try{
+            const docker = new Docker(config.docker);
             await Sandbox.destroy_all(docker);
             process.exit(0);
         }
