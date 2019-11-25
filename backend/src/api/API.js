@@ -252,6 +252,23 @@ module.exports = async (config) => {
             await sandbox.stop();
         });
 
+    app.get("/widList", async (req, res) => {
+        const {docs} = await db.find({
+            selector: {
+                type: "TestSpec"
+            },
+            fields: ["wid"]
+        });
+
+        res.json(
+            docs
+                .map(doc => doc.wid)
+                .filter((value, index, self) =>
+                    self.indexOf(value) === index
+                )
+        );
+    });
+
     //noinspection JSUnusedLocalSymbols
     app.use(function(err, req, res, next) {
         debug("Error handler: ", err);
