@@ -176,7 +176,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TestTargetResultList'
 
-  /widList:
+  /Widget/list:
     get:
       summary: Get all existing widget ids
       responses:
