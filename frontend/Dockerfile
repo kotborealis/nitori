@@ -1,4 +1,4 @@
-FROM node:12-alpine AS build
+FROM node:13-alpine AS build
 
 ARG PUBLIC_PATH
 
