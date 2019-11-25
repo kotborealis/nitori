@@ -62,6 +62,7 @@ paths:
       parameters:
         - name: id
           in: query
+          required: true
           schema:
             type: string
       responses:
@@ -78,6 +79,7 @@ paths:
       summary: Submit source code to test
       parameters:
         - name: testSpecId
+          description: TestSpec id to test with
           in: query
           schema:
             type: string
@@ -99,6 +101,79 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TestTargetResult'
+
+  /TestTargetList:
+    get:
+      summary: Get list of TestTargets
+      parameters:
+        - name: limit
+          description: Limit
+          in: query
+          required: false
+          schema:
+            type: number
+            default: 100
+        - name: skip
+          description: Skip
+          in: query
+          required: false
+          schema:
+            type: number
+            default: 0
+        - name: testSpecId
+          description: Filter by TestSpec id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: timestampStart
+          description: Filter by TestSpec timestamp range (end)
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: timestampEnd
+          description: Filter by TestSpec timestamp range (end)
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: userDataId
+          description: Filter by UserData userId
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: userDataLogin
+          description: Filter by UserData login
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: userDataName
+          description: Filter by UserData name
+          in: query
+          schema:
+            type: string
+        - name: userDataGroupId
+          description: Filter by UserData groupId
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: userDataGroupName
+          description: Filter by UserData groupId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of TestTargets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestTargetResultList'
 
 components:
 
@@ -175,3 +250,8 @@ components:
           $ref: '#/components/schemas/ExecOutput'
         runnerResult:
           $ref: '#/components/schemas/ExecOutput'
+
+    TestTargetResultList:
+      type: array
+      items:
+        $ref: '#/components/schemas/TestTargetResult'

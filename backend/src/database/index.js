@@ -11,20 +11,20 @@ module.exports = class {
 
     insert = (...args) => this.db.insert(...args);
     get = (...args) => this.db.get(...args);
-    view = (...args) => this.db.view(...args);
-
     multipart = {
         insert: (...args) => this.db.multipart.insert(...args),
         update: async (data, files, doc) => {
             try{
                 const {_rev} = await this.db.get(doc);
-                return this.db.multipart.insert({...data, _rev}, files, doc);
+                return await this.db.multipart.insert({...data, _rev}, files, doc);
             }
             catch(e){
-                return this.db.multipart.insert(data, files, doc);
+                return await this.db.multipart.insert(data, files, doc);
             }
         },
-    }
+    };
+
+    find = (...args) => this.db.find(...args);
 
     async exists(id) {
         try{
@@ -58,11 +58,11 @@ module.exports = class {
     async update(id, data) {
         try{
             const {_rev} = await this.db.get(id);
-            return this.db.insert({...data, _rev}, id);
+            return await this.db.insert({...data, _rev}, id);
         }
         catch(e){
             debug(e);
-            return this.db.insert(data, id);
+            return await this.db.insert(data, id);
         }
     }
 };

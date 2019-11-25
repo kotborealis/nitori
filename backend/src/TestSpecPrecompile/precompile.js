@@ -61,10 +61,14 @@ const precompile_all = async (config) => {
     debug("Start TestSpecs precompilation");
 
     const db = require('nano')(config.database).use(config.database.name);
-    const {rows} = await db.view("TestSpec", "by_wid", {include_docs: true});
-    const tests = rows.map(({value: {_id}}) => _id);
 
-    for await (const test of tests) await precompile(config, test);
+    const {docs: rows} = await db.find({
+        selector: {type: "TestSpec"}
+    });
+
+    const spec_ids = rows.map(({_id}) => _id);
+
+    for await (const test of spec_ids) await precompile(config, test);
 
     debug("Precompiled all TestSpecs");
 };

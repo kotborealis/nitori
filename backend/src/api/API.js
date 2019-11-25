@@ -16,7 +16,7 @@ const filesHandler = require('./filesHandler');
 
 const debug = require('debug')('nitori:api');
 const express = require('express');
-//const fileUpload = require('express-fileupload');
+require('express-async-errors');
 
 const Database = require('../database');
 const {precompile} = require('../TestSpecPrecompile/precompile');
@@ -72,12 +72,15 @@ module.exports = async (config) => {
             const {wid} = req.query;
             const {name, description = ""} = req.body;
 
-            const {rows: [row]} = await db.view("TestSpec", "by_wid_and_name", {
-                key: [wid, name],
-                include_docs: true
+            const {docs: [test]} = await db.find({
+                selector: {
+                    wid,
+                    name,
+                    type: "TestSpec"
+                }
             });
 
-            let id = row ? row.doc._id : shortid.generate();
+            let id = test ? test._id : shortid.generate();
 
             await db.multipart.update({
                 type: "TestSpec",
@@ -98,28 +101,68 @@ module.exports = async (config) => {
     app.get("/TestSpec", async function(req, res) {
         debug("/TestSpec/");
 
-        const {rows} = await db.view("TestSpec", "by_wid", {
-            key: req.query.wid,
-            include_docs: true
+        const {wid} = req.query;
+
+        const {docs} = await db.find({
+            selector: {
+                wid,
+                type: "TestSpec"
+            }
         });
-        res.json(rows.map(({doc}) => doc));
+
+        res.json(docs);
     });
 
     app.get("/TestTarget", async function(req, res, next) {
         const {id} = req.query;
 
-        const {rows: [test]} = await db.view('TestTarget', 'by_id', {key: id, include_docs: true});
+        const {docs: [test]} = await db.find({selector: {_id: id, type: "TestTarget"}});
 
         if(!test){
             const err = new Error("Specified TestTarget does not exists");
             err.status = 404;
-            next(err);
-            return;
+            throw err;
         }
 
-        const data = test.doc;
-        data.sourceFiles = await db.getAllAttachments(id);
-        res.json(data);
+        test.sourceFiles = await db.getAllAttachments(id);
+        res.json(test);
+    });
+
+    app.get("/TestTargetList", async function(req, res, next) {
+        const {
+            limit,
+            skip,
+            testSpecId,
+            timestampStart,
+            timestampEnd,
+            userDataId,
+            userDataLogin,
+            userDataName,
+            userDataGroupId,
+            userDataGroupName
+        } = req.query;
+
+        const selector = {
+            type: "TestTarget",
+            testSpecId: testSpecId ? {"$eq": testSpecId} : undefined,
+            timestamp: (timestampStart || timestampEnd) ? {
+                "$gte": timestampStart ? timestampStart : undefined,
+                "$lte": timestampEnd ? timestampEnd : undefined,
+            } : undefined,
+            userDataId: userDataId ? {"$eq": userDataId} : undefined,
+            userDataLogin: userDataLogin ? {"$eq": userDataLogin} : undefined,
+            userDataName: userDataName ? {"$eq": userDataName} : undefined,
+            userDataGroupId: userDataGroupId ? {"$eq": userDataGroupId} : undefined,
+            userDataGroupName: userDataGroupName ? {"$eq": userDataGroupName} : undefined,
+        };
+
+        const {docs} = await db.find({
+            limit,
+            skip,
+            selector
+        });
+
+        res.json(docs);
     });
 
     app.post("/TestTarget/",
