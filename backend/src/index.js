@@ -7,8 +7,6 @@ const {API} = require('./api');
 
 process.on('unhandledRejection', (reason) => debug('unhandledRejection', reason));
 
-console.log(config.database.url);
-
 (async () => {
     await databaseInit(config);
     await precompile_all(config);
