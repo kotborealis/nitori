@@ -20,12 +20,10 @@ const {Sandbox} = require('../Sandbox');
 const {Docker} = require('node-docker-api');
 
 module.exports = async (config) => {
-    const auth = require('../auth').auth(config.auth.url);
     const authHandler = require('../auth').middleware(config.auth.url);
     const db = new Database(require('nano')(config.database), config.database.name);
 
     const port = config.api.port;
-    const working_dir = config.sandbox.working_dir;
 
     const app = express();
 
@@ -52,9 +50,7 @@ module.exports = async (config) => {
         }
     }).install(app);
 
-    app.use('/TestSpec', require('./routes/TestSpec')(config));
-    app.use('/TestTarget', require('./routes/TestTarget')(config));
-    app.use('/Widget', require('./routes/Widget')(config));
+    app.use('/widgets/', require('./routes/widgets/widgets')(config));
 
     //noinspection JSUnusedLocalSymbols
     app.use(function(err, req, res, next) {

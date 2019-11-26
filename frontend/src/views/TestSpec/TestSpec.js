@@ -26,8 +26,7 @@ export default () => {
         setOutputStateLoading(true);
 
         try{
-            const {data} = await api(`TestSpec?wid=${0}&name=${formData.get('name')}` +
-                                     `&description=${formData.get('description')}`,
+            const {data} = await api(`widgets/0/test-specs/?name=${formData.get('name')}&description=${formData.get('description')}`,
                 {
                     method: "POST",
                     body: formData

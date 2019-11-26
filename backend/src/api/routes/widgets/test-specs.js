@@ -1,8 +1,8 @@
 const {Router} = require('express');
-const filesMiddleware = require('../middleware/filesMiddleware');
+const filesMiddleware = require('../../middleware/filesMiddleware');
 const shortid = require('shortid');
-const Database = require('../../database');
-const {precompile} = require('../../TestSpecPrecompile/precompile');
+const Database = require('../../../database');
+const {precompile} = require('../../../TestSpecPrecompile/precompile');
 
 module.exports = (config) => {
 
@@ -10,34 +10,39 @@ module.exports = (config) => {
     const db = new Database(require('nano')(config.database), config.database.name);
 
     router.route('/')
-        .get(async function(req, res) {
-            const {id} = req.query;
+        .get(async (req, res) => {
+            const {
+                limit,
+                skip,
+                name
+            } = req.query;
 
-            const {docs: [doc]} = await db.find({
-                selector: {
-                    _id: id,
-                    type: "TestSpec"
-                }
+            const {widgetId} = req;
+
+            const selector = {
+                type: "TestSpec",
+                name,
+                widgetId
+            };
+
+            const {docs} = await db.find({
+                limit,
+                skip,
+                selector
             });
 
-            if(!doc){
-                const err = new Error("Not found");
-                err.status = 404;
-                throw err;
-            }
-
-            res.json(doc);
+            res.json(docs);
         })
         .post(//authHandler([({isAdmin}) => isAdmin === true]),
             filesMiddleware(config.api.limits, 1, 1),
             async function(req, res) {
                 const [file] = req.files;
-                const {wid} = req.query;
+                const {widgetId} = req;
                 const {name, description = ""} = req.body;
 
                 const {docs: [test]} = await db.find({
                     selector: {
-                        wid,
+                        widgetId,
                         name,
                         type: "TestSpec"
                     }
@@ -48,7 +53,7 @@ module.exports = (config) => {
                 await db.multipart.update({
                     type: "TestSpec",
                     name,
-                    wid,
+                    widgetId,
                     description
                 }, [{
                     name: file.name,
@@ -61,28 +66,24 @@ module.exports = (config) => {
                 res.json(compilerResult);
             });
 
-    router.route('/list')
-        .get(async (req, res) => {
-            const {
-                limit,
-                skip,
-                name,
-                wid
-            } = req.query;
+    router.route('/:testSpecId')
+        .get(async function(req, res) {
+            const {testSpecId: _id} = req.params;
 
-            const selector = {
-                type: "TestSpec",
-                name,
-                wid
-            };
-
-            const {docs} = await db.find({
-                limit,
-                skip,
-                selector
+            const {docs: [doc]} = await db.find({
+                selector: {
+                    _id,
+                    type: "TestSpec"
+                }
             });
 
-            res.json(docs);
+            if(!doc){
+                const err = new Error("Not found");
+                err.status = 404;
+                throw err;
+            }
+
+            res.json(doc);
         });
 
     return router;

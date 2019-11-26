@@ -1,39 +1,66 @@
 const {Router} = require('express');
-const Database = require('../../database');
-const filesHandler = require('../middleware/filesMiddleware');
+const Database = require('../../../database');
+const filesHandler = require('../../middleware/filesMiddleware');
 const shortid = require('shortid');
 const md5 = require('md5');
-const {Objcopy} = require('../../SandboxedGnuUtils');
-const {Compiler} = require('../../SandboxedGnuUtils');
-const {Sandbox} = require('../../Sandbox');
+const {Objcopy} = require('../../../SandboxedGnuUtils');
+const {Compiler} = require('../../../SandboxedGnuUtils');
+const {Sandbox} = require('../../../Sandbox');
 const {Docker} = require('node-docker-api');
-const {ObjectCache} = require('../../ObjectCache');
+const {ObjectCache} = require('../../../ObjectCache');
 
 module.exports = (config) => {
     const router = Router();
+    const auth = require('../../../auth').auth(config.auth.url);
     const db = new Database(require('nano')(config.database), config.database.name);
     const docker = new Docker(config.docker);
     const objectCache = new ObjectCache(config.cache.dir);
 
     router.route('/')
-        .get(async (req, res) => {
-            const {id} = req.query;
+        .get(async function(req, res) {
+            const {widgetId} = req;
 
-            const {docs: [test]} = await db.find({selector: {_id: id, type: "TestTarget"}});
+            const {
+                limit,
+                skip,
+                testSpecId,
+                timestampStart,
+                timestampEnd,
+                userDataId,
+                userDataLogin,
+                userDataName,
+                userDataGroupId,
+                userDataGroupName
+            } = req.query;
 
-            if(!test){
-                const err = new Error("Specified TestTarget does not exists");
-                err.status = 404;
-                throw err;
-            }
+            const selector = {
+                type: "TestTarget",
+                widgetId,
+                testSpecId: testSpecId ? {"$eq": testSpecId} : undefined,
+                timestamp: (timestampStart || timestampEnd) ? {
+                    "$gte": timestampStart ? timestampStart : undefined,
+                    "$lte": timestampEnd ? timestampEnd : undefined,
+                } : undefined,
+                userDataId: userDataId ? {"$eq": userDataId} : undefined,
+                userDataLogin: userDataLogin ? {"$eq": userDataLogin} : undefined,
+                userDataName: userDataName ? {"$eq": userDataName} : undefined,
+                userDataGroupId: userDataGroupId ? {"$eq": userDataGroupId} : undefined,
+                userDataGroupName: userDataGroupName ? {"$eq": userDataGroupName} : undefined,
+            };
 
-            test.sourceFiles = await db.getAllAttachments(id);
-            res.json(test);
+            const {docs} = await db.find({
+                limit,
+                skip,
+                selector
+            });
+
+            res.json(docs);
         })
         .post(filesHandler(config.api.limits, 1, 10),
             async (req, res) => {
                 const userData = await auth(req.cookies.PHPSESSID);
 
+                const {widgetId} = req;
                 const {testSpecId} = req.query;
                 const id = shortid.generate();
 
@@ -44,6 +71,7 @@ module.exports = (config) => {
 
                     await db.multipart.insert({
                         type: "TestTarget",
+                        widgetId,
                         timestamp: Date.now(),
                         userData,
                         testSpecId: testSpecId,
@@ -74,6 +102,7 @@ module.exports = (config) => {
                 await sandbox.start();
 
                 const compiler = new Compiler(sandbox, config.timeout.compilation);
+                const working_dir = config.sandbox.working_dir;
                 const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(req.files, {working_dir});
 
                 if(compilerResult.exitCode){
@@ -113,42 +142,21 @@ module.exports = (config) => {
                 await sandbox.stop();
             });
 
-    router.route('/list')
-        .get(async function(req, res) {
-            const {
-                limit,
-                skip,
-                testSpecId,
-                timestampStart,
-                timestampEnd,
-                userDataId,
-                userDataLogin,
-                userDataName,
-                userDataGroupId,
-                userDataGroupName
-            } = req.query;
+    router.route('/:testTargetId')
+        .get(async (req, res) => {
+            const {testTargetId: _id} = req.params;
+            const {widgetId} = req;
 
-            const selector = {
-                type: "TestTarget",
-                testSpecId: testSpecId ? {"$eq": testSpecId} : undefined,
-                timestamp: (timestampStart || timestampEnd) ? {
-                    "$gte": timestampStart ? timestampStart : undefined,
-                    "$lte": timestampEnd ? timestampEnd : undefined,
-                } : undefined,
-                userDataId: userDataId ? {"$eq": userDataId} : undefined,
-                userDataLogin: userDataLogin ? {"$eq": userDataLogin} : undefined,
-                userDataName: userDataName ? {"$eq": userDataName} : undefined,
-                userDataGroupId: userDataGroupId ? {"$eq": userDataGroupId} : undefined,
-                userDataGroupName: userDataGroupName ? {"$eq": userDataGroupName} : undefined,
-            };
+            const {docs: [test]} = await db.find({selector: {_id, type: "TestTarget", widgetId}});
 
-            const {docs} = await db.find({
-                limit,
-                skip,
-                selector
-            });
+            if(!test){
+                const err = new Error("Specified TestTarget does not exists");
+                err.status = 404;
+                throw err;
+            }
 
-            res.json(docs);
+            test.sourceFiles = await db.getAllAttachments(_id);
+            res.json(test);
         });
 
     return router;

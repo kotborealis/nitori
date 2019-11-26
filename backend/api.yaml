@@ -12,32 +12,76 @@ servers:
     description: Webpack-dev-server
 
 paths:
-  /TestSpec:
+  /widgets/:
     get:
-      summary: Get TestSpecs by id
+      summary: Get all existing widgets
       tags:
-        - TestSpec
-      parameters:
-        - name: id
-          in: query
-          required: true
-          schema:
-            type: string
+        - Widget
       responses:
-        '200':
-          description: Specified TestSpec
+        200:
+          description: List of widgets
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TestSpec'
-        '404':
-          description: Specified TestSpec not found
+                type: array
+                items:
+                  $ref: '#/components/schemas/widgetId'
+
+  /widgets/{widgetId}:
+    get:
+      summary: Get widget
+      tags:
+        - Widget
+      parameters:
+        - $ref: '#/components/parameters/widgetId'
+      responses:
+        200:
+          description: Widget id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/widgetId'
+        404:
+          description: Widget does not exists
+
+  /widgets/{widgetId}/test-specs:
+    get:
+      summary: Get filtered list of TestSpecs
+      tags:
+        - TestSpec
+      parameters:
+        - $ref: '#/components/parameters/widgetId'
+        - name: limit
+          description: Limit
+          in: query
+          required: false
+          schema:
+            type: number
+            default: 100
+        - name: skip
+          description: Skip
+          in: query
+          required: false
+          schema:
+            type: number
+            default: 0
+        - name: name
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of TestSpecs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestSpecList'
     post:
       summary: Add TestSpec
       tags:
         - TestSpec
       parameters:
-        - $ref: "#/components/parameters/WidgetID"
+        - $ref: '#/components/parameters/widgetId'
         - name: name
           in: query
           required: true
@@ -67,98 +111,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExecOutput'
 
-  /TestSpec/list:
+  /widgets/{widgetId}/test-specs/{testSpecId}:
     get:
-      summary: Get TestSpecs by filter
+      summary: Get TestSpecs by id
       tags:
         - TestSpec
       parameters:
-        - name: limit
-          description: Limit
-          in: query
-          required: false
-          schema:
-            type: number
-            default: 100
-        - name: skip
-          description: Skip
-          in: query
-          required: false
-          schema:
-            type: number
-            default: 0
-        - name: name
-          in: query
-          schema:
-            type: string
-        - name: wid
-          in: query
-          schema:
-            type: string
-      responses:
-        200:
-          description: List of TestSpecs
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TestSpecList'
-
-  /TestTarget:
-    get:
-      summary: Get TestTarget info by id
-      tags:
-        - TestTarget
-      parameters:
-        - name: id
-          in: query
+        - $ref: '#/components/parameters/widgetId'
+        - name: testSpecId
+          in: path
           required: true
           schema:
             type: string
       responses:
-        200:
-          description: TestTarget info
+        '200':
+          description: Specified TestSpec
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TestTargetResult'
-        404:
-          description: TestTarget does not exists
+                $ref: '#/components/schemas/TestSpec'
+        '404':
+          description: Specified TestSpec not found
 
-    post:
-      summary: Submit source code to test
-      tags:
-        - TestTarget
-      parameters:
-        - name: testSpecId
-          description: TestSpec id to test with
-          in: query
-          schema:
-            type: string
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
-      responses:
-        200:
-          description: TestTarget completed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TestTargetResult'
-
-  /TestTarget/list:
+  /widgets/{widgetId}/test-targets:
     get:
       summary: Get list of TestTargets
       tags:
         - TestTarget
       parameters:
+        - $ref: '#/components/parameters/widgetId'
         - name: limit
           description: Limit
           in: query
@@ -227,37 +208,74 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TestTargetResultList'
-
-  /Widget/list:
-    get:
-      summary: Get all existing widget ids
+    post:
+      summary: Submit new TestTarget
       tags:
-        - Widget
+        - TestTarget
+      parameters:
+        - $ref: '#/components/parameters/widgetId'
+        - name: testSpecId
+          description: TestSpec id to test with
+          in: query
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
       responses:
         200:
-          description: List of wIds
+          description: TestTarget completed
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/wid'
+                $ref: '#/components/schemas/TestTargetResult'
+
+  /widgets/{widgetId}/test-targets/{testTargetId}:
+    get:
+      summary: Get TestTarget info by id
+      tags:
+        - TestTarget
+      parameters:
+        - $ref: '#/components/parameters/widgetId'
+        - name: testTargetId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: TestTarget info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestTargetResult'
+        404:
+          description: TestTarget does not exists
+
 
 components:
 
   parameters:
 
-    WidgetID:
-      name: wid
-      in: query
-      description: WidgetID
+    widgetId:
+      name: widgetId
+      description: Widget id
+      in: path
       required: true
       schema:
-        $ref: '#/components/schemas/wid'
+        $ref: '#/components/schemas/widgetId'
 
   schemas:
 
-    wid:
+    widgetId:
       type: string
       default: "0"
 
@@ -265,12 +283,12 @@ components:
       type: object
       required:
         - name
-        - wid
+        - widgetId
         - description
       properties:
         name:
           type: string
-        wid:
+        widgetId:
           type: string
         description:
           type: string

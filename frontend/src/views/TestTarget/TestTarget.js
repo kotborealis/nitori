@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Alert, Col, Container, Row} from 'react-bootstrap';
 import {SourceInputForm} from '../../components/SourceInputForm/SourceInputForm';
 import {TestOutput} from '../../components/TestOutput/TestOutput';
@@ -16,7 +16,7 @@ const TestTarget = () => {
     const {
         data: tasksList,
         loading: taskListLoading
-    } = useApi("TestSpec?wid=0", []);
+    } = useApi("widgets/0/test-specs/", []);
 
     const [outputState, setOutputState] = useState({
         compilerResult: undefined,
@@ -42,7 +42,7 @@ const TestTarget = () => {
         if(hash){
             (async () => {
                 try{
-                    const {data} = await api(`TestTarget?id=${hash}`);
+                    const {data} = await api(`/widgets/0/test-targets/${hash}`);
                     setOutputState(data);
                 }
                 catch(error){
@@ -70,7 +70,7 @@ const TestTarget = () => {
 
         setOutputStateLoading(true);
         try{
-            const {data} = await api(`TestTarget?testSpecId=${formData.get('testSpecId')}`, {
+            const {data} = await api(`/widgets/0/test-targets/?testSpecId=${formData.get('testSpecId')}`, {
                 method: "POST",
                 body: formData
             });
