@@ -52,6 +52,10 @@ module.exports = async (config) => {
         }
     }).install(app);
 
+    app.use('/TestSpec', require('./routes/TestSpec')(config));
+    app.use('/TestTarget', require('./routes/TestTarget')(config));
+    app.use('/Widget', require('./routes/Widget')(config));
+
     //noinspection JSUnusedLocalSymbols
     app.use(function(err, req, res, next) {
         debug("Error handler: ", err);
@@ -61,10 +65,6 @@ module.exports = async (config) => {
             errors: err.errors || [err.message]
         });
     });
-
-    app.use('/TestSpec', require('./routes/TestSpec')(config));
-    app.use('/TestTarget', require('./routes/TestTarget')(config));
-    app.use('/Widget', require('./routes/Widget')(config));
 
     const server = app.listen(port, () => debug(`Server running on 0.0.0.0:${port}`));
 
