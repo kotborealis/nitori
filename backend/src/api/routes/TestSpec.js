@@ -10,6 +10,24 @@ module.exports = (config) => {
     const db = new Database(require('nano')(config.database), config.database.name);
 
     router.route('/')
+        .get(async function(req, res) {
+            const {id} = req.query;
+
+            const {docs: [doc]} = await db.find({
+                selector: {
+                    _id: id,
+                    type: "TestSpec"
+                }
+            });
+
+            if(!doc){
+                const err = new Error("Not found");
+                err.status = 404;
+                throw err;
+            }
+
+            res.json(doc);
+        })
         .post(//authHandler([({isAdmin}) => isAdmin === true]),
             filesMiddleware(config.api.limits, 1, 1),
             async function(req, res) {
@@ -41,15 +59,27 @@ module.exports = (config) => {
                 const compilerResult = await precompile(config, id);
 
                 res.json(compilerResult);
-            })
-        .get(async function(req, res) {
-            const {wid} = req.query;
+            });
+
+    router.route('/list')
+        .get(async (req, res) => {
+            const {
+                limit,
+                skip,
+                name,
+                wid
+            } = req.query;
+
+            const selector = {
+                type: "TestSpec",
+                name,
+                wid
+            };
 
             const {docs} = await db.find({
-                selector: {
-                    wid,
-                    type: "TestSpec"
-                }
+                limit,
+                skip,
+                selector
             });
 
             res.json(docs);

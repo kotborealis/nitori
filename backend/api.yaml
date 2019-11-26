@@ -14,18 +14,28 @@ servers:
 paths:
   /TestSpec:
     get:
-      summary: Get TestSpecs by WID (Widged ID)
+      summary: Get TestSpecs by id
+      tags:
+        - TestSpec
       parameters:
-        - $ref: "#/components/parameters/WidgetID"
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: List of TestSpecs
+          description: Specified TestSpec
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TestSpecList'
+                $ref: '#/components/schemas/TestSpec'
+        '404':
+          description: Specified TestSpec not found
     post:
       summary: Add TestSpec
+      tags:
+        - TestSpec
       parameters:
         - $ref: "#/components/parameters/WidgetID"
         - name: name
@@ -57,9 +67,47 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExecOutput'
 
+  /TestSpec/list:
+    get:
+      summary: Get TestSpecs by filter
+      tags:
+        - TestSpec
+      parameters:
+        - name: limit
+          description: Limit
+          in: query
+          required: false
+          schema:
+            type: number
+            default: 100
+        - name: skip
+          description: Skip
+          in: query
+          required: false
+          schema:
+            type: number
+            default: 0
+        - name: name
+          in: query
+          schema:
+            type: string
+        - name: wid
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of TestSpecs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestSpecList'
+
   /TestTarget:
     get:
       summary: Get TestTarget info by id
+      tags:
+        - TestTarget
       parameters:
         - name: id
           in: query
@@ -78,6 +126,8 @@ paths:
 
     post:
       summary: Submit source code to test
+      tags:
+        - TestTarget
       parameters:
         - name: testSpecId
           description: TestSpec id to test with
@@ -103,9 +153,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/TestTargetResult'
 
-  /TestTargetList:
+  /TestTarget/list:
     get:
       summary: Get list of TestTargets
+      tags:
+        - TestTarget
       parameters:
         - name: limit
           description: Limit
@@ -179,6 +231,8 @@ paths:
   /Widget/list:
     get:
       summary: Get all existing widget ids
+      tags:
+        - Widget
       responses:
         200:
           description: List of wIds
