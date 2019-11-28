@@ -13,7 +13,7 @@ module.exports = (env = {prod: false}) => {
 
     return {
         entry: {
-            app: path.join(__dirname, '../src/index.js'),
+            app: path.join(__dirname, '../src/app/index.js'),
             vendor: [
                 'react',
                 'react-dom',
@@ -123,7 +123,7 @@ module.exports = (env = {prod: false}) => {
             ifDebug(new webpack.NamedModulesPlugin()),
 
             new HtmlWebpackPlugin({
-                template: path.join(__dirname, '../src/index.html'),
+                template: path.join(__dirname, '../src/app/index.html'),
                 filename: 'index.html',
                 inject: 'body',
             }),

@@ -1,6 +1,5 @@
 import {useFetch} from './useFetch';
-import {API_URL} from '../api';
-import urljoin from 'url-join';
+import {api_url} from '../api';
 
 export const useApi = (url, init, options, deps) => {
     const {
@@ -8,7 +7,7 @@ export const useApi = (url, init, options, deps) => {
         loading,
         error: fetchError,
         status
-    } = useFetch(urljoin(API_URL, url), init, options, deps);
+    } = useFetch(api_url(url), init, options, deps);
 
 
 

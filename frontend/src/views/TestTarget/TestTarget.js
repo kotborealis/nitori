@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {Alert, Col, Container, Row} from 'react-bootstrap';
+import {Alert, Col, Row} from 'react-bootstrap';
 import {SourceInputForm} from '../../components/SourceInputForm/SourceInputForm';
 import {TestOutput} from '../../components/TestOutput/TestOutput';
-import styles from './index.css';
+import styles from './TestTarget.css';
 import {api} from '../../api';
 import {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
 import {useFetch} from '../../hooks/useFetch';
@@ -47,8 +47,7 @@ const TestTarget = () => {
                 }
                 catch(error){
                     alert(JSON.stringify(error));
-                }
-                finally{
+                }finally{
                     setOutputStateLoading(false);
                 }
             })();
@@ -80,52 +79,53 @@ const TestTarget = () => {
         }
         catch(error){
             alert(JSON.stringify(error));
-        }
-        finally{
+        }finally{
             setOutputStateLoading(false);
         }
     };
 
     const progressStages = [
         outputState.compilerResult && {
-            variant: outputState.compilerResult.exitCode === 0 ? "success": "danger",
-            size: 100/3
+            variant: outputState.compilerResult.exitCode === 0 ? "success" : "danger",
+            size: 100 / 3
         },
         outputState.linkerResult && {
             variant: outputState.linkerResult.exitCode === 0 ? "success" : "danger",
-            size: 100/3
+            size: 100 / 3
         },
         outputState.runnerResult && {
             variant: outputState.runnerResult.exitCode === 0 ? "success" : "danger",
-            size: 100/3
+            size: 100 / 3
         },
     ].filter(id => id);
 
-    return (<Container className={styles.container}>
-        {userDataStatus !== 200 && (<Row className={styles.row}>
-            <Col>
-                <Alert variant={"danger"}>
-                    <Alert.Heading>Требуется аутентификация</Alert.Heading>
-                    <p><a href={process.env.AUTH_PATH}>Аутентификация</a></p>
-                </Alert>
-            </Col>
-        </Row>)}
-        <Row className={styles.row}>
-            <Col>
-                <SourceInputForm {...{onSubmit, tasksList}} disabled={outputStateLoading || taskListLoading}/>
-            </Col>
-        </Row>
-        <Row className={styles.row}>
-            <Col>
-                <ProgressbarStages state={progressStages} loading={outputStateLoading}/>
-            </Col>
-        </Row>
-        <Row className={styles.row}>
-            <Col>
-                <TestOutput {...outputState}/>
-            </Col>
-        </Row>
-    </Container>);
+    return (
+        <>
+            {userDataStatus !== 200 && (<Row className={styles.row}>
+                <Col>
+                    <Alert variant={"danger"}>
+                        <Alert.Heading>Требуется аутентификация</Alert.Heading>
+                        <p><a href={process.env.AUTH_PATH}>Аутентификация</a></p>
+                    </Alert>
+                </Col>
+            </Row>)}
+            <Row className={styles.row}>
+                <Col>
+                    <SourceInputForm {...{onSubmit, tasksList}} disabled={outputStateLoading || taskListLoading}/>
+                </Col>
+            </Row>
+            <Row className={styles.row}>
+                <Col>
+                    <ProgressbarStages state={progressStages} loading={outputStateLoading}/>
+                </Col>
+            </Row>
+            <Row className={styles.row}>
+                <Col>
+                    <TestOutput {...outputState}/>
+                </Col>
+            </Row>
+        </>
+    );
 };
 
 export default TestTarget;

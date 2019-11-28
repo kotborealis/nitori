@@ -1,9 +1,11 @@
 declare const API_URL: string;
 
-declare function api(url: Array<string> | string, options?: object): {
+declare function api(url: string, options?: object): {
     data: any,
     error: any,
     status: number
 };
 
-export {api, API_URL};
+declare function api_url(url: string): string
+
+export {api, API_URL, api_url};
