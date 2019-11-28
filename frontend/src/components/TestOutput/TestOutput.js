@@ -1,6 +1,7 @@
 import {Tab, Tabs} from 'react-bootstrap';
 import TtyRenderer from '../TtyRenderer/TtyRenderer';
 import React, {useEffect, useState} from 'react';
+import {exitCodeToVariant} from '../../helpers/exitCodeToVariant';
 
 export const TestOutput = ({
                                userData = undefined,
@@ -11,20 +12,14 @@ export const TestOutput = ({
                                runnerResult = {}
                            } = {}) => {
 
-    const exitCodeToAlertVariant = (code) => {
-        if(code === 0) return 'success';
-        if(code === undefined) return 'light';
-        return 'danger';
-    };
-
     const [tab, setTab] = useState('compilation');
 
     useEffect(() => {
-        if(exitCodeToAlertVariant(compilerResult.exitCode) === "danger"){
+        if(exitCodeToVariant(compilerResult.exitCode) === "danger"){
             if(tab !== 'compilation')
                 setTab('compilation');
         }
-        else if(exitCodeToAlertVariant(linkerResult.exitCode) === "danger"){
+        else if(exitCodeToVariant(linkerResult.exitCode) === "danger"){
             if(tab !== 'linking')
                 setTab('linking');
         }

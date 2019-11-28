@@ -12,7 +12,7 @@ export const TestSpecForm = ({onSubmit, initialName = "", initialDescription = "
         <Form onSubmit={onSubmit}>
             <Form.Row>
                 <Form.Group>
-                    <Form.Label>Test spec:</Form.Label>
+                    <Form.Label>Исходный код теста:</Form.Label>
                     <Form.Control
                         name={"sources"}
                         type={"file"}
@@ -21,7 +21,7 @@ export const TestSpecForm = ({onSubmit, initialName = "", initialDescription = "
                     />
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Test spec name:</Form.Label>
+                    <Form.Label>Название теста:</Form.Label>
                     <Form.Control
                         name={"name"}
                         type={"text"}
@@ -32,7 +32,7 @@ export const TestSpecForm = ({onSubmit, initialName = "", initialDescription = "
             </Form.Row>
             <Form.Row>
                 <Form.Group style={{width: '100%'}}>
-                    <Form.Label>Test spec description:</Form.Label>
+                    <Form.Label>Описание теста:</Form.Label>
                     <Form.Control
                         as="textarea"
                         rows="3"

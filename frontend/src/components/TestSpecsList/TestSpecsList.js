@@ -14,10 +14,10 @@ export const TestSpecsList = ({data, loading, error}) => {
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Updated at</th>
-                    <th>Source</th>
+                    <th>Название</th>
+                    <th>Описание</th>
+                    <th>Обновлено</th>
+                    <th>Исходный код</th>
                 </tr>
                 </thead>
                 <tbody>
