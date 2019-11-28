@@ -2,7 +2,7 @@ const {Router} = require('express');
 const filesMiddleware = require('../../middleware/filesMiddleware');
 const shortid = require('shortid');
 const Database = require('../../../database');
-const {precompile} = require('../../../TestSpecPrecompile/precompile');
+const {precompile} = require('../../../TestSpec/precompile');
 
 module.exports = (config) => {
 

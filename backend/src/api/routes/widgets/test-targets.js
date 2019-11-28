@@ -8,6 +8,7 @@ const {Compiler} = require('../../../SandboxedGnuUtils');
 const {Sandbox} = require('../../../Sandbox');
 const {Docker} = require('node-docker-api');
 const {ObjectCache} = require('../../../ObjectCache');
+const compileTestTarget = require('../../../TestTarget/compile');
 
 module.exports = (config) => {
     const router = Router();
@@ -63,83 +64,34 @@ module.exports = (config) => {
                 const {widgetId} = req;
                 const {testSpecId} = req.query;
                 const id = shortid.generate();
+                const test_source = await db.getFirstAttachment(testSpecId);
 
-                const insertResults = async (data) => {
-                    const sources = req.files.map(({name, content: data, content_type}) => ({
-                        name, data, content_type
-                    }));
+                const testTargetRes = await compileTestTarget(config, test_source, req.files);
 
-                    await db.multipart.insert({
-                        type: "TestTarget",
-                        widgetId,
-                        timestamp: Date.now(),
-                        userData,
-                        testSpecId: testSpecId,
+                const sources = req.files.map(({name, content: data, content_type}) => ({
+                    name, data, content_type
+                }));
+
+                await db.multipart.insert({
+                    type: "TestTarget",
+                    widgetId,
+                    timestamp: Date.now(),
+                    userData,
+                    testSpecId: testSpecId,
+                    ...{
                         compilerResult: {exitCode: undefined, stdout: ""},
                         linkerResult: {exitCode: undefined, stdout: ""},
                         runnerResult: {exitCode: undefined, stdout: ""},
-                        ...data
-                    }, sources, id);
+                        ...testTargetRes
+                    }
+                }, sources, id);
 
-                    const attempt = await db.get(id);
-                    attempt.sourceFiles = sources.map(file => ({
-                        ...file,
-                        data: file.data.toString()
-                    }));
-                    res.json(attempt);
-                };
-
-                if(!await db.exists(testSpecId)){
-                    const err = new Error("Selected TestSpec does not exists");
-                    err.status = 404;
-                    throw err;
-                }
-
-                const test_source = await db.getFirstAttachment(testSpecId);
-                const cache_key = md5(test_source);
-
-                const sandbox = new Sandbox(docker, config);
-                await sandbox.start();
-
-                const compiler = new Compiler(sandbox, config.timeout.compilation);
-                const working_dir = config.sandbox.working_dir;
-                const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(req.files, {working_dir});
-
-                if(compilerResult.exitCode){
-                    await insertResults({compilerResult});
-                    await sandbox.stop();
-                    return;
-                }
-
-                const objcopy = new Objcopy(sandbox);
-                await objcopy.redefine_sym(targetBinaries, "main", config.testing.hijack_main, {working_dir});
-
-                if(!objectCache.has(cache_key)){
-                    const err = new Error("Failed to fetch TestSpec binary from cache");
-                    err.status = 500;
-                    throw err;
-                }
-                else{
-                    await sandbox.fs_put(objectCache.get(cache_key), working_dir);
-                }
-
-                const {exec: linkerResult, output} = await compiler.link(
-                    [...targetBinaries, config.testing.test_obj_name]
-                );
-
-                if(linkerResult.exitCode !== 0){
-                    await insertResults({compilerResult, linkerResult});
-                    await sandbox.stop();
-                    return;
-                }
-
-                const runnerResult = await sandbox.exec(["./" + output, "-r", "compact"], {
-                    timeout: config.timeout.run
-                });
-
-                await insertResults({compilerResult, linkerResult, runnerResult});
-
-                await sandbox.stop();
+                const data = await db.get(id);
+                data.sourceFiles = sources.map(file => ({
+                    ...file,
+                    data: file.data.toString()
+                }));
+                res.json(data);
             });
 
     router.route('/:testTargetId')
