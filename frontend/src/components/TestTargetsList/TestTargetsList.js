@@ -3,6 +3,8 @@ import {Badge, Table} from 'react-bootstrap';
 import {ErrorRenderer} from '../ErrorRenderer/ErrorRenderer';
 import {LoadingRenderer} from '../LoadingRenderer/LoadingRenderer';
 import {exitCodeToVariant} from '../../helpers/exitCodeToVariant';
+import {formatDistance} from 'date-fns';
+import {ru} from 'date-fns/locale';
 
 export const TestTargetsList = ({data, loading, error}) => {
     if(loading) return <LoadingRenderer/>;
@@ -14,7 +16,7 @@ export const TestTargetsList = ({data, loading, error}) => {
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>Время</th>
+                    <th>Отправлено</th>
                     <th>Тест</th>
                     <th>Пользователь</th>
                     <th>Проверки</th>
@@ -33,7 +35,7 @@ export const TestTargetsList = ({data, loading, error}) => {
                            }) =>
                     <tr>
                         <td>{_id}</td>
-                        <td>{(new Date(timestamp)).toISOString()}</td>
+                        <td>{formatDistance(new Date(timestamp), new Date, {locale: ru})}</td>
                         <td>
                             {!testSpec
                                 ? <>{testSpecId} <LoadingRenderer/></>

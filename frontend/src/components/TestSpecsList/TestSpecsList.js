@@ -3,6 +3,8 @@ import {Table} from 'react-bootstrap';
 import {ErrorRenderer} from '../ErrorRenderer/ErrorRenderer';
 import {LoadingRenderer} from '../LoadingRenderer/LoadingRenderer';
 import {api_url} from '../../api';
+import {formatDistance} from 'date-fns';
+import {ru} from 'date-fns/locale';
 
 export const TestSpecsList = ({data, loading, error}) => {
     if(loading) return <LoadingRenderer/>;
@@ -15,7 +17,6 @@ export const TestSpecsList = ({data, loading, error}) => {
                 <tr>
                     <th>#</th>
                     <th>Название</th>
-                    <th>Описание</th>
                     <th>Обновлено</th>
                     <th>Исходный код</th>
                 </tr>
@@ -24,8 +25,7 @@ export const TestSpecsList = ({data, loading, error}) => {
                 {data.map(({_id, name, description, timestamp}) => <tr>
                     <td>{_id}</td>
                     <td>{name}</td>
-                    <td>{description}</td>
-                    <td>{(new Date(timestamp)).toISOString()}</td>
+                    <td>{formatDistance(new Date(timestamp), new Date, {locale: ru})}</td>
                     <td>
                         <a href={api_url(`/widgets/0/test-specs/${_id}/source`)} target="_blank">
                             {name}.cpp
