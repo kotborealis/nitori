@@ -54,7 +54,8 @@ module.exports = (config) => {
                     type: "TestSpec",
                     name,
                     widgetId,
-                    description
+                    description,
+                    timestamp: Date.now(),
                 }, [{
                     name: file.name,
                     data: file.content,
@@ -84,6 +85,29 @@ module.exports = (config) => {
             }
 
             res.json(doc);
+        });
+
+    router.route('/:testSpecId/source')
+        .get(async function(req, res) {
+            const {testSpecId: _id} = req.params;
+
+            const {docs: [doc]} = await db.find({
+                selector: {
+                    _id,
+                    type: "TestSpec"
+                }
+            });
+
+            if(!doc){
+                const err = new Error("Not found");
+                err.status = 404;
+                throw err;
+            }
+
+            const content = await db.getFirstAttachment(_id);
+
+            res.setHeader('Content-Type', 'text/x-c');
+            res.send(content.toString());
         });
 
     return router;
