@@ -19,7 +19,7 @@ const Database = require('../database');
 const {Sandbox} = require('../Sandbox');
 const {Docker} = require('node-docker-api');
 
-module.exports = async (config) => {
+module.exports = (config) => {
     const authHandler = require('../auth').middleware(config.auth.url);
     const db = new Database(require('nano')(config.database), config.database.name);
 
