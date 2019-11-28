@@ -1,0 +1,7 @@
+.container {
+    padding: 20px 0;
+}
+
+.container :global(.row) {
+    padding: 20px 0;
+}
