@@ -5,10 +5,10 @@ import {LoadingRenderer} from '../LoadingRenderer/LoadingRenderer';
 import {api_url} from '../../api';
 import {formatDistance} from 'date-fns';
 import {ru} from 'date-fns/locale';
-import {useStoreWidget} from '../../store/widget';
+import {useWidgetStore} from '../../store/widget';
 
 export const TestSpecsList = ({data, loading, error}) => {
-    const widgetId = useStoreWidget(({widgetId}) => widgetId);
+    const widgetId = useWidgetStore(({widgetId}) => widgetId);
 
     if(loading) return <LoadingRenderer/>;
     if(error) return <ErrorRenderer error={error}/>;

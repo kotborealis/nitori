@@ -6,10 +6,10 @@ import {Col, Row} from 'react-bootstrap';
 import {api} from '../../api';
 import {ErrorRenderer} from '../ErrorRenderer/ErrorRenderer';
 import TtyRenderer from '../TtyRenderer/TtyRenderer';
-import {useStoreWidget} from '../../store/widget';
+import {useWidgetStore} from '../../store/widget';
 
 export const TestSpecCreate = ({}) => {
-    const widgetId = useStoreWidget(({widgetId}) => widgetId);
+    const widgetId = useWidgetStore(({widgetId}) => widgetId);
 
     const [outputState, setOutputState] = useState(null);
     const [outputLoading, setOutputLoading] = useState(false);

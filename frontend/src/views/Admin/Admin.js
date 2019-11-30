@@ -4,10 +4,10 @@ import {TestSpecsList} from '../../components/TestSpecsList/TestSpecsList';
 import {useApi} from '../../hooks/useApi';
 import {TestSpecCreate} from '../../components/TestSpecCreate/TestSpecCreate';
 import {TestTargetsList} from '../../components/TestTargetsList/TestTargetsList';
-import {useStoreWidget} from '../../store/widget';
+import {useWidgetStore} from '../../store/widget';
 
 export default () => {
-    const widgetId = useStoreWidget(({widgetId}) => widgetId);
+    const widgetId = useWidgetStore(({widgetId}) => widgetId);
     const {
         data: testSpecsData,
         loading: testSpecsLoading,

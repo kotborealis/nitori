@@ -1,10 +1,7 @@
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-export const [useStoreWidget] = create(devtools(set => ({
+export const [useWidgetStore, widgetStoreApi] = create(devtools(set => ({
     widgetId: 0,
-    setWidgetId: id => {
-        console.log("calleD", id);
-        set(state => ({...state, widgetId: id}));
-    }
-})));
+    setWidgetId: id => set(state => ({...state, widgetId: id}))
+})), "WidgetStore");

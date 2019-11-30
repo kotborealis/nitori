@@ -7,10 +7,10 @@ import {api} from '../../api';
 import {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
 import {useFetch} from '../../hooks/useFetch';
 import {useApi} from '../../hooks/useApi';
-import {useStoreWidget} from '../../store/widget';
+import {useWidgetStore} from '../../store/widget';
 
 const TestTarget = () => {
-    const widgetId = useStoreWidget(({widgetId}) => widgetId);
+    const widgetId = useWidgetStore(({widgetId}) => widgetId);
 
     const {
         status: userDataStatus
