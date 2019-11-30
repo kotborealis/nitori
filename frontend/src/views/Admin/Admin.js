@@ -49,8 +49,9 @@ export default () => {
                     <h2>Список таргетов</h2>
                     <TestTargetsList
                         data={testTargetsData}
-                        loading={testTargetsLoading}
-                        error={testTargetsError}
+                        loading={testTargetsLoading || testSpecsLoading}
+                        error={testTargetsError || testSpecsLoading}
+                        testSpecs={testSpecsData}
                     />
                 </Col>
             </Row>
