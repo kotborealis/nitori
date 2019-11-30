@@ -1,15 +1,17 @@
 import React, {useEffect} from 'react';
 import {render} from 'react-dom';
 import "!style-loader!css-loader!bootstrap/dist/css/bootstrap.min.css";
-import {BrowserRouter, Route, Switch, useParams} from 'react-router-dom';
+import {BrowserRouter, Link, Route, Switch, useParams, useRouteMatch} from 'react-router-dom';
 import TestTarget from '../views/TestTarget/TestTarget';
-import TestSpec from '../views/TestSpec/TestSpec';
 import Admin from '../views/Admin/Admin';
 import {BlockContainer} from '../components/BlockContainer/BlockContainer';
 
 import {useStoreWidget} from '../store/widget';
+import {Jumbotron} from 'react-bootstrap';
 
 const Widget = () => {
+    const {path} = useRouteMatch();
+
     const widgetId = useStoreWidget(state => state.widgetId);
     const setWidgetId = useStoreWidget(state => state.setWidgetId);
     const {widgetId: pathWidgetId} = useParams();
@@ -19,13 +21,10 @@ const Widget = () => {
         <>
             <BlockContainer>
                 <Switch>
-                    <Route path="/">
+                    <Route exact path={path}>
                         <TestTarget/>
                     </Route>
-                    <Route path="/submitTask">
-                        <TestSpec/>
-                    </Route>
-                    <Route path="/admin">
+                    <Route path={`${path}/admin`}>
                         <Admin/>
                     </Route>
                 </Switch>
@@ -39,7 +38,16 @@ render(
     <BrowserRouter basename={process.env.PUBLIC_PATH}>
         <Switch>
             <Route path="/widgets/:widgetId"><Widget/></Route>
-            <Route path="/">.</Route>
+            <Route exact path="/">
+                <BlockContainer>
+                    <Jumbotron>
+                        <h1>C++ contest-like system</h1>
+                        <p>
+                            <Link to="/widgets/0">Default widget</Link>
+                        </p>
+                    </Jumbotron>
+                </BlockContainer>
+            </Route>
         </Switch>
     </BrowserRouter>
     , document.getElementById('App'));
