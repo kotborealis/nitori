@@ -2,11 +2,12 @@ import create from 'zustand';
 import {devtools} from 'zustand/middleware';
 import {apiStoreHelper} from '../api';
 
-export const [useStore, storeApi] = create(devtools((set, get) => ({
+const store = (set, get) => ({
     widgetId: 0,
-    setWidgetId: id => set(state => ({...state, widgetId: id})),
+    setWidgetId: id => set(state => ({...state, widgetId: id}), 'setWidgetId'),
 
     ...apiStoreHelper("testSpecs", set, () => `/widgets/${get().widgetId}/test-specs/`, []),
     ...apiStoreHelper("testTargets", set, () => `/widgets/${get().widgetId}/test-targets/`, []),
+});
 
-}), "WidgetStore"));
+export const [useStore, storeApi] = create(devtools(store, "WidgetStore"));

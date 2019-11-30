@@ -18,8 +18,9 @@ export const api = async (url, options) => {
     };
 };
 
-export const apiStoreHelper = (name, set, url, init = [], options = {}) =>
-    ({
+export const apiStoreHelper = (name, set, url, init = [], options = {}) => {
+    const nameGen = (...args) => `${name}::${args.join('::')}`;
+    return {
         [name]:
             {
                 data: init,
@@ -27,17 +28,30 @@ export const apiStoreHelper = (name, set, url, init = [], options = {}) =>
                 error: null,
 
                 fetch: async () => {
-                    set(state => produce(state, state => void (state[name].loading = true)));
+                    set(
+                        state => produce(state, state => void (state[name].loading = true)),
+                        nameGen('setLoading')
+                    );
 
                     try{
                         const {data} = await api(typeof url === "function" ? url() : url, options);
-                        set(state => produce(state, state => void (state[name].data = data)));
+                        set(
+                            state => produce(state, state => void (state[name].data = data)),
+                            nameGen('setData')
+                        );
                     }
                     catch(error){
-                        set(state => produce(state, state => void (state[name].error = error)));
+                        set(
+                            state => produce(state, state => void (state[name].error = error)),
+                            nameGen('setError')
+                        );
                     }finally{
-                        set(state => produce(state, state => void (state[name].loading = false)));
+                        set(
+                            state => produce(state, state => void (state[name].loading = false)),
+                            nameGen('setLoading')
+                        );
                     }
                 }
             }
-    });
+    };
+};
