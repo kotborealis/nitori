@@ -1,38 +1,10 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {render} from 'react-dom';
 import "!style-loader!css-loader!bootstrap/dist/css/bootstrap.min.css";
-import {BrowserRouter, Link, Route, Switch, useParams, useRouteMatch} from 'react-router-dom';
-import TestTarget from '../views/TestTarget/TestTarget';
-import Admin from '../views/Admin/Admin';
+import {BrowserRouter, Link, Route, Switch} from 'react-router-dom';
 import {BlockContainer} from '../components/BlockContainer/BlockContainer';
-
-import {useStoreWidget} from '../store/widget';
 import {Jumbotron} from 'react-bootstrap';
-
-const Widget = () => {
-    const {path} = useRouteMatch();
-
-    const widgetId = useStoreWidget(state => state.widgetId);
-    const setWidgetId = useStoreWidget(state => state.setWidgetId);
-    const {widgetId: pathWidgetId} = useParams();
-    useEffect(() => setWidgetId(pathWidgetId));
-
-    return (
-        <>
-            <BlockContainer>
-                <Switch>
-                    <Route exact path={path}>
-                        <TestTarget/>
-                    </Route>
-                    <Route path={`${path}/admin`}>
-                        <Admin/>
-                    </Route>
-                </Switch>
-            </BlockContainer>
-        </>
-    );
-};
-
+import {Widget} from '../components/Widget/Widget';
 
 render(
     <BrowserRouter basename={process.env.PUBLIC_PATH}>
