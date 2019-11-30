@@ -5,8 +5,11 @@ import {api} from '../../api';
 import {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
 import {TestOutput} from '../../components/TestOutput/TestOutput';
 import {TestOutputDefaultState} from '../../components/TestOutput/TestOutputDefaultState';
+import {useStoreWidget} from '../../store/widget';
 
 export default () => {
+    const widgetId = useStoreWidget(({widgetId}) => widgetId);
+
     const [formState, setFormState] = useState({
         files: undefined,
         wid: "0",
@@ -26,7 +29,7 @@ export default () => {
         setOutputStateLoading(true);
 
         try{
-            const {data} = await api(`widgets/0/test-specs/?name=${formData.get('name')}&description=${formData.get('description')}`,
+            const {data} = await api(`widgets/${widgetId}/test-specs/?name=${formData.get('name')}&description=${formData.get('description')}`,
                 {
                     method: "POST",
                     body: formData

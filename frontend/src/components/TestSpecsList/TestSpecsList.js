@@ -5,8 +5,11 @@ import {LoadingRenderer} from '../LoadingRenderer/LoadingRenderer';
 import {api_url} from '../../api';
 import {formatDistance} from 'date-fns';
 import {ru} from 'date-fns/locale';
+import {useStoreWidget} from '../../store/widget';
 
 export const TestSpecsList = ({data, loading, error}) => {
+    const widgetId = useStoreWidget(({widgetId}) => widgetId);
+
     if(loading) return <LoadingRenderer/>;
     if(error) return <ErrorRenderer error={error}/>;
 
@@ -27,7 +30,7 @@ export const TestSpecsList = ({data, loading, error}) => {
                     <td>{name}</td>
                     <td>{formatDistance(new Date(timestamp), new Date, {locale: ru})}</td>
                     <td>
-                        <a href={api_url(`/widgets/0/test-specs/${_id}/source`)} target="_blank">
+                        <a href={api_url(`/widgets/${widgetId}/test-specs/${_id}/source`)} target="_blank">
                             {name}.cpp
                         </a>
                     </td>

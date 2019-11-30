@@ -6,8 +6,11 @@ import {Col, Row} from 'react-bootstrap';
 import {api} from '../../api';
 import {ErrorRenderer} from '../ErrorRenderer/ErrorRenderer';
 import TtyRenderer from '../TtyRenderer/TtyRenderer';
+import {useStoreWidget} from '../../store/widget';
 
 export const TestSpecCreate = ({}) => {
+    const widgetId = useStoreWidget(({widgetId}) => widgetId);
+
     const [outputState, setOutputState] = useState(null);
     const [outputLoading, setOutputLoading] = useState(false);
     const [isError, setIsError] = useState(false);
@@ -31,7 +34,7 @@ export const TestSpecCreate = ({}) => {
         setOutputLoading(true);
 
         try{
-            const {data} = await api(`widgets/0/test-specs/?name=${formData.get('name')}&description=${formData.get('description')}`,
+            const {data} = await api(`widgets/${widgetId}/test-specs/?name=${formData.get('name')}&description=${formData.get('description')}`,
                 {
                     method: "POST",
                     body: formData

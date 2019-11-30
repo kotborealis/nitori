@@ -7,8 +7,11 @@ import {api} from '../../api';
 import {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
 import {useFetch} from '../../hooks/useFetch';
 import {useApi} from '../../hooks/useApi';
+import {useStoreWidget} from '../../store/widget';
 
 const TestTarget = () => {
+    const widgetId = useStoreWidget(({widgetId}) => widgetId);
+
     const {
         status: userDataStatus
     } = useFetch("/auth/user_data.php");
@@ -16,7 +19,7 @@ const TestTarget = () => {
     const {
         data: tasksList,
         loading: taskListLoading
-    } = useApi("widgets/0/test-specs/", []);
+    } = useApi(`widgets/${widgetId}/test-specs/`, []);
 
     const [outputState, setOutputState] = useState({
         compilerResult: undefined,
@@ -42,7 +45,7 @@ const TestTarget = () => {
         if(hash){
             (async () => {
                 try{
-                    const {data} = await api(`/widgets/0/test-targets/${hash}`);
+                    const {data} = await api(`/widgets/${widgetId}/test-targets/${hash}`);
                     setOutputState(data);
                 }
                 catch(error){
@@ -69,7 +72,7 @@ const TestTarget = () => {
 
         setOutputStateLoading(true);
         try{
-            const {data} = await api(`/widgets/0/test-targets/?testSpecId=${formData.get('testSpecId')}`, {
+            const {data} = await api(`/widgets/${widgetId}/test-targets/?testSpecId=${formData.get('testSpecId')}`, {
                 method: "POST",
                 body: formData
             });
