@@ -2,13 +2,13 @@ import React from 'react';
 import {Table} from 'react-bootstrap';
 import {ErrorRenderer} from '../ErrorRenderer/ErrorRenderer';
 import {LoadingRenderer} from '../LoadingRenderer/LoadingRenderer';
-import {api_url} from '../../api';
+import {apiUrl} from '../../api';
 import {formatDistance} from 'date-fns';
 import {ru} from 'date-fns/locale';
-import {useWidgetStore} from '../../store/widget';
+import {useStore} from '../../store/store';
 
 export const TestSpecsList = ({data, loading, error}) => {
-    const widgetId = useWidgetStore(({widgetId}) => widgetId);
+    const widgetId = useStore(({widgetId}) => widgetId);
 
     if(loading) return <LoadingRenderer/>;
     if(error) return <ErrorRenderer error={error}/>;
@@ -30,7 +30,7 @@ export const TestSpecsList = ({data, loading, error}) => {
                     <td>{name}</td>
                     <td>{formatDistance(new Date(timestamp), new Date, {locale: ru})}</td>
                     <td>
-                        <a href={api_url(`/widgets/${widgetId}/test-specs/${_id}/source`)} target="_blank">
+                        <a href={apiUrl(`/widgets/${widgetId}/test-specs/${_id}/source`)} target="_blank">
                             {name}.cpp
                         </a>
                     </td>

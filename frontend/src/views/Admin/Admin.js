@@ -1,29 +1,30 @@
 import {Col, Row} from 'react-bootstrap';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {TestSpecsList} from '../../components/TestSpecsList/TestSpecsList';
-import {useApi} from '../../hooks/useApi';
 import {TestSpecCreate} from '../../components/TestSpecCreate/TestSpecCreate';
 import {TestTargetsList} from '../../components/TestTargetsList/TestTargetsList';
-import {useWidgetStore} from '../../store/widget';
+import {useStore} from '../../store/store';
 
 export default () => {
-    const widgetId = useWidgetStore(({widgetId}) => widgetId);
-    const {
-        data: testSpecsData,
-        loading: testSpecsLoading,
-        error: testSpecsError
-    } = useApi(`/widgets/${widgetId}/test-specs/`, []);
+    const widgetId = useStore(({widgetId}) => widgetId);
 
-    const {
-        data: testTargetsData,
-        loading: testTargetsLoading,
-        error: testTargetsError
-    } = useApi(`/widgets/${widgetId}/test-targets/`, []);
+    const fetchTestSpecs = useStore(({testSpecs: {fetch}}) => fetch);
+    useEffect(() => void fetchTestSpecs(), []);
 
-    const testTargetsDataPopulated = testTargetsData.map(target => {
-        target.testSpec = testSpecsData.find(({_id}) => _id === target.testSpecId);
-        return target;
-    });
+    const [
+        testSpecsData,
+        testSpecsLoading,
+        testSpecsError
+    ] = useStore(({testSpecs: {data, loading, error}}) => [data, loading, error]);
+
+    const fetchTestTargets = useStore(({testTargets: {fetch}}) => fetch);
+    useEffect(() => void fetchTestTargets(), []);
+
+    const [
+        testTargetsData,
+        testTargetsLoading,
+        testTargetsError
+    ] = useStore(({testTargets: {data, loading, error}}) => [data, loading, error]);
 
     return (
         <>
@@ -47,7 +48,7 @@ export default () => {
                 <Col>
                     <h2>Список таргетов</h2>
                     <TestTargetsList
-                        data={testTargetsDataPopulated}
+                        data={testTargetsData}
                         loading={testTargetsLoading}
                         error={testTargetsError}
                     />

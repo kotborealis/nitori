@@ -6,6 +6,15 @@ declare function api(url: string, options?: object): {
     status: number
 };
 
-declare function api_url(url: string): string
+declare function apiUrl(url: string): string
 
-export {api, API_URL, api_url};
+declare function apiStoreHelper(name: string, set: Function, url: string | Function, init?: any, options?: object): {
+    [name]: {
+        data: any,
+        loading: boolean,
+        error: any,
+        status: number
+    }
+};
+
+export {api, API_URL, apiUrl, apiStoreHelper};

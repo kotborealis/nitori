@@ -5,8 +5,11 @@ import {LoadingRenderer} from '../LoadingRenderer/LoadingRenderer';
 import {exitCodeToVariant} from '../../helpers/exitCodeToVariant';
 import {formatDistance} from 'date-fns';
 import {ru} from 'date-fns/locale';
+import {useStore} from '../../store/store';
 
 export const TestTargetsList = ({data, loading, error}) => {
+    const [testSpecsData, testSpecsLoading] = useStore(({testSpecs: {data, loading}}) => [data, loading]);
+
     if(loading) return <LoadingRenderer/>;
     if(error) return <ErrorRenderer error={error}/>;
 
@@ -28,7 +31,6 @@ export const TestTargetsList = ({data, loading, error}) => {
                                timestamp,
                                userData: {name, login},
                                testSpecId,
-                               testSpec,
                                compilerResult,
                                linkerResult,
                                runnerResult
@@ -37,9 +39,9 @@ export const TestTargetsList = ({data, loading, error}) => {
                         <td>{_id}</td>
                         <td>{formatDistance(new Date(timestamp), new Date, {locale: ru})}</td>
                         <td>
-                            {!testSpec
+                            {testSpecsLoading
                                 ? <>{testSpecId} <LoadingRenderer/></>
-                                : testSpec.name
+                                : testSpecsData.find(({_id}) => _id === testSpecId).name
                             }
                         </td>
                         <td>{name ? `${name} (${login})` : login}</td>

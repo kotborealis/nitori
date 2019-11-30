@@ -1,11 +1,12 @@
 import urljoin from 'url-join';
+import {produce} from 'immer';
 
 export const API_URL = urljoin(process.env.PUBLIC_PATH, `/api/v1/`);
 
-export const api_url = url => urljoin(API_URL, url);
+export const apiUrl = url => urljoin(API_URL, url);
 
 export const api = async (url, options) => {
-    const response = await fetch(api_url(url), options);
+    const response = await fetch(apiUrl(url), options);
     const status = response.status;
     const data = await response.json();
 
@@ -16,3 +17,27 @@ export const api = async (url, options) => {
         status
     };
 };
+
+export const apiStoreHelper = (name, set, url, init = [], options = {}) =>
+    ({
+        [name]:
+            {
+                data: init,
+                loading: null,
+                error: null,
+
+                fetch: async () => {
+                    set(state => produce(state, state => void (state[name].loading = true)));
+
+                    try{
+                        const {data} = await api(typeof url === "function" ? url() : url, options);
+                        set(state => produce(state, state => void (state[name].data = data)));
+                    }
+                    catch(error){
+                        set(state => produce(state, state => void (state[name].error = error)));
+                    }finally{
+                        set(state => produce(state, state => void (state[name].loading = false)));
+                    }
+                }
+            }
+    });

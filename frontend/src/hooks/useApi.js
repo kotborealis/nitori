@@ -1,5 +1,5 @@
 import {useFetch} from './useFetch';
-import {api_url} from '../api';
+import {apiUrl} from '../api';
 
 export const useApi = (url, init, options, deps) => {
     const {
@@ -7,7 +7,7 @@ export const useApi = (url, init, options, deps) => {
         loading,
         error: fetchError,
         status
-    } = useFetch(api_url(url), init, options, deps);
+    } = useFetch(apiUrl(url), init, options, deps);
 
 
 

@@ -5,10 +5,10 @@ import {api} from '../../api';
 import {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
 import {TestOutput} from '../../components/TestOutput/TestOutput';
 import {TestOutputDefaultState} from '../../components/TestOutput/TestOutputDefaultState';
-import {useWidgetStore} from '../../store/widget';
+import {useStore} from '../../store/store';
 
 export default () => {
-    const widgetId = useWidgetStore(({widgetId}) => widgetId);
+    const widgetId = useStore(({widgetId}) => widgetId);
 
     const [formState, setFormState] = useState({
         files: undefined,

@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {Route, Switch, useParams, useRouteMatch} from 'react-router-dom';
-import {useWidgetStore} from '../../store/widget';
+import {useStore} from '../../store/store';
 import {BlockContainer} from '../BlockContainer/BlockContainer';
 import TestTarget from '../../views/TestTarget/TestTarget';
 import Admin from '../../views/Admin/Admin';
@@ -8,8 +8,8 @@ import Admin from '../../views/Admin/Admin';
 export const Widget = () => {
     const {path} = useRouteMatch();
 
-    const widgetId = useWidgetStore(state => state.widgetId);
-    const setWidgetId = useWidgetStore(state => state.setWidgetId);
+    const widgetId = useStore(state => state.widgetId);
+    const setWidgetId = useStore(state => state.setWidgetId);
     const {widgetId: pathWidgetId} = useParams();
     useEffect(() => setWidgetId(pathWidgetId), [pathWidgetId]);
 
