@@ -69,6 +69,11 @@ paths:
           in: query
           schema:
             type: string
+        - name: includeSources
+          in: query
+          required: false
+          schema:
+            type: boolean
       responses:
         200:
           description: List of TestSpecs
@@ -123,6 +128,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: includeSources
+          in: query
+          required: false
+          schema:
+            type: boolean
       responses:
         '200':
           description: Specified TestSpec
@@ -225,7 +235,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TestTargetResultList'
+                $ref: '#/components/schemas/TestTargetList'
     post:
       summary: Submit new TestTarget
       tags:
@@ -254,7 +264,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TestTargetResult'
+                $ref: '#/components/schemas/TestTarget'
 
   /widgets/{widgetId}/test-targets/{testTargetId}:
     get:
@@ -274,7 +284,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TestTargetResult'
+                $ref: '#/components/schemas/TestTarget'
         404:
           description: TestTarget does not exists
 
@@ -297,6 +307,14 @@ components:
       type: string
       default: "0"
 
+    SourceFile:
+      type: object
+      properties:
+        data:
+          type: string
+        name:
+          type: string
+
     TestSpec:
       type: object
       properties:
@@ -310,6 +328,10 @@ components:
           type: string
         timestamp:
           type: number
+        sourceFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceFile'
 
     TestSpecList:
       type: array
@@ -342,7 +364,7 @@ components:
         groupName:
           type: string
 
-    TestTargetResult:
+    TestTarget:
       type: object
       properties:
         _id:
@@ -359,8 +381,12 @@ components:
           $ref: '#/components/schemas/ExecOutput'
         runnerResult:
           $ref: '#/components/schemas/ExecOutput'
+        sourceFiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceFile'
 
-    TestTargetResultList:
+    TestTargetList:
       type: array
       items:
-        $ref: '#/components/schemas/TestTargetResult'
+        $ref: '#/components/schemas/TestTarget'

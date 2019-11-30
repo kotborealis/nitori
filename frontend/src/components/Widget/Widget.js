@@ -4,6 +4,7 @@ import {useStore} from '../../store/store';
 import {BlockContainer} from '../BlockContainer/BlockContainer';
 import TestTarget from '../../views/TestTarget/TestTarget';
 import Admin from '../../views/Admin/Admin';
+import TestSpec from '../../views/TestSpec/TestSpec';
 
 export const Widget = () => {
     const {path} = useRouteMatch();
@@ -22,6 +23,9 @@ export const Widget = () => {
                     </Route>
                     <Route path={`${path}/admin`}>
                         <Admin/>
+                    </Route>
+                    <Route path={`${path}/test-spec/:testSpecId`}>
+                        <TestSpec/>
                     </Route>
                 </Switch>
             </BlockContainer>

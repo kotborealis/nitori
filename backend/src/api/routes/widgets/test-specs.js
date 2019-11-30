@@ -11,6 +11,8 @@ module.exports = (config) => {
 
     router.route('/')
         .get(async (req, res) => {
+            const {includeSources = false} = req.query;
+
             const {
                 limit,
                 skip,
@@ -30,6 +32,9 @@ module.exports = (config) => {
                 skip,
                 selector
             });
+
+            if(includeSources)
+                await Promise.all(docs.map(async doc => doc.sourceFiles = await db.getAllAttachments(doc._id)));
 
             res.json(docs);
         })
@@ -70,6 +75,7 @@ module.exports = (config) => {
     router.route('/:testSpecId')
         .get(async function(req, res) {
             const {testSpecId: _id} = req.params;
+            const {includeSources = false} = req.query;
 
             const {docs: [doc]} = await db.find({
                 selector: {
@@ -83,6 +89,10 @@ module.exports = (config) => {
                 err.status = 404;
                 throw err;
             }
+
+            if(includeSources)
+                doc.sourceFiles = await db.getAllAttachments(_id);
+
 
             res.json(doc);
         });

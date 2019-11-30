@@ -14,12 +14,12 @@ export const useFetch = (url, init = null, options = {}, deps = [url]) => {
             setStatus(response.status);
 
             const json = await response.json();
-            setLoading(false);
 
             if(cancel)
                 return;
 
             setData(json);
+            setLoading(false);
         };
 
         req().catch(setError);
