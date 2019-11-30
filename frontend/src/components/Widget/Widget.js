@@ -24,7 +24,7 @@ export const Widget = () => {
                     <Route path={`${path}/admin`}>
                         <Admin/>
                     </Route>
-                    <Route path={`${path}/test-spec/:testSpecId`}>
+                    <Route path={`${path}/test-specs/:testSpecId`}>
                         <TestSpec/>
                     </Route>
                 </Switch>
