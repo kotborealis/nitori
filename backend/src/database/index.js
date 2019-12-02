@@ -25,6 +25,7 @@ module.exports = class {
     };
 
     find = (...args) => this.db.find(...args);
+    view = (...args) => this.db.view(...args);
 
     async exists(id) {
         try{

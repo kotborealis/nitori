@@ -1,3 +1,11 @@
 module.exports = {
-    views: {}
+    views: {
+        list: {
+            map: function(doc) {
+                if(doc.type === "TestTarget"){
+                    emit(doc._id, doc._id);
+                }
+            }
+        }
+    }
 };

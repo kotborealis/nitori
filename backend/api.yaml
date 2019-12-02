@@ -16,7 +16,7 @@ paths:
     get:
       summary: Get all existing widgets
       tags:
-        - Widget
+        - Widgets
       responses:
         200:
           description: List of widgets
@@ -25,15 +25,33 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/widgetId'
+                  $ref: '#/components/schemas/Widget'
         403:
           $ref: "#/components/responses/Unauthorized"
+    post:
+      summary: Create new widget
+      tags:
+        - Widgets
+      parameters:
+        - name: name
+          description: Widget name
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        201:
+          description: Created new widget
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
 
   /widgets/{widgetId}:
     get:
       summary: Get widget
       tags:
-        - Widget
+        - Widgets
       parameters:
         - $ref: '#/components/parameters/widgetId'
       responses:
@@ -42,7 +60,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/widgetId'
+                $ref: '#/components/schemas/Widget'
         404:
           $ref: "#/components/responses/NotFound"
         403:
@@ -52,7 +70,7 @@ paths:
     get:
       summary: Get filtered list of TestSpecs
       tags:
-        - TestSpec
+        - TestSpecs
       parameters:
         - $ref: '#/components/parameters/widgetId'
         - name: limit
@@ -92,7 +110,7 @@ paths:
     post:
       summary: Add TestSpec
       tags:
-        - TestSpec
+        - TestSpecs
       parameters:
         - $ref: '#/components/parameters/widgetId'
         - name: name
@@ -132,7 +150,7 @@ paths:
     get:
       summary: Get TestSpecs by id
       tags:
-        - TestSpec
+        - TestSpecs
       parameters:
         - $ref: '#/components/parameters/widgetId'
         - name: testSpecId
@@ -159,7 +177,7 @@ paths:
     delete:
       summary: Delete TestSpecs by id
       tags:
-        - TestSpec
+        - TestSpecs
       parameters:
         - $ref: '#/components/parameters/widgetId'
         - name: testSpecId
@@ -179,7 +197,7 @@ paths:
     get:
       summary: Get list of TestTargets
       tags:
-        - TestTarget
+        - TestTargets
       parameters:
         - $ref: '#/components/parameters/widgetId'
         - name: limit
@@ -257,7 +275,7 @@ paths:
     post:
       summary: Submit new TestTarget
       tags:
-        - TestTarget
+        - TestTargets
       parameters:
         - $ref: '#/components/parameters/widgetId'
         - name: testSpecId
@@ -292,7 +310,7 @@ paths:
     get:
       summary: Get TestTarget info by id
       tags:
-        - TestTarget
+        - TestTargets
       parameters:
         - $ref: '#/components/parameters/widgetId'
         - name: testTargetId
@@ -333,7 +351,14 @@ components:
 
     widgetId:
       type: string
-      default: "0"
+
+    Widget:
+      type: object
+      properties:
+        _id:
+          $ref: '#/components/schemas/widgetId'
+        name:
+          type: string
 
     SourceFile:
       type: object
