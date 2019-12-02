@@ -1,9 +1,9 @@
 import React, {useEffect} from 'react';
 import {Route, Switch, useParams, useRouteMatch} from 'react-router-dom';
 import {BlockContainer} from '../BlockContainer/BlockContainer';
-import TestTargetSubmit from '../../views/TestTargetSubmit/TestTargetSubmit';
-import Admin from '../../views/Admin/Admin';
-import TestSpec from '../../views/TestSpec/TestSpec';
+import TestTargetSubmit from '../../views/Widget/TestTargetSubmit/TestTargetSubmit';
+import Admin from '../../views/Widget/Admin/Admin';
+import TestSpec from '../../views/Widget/TestSpec/TestSpec';
 import {useStore} from '../../store/store';
 
 export const Widget = () => {

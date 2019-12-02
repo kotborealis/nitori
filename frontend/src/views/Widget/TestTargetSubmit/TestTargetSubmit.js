@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {Alert, Col, Row} from 'react-bootstrap';
-import {SourceInputForm} from '../../components/SourceInputForm/SourceInputForm';
-import {TestOutput} from '../../components/TestOutput/TestOutput';
-import {api} from '../../api';
-import {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
-import {useStore} from '../../store/store';
+import {SourceInputForm} from '../../../components/SourceInputForm/SourceInputForm';
+import {TestOutput} from '../../../components/TestOutput/TestOutput';
+import {api} from '../../../api';
+import {ProgressbarStages} from '../../../components/ProgressbarStages/ProgressbarStages';
+import {useStore} from '../../../store/store';
 import {useParams} from 'react-router-dom';
 
 const TestTarget = () => {

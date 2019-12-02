@@ -1,9 +1,9 @@
 import {Col, Row} from 'react-bootstrap';
 import React from 'react';
-import {TestSpecsList} from '../../components/TestSpecsList/TestSpecsList';
-import {TestSpecCreate} from '../../components/TestSpecCreate/TestSpecCreate';
-import {TestTargetsList} from '../../components/TestTargetsList/TestTargetsList';
-import {useStore} from '../../store/store';
+import {TestSpecsList} from '../../../components/TestSpecsList/TestSpecsList';
+import {TestSpecCreate} from '../../../components/TestSpecCreate/TestSpecCreate';
+import {TestTargetsList} from '../../../components/TestTargetsList/TestTargetsList';
+import {useStore} from '../../../store/store';
 
 export default () => {
     const [
