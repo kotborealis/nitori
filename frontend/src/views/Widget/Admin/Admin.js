@@ -1,11 +1,17 @@
 import {Col, Row} from 'react-bootstrap';
-import React from 'react';
-import {TestSpecsList} from '../../../components/TestSpecsList/TestSpecsList';
-import {TestSpecCreate} from '../../../components/TestSpecCreate/TestSpecCreate';
-import {TestTargetsList} from '../../../components/TestTargetsList/TestTargetsList';
+import React, {useEffect} from 'react';
+import {TestSpecsList} from '../../../components/TestSpec/TestSpecsList';
+import {TestSpecCreate} from '../../../components/TestSpec/TestSpecCreate';
+import {TestTargetsList} from '../../../components/TestTarget/TestTargetsList';
 import {useStore} from '../../../store/store';
+import {useParams} from 'react-router-dom';
 
 export default () => {
+    const {widgetId} = useParams();
+    // Fetch test targets
+    const fetchTestTargets = useStore(({testTargets: {fetch}}) => fetch);
+    useEffect(() => void fetchTestTargets([widgetId]), [widgetId]);
+
     const [
         testSpecsData,
         testSpecsLoading,

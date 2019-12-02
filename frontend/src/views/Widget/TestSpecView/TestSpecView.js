@@ -1,10 +1,10 @@
 import React from 'react';
-import {TestSpecView} from '../../../components/TestSpecView/TestSpecView';
+import {TestSpec} from '../../../components/TestSpec/TestSpec';
 import {useParams} from 'react-router-dom';
 import {useApi} from '../../../hooks/useApi';
 import {Col, Row} from 'react-bootstrap';
-import {LoadingRenderer} from '../../../components/LoadingRenderer/LoadingRenderer';
-import {ErrorRenderer} from '../../../components/ErrorRenderer/ErrorRenderer';
+import {Loading} from '../../../components/InvalidState/Loading';
+import {Error} from '../../../components/InvalidState/Error';
 
 export default () => {
     const {testSpecId, widgetId} = useParams();
@@ -18,11 +18,11 @@ export default () => {
     let child;
 
     if(loading)
-        child = <LoadingRenderer/>;
+        child = <Loading/>;
     else if(error)
-        child = <ErrorRenderer error={error}/>;
+        child = <Error error={error}/>;
     else
-        child = <TestSpecView {...data}/>;
+        child = <TestSpec {...data}/>;
 
     return (<>
         <Row>

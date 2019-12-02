@@ -1,16 +1,16 @@
 import {produce} from 'immer';
 import {api} from '../../api';
 
-const fetchStoreHelperGeneric = (fetcher) => (name, set, url, init = [], options = {}) => {
+const fetchStoreHelperGeneric = (fetcher) => (name, set, url, init = [], default_options = {}) => {
     const nameGen = (...args) => `${name}::${args.join('::')}`;
     return {
         [name]:
             {
                 data: init,
-                loading: null,
+                loading: false,
                 error: null,
 
-                fetch: async (...args) => {
+                fetch: async (args = [], options = {}) => {
                     const fetch_url = typeof url === "function" ? url(...args) : url;
                     set(
                         state => produce(state, state => {
@@ -21,7 +21,7 @@ const fetchStoreHelperGeneric = (fetcher) => (name, set, url, init = [], options
                     );
 
                     try{
-                        const {data} = await fetcher(fetch_url, options);
+                        const {data} = await fetcher(fetch_url, {...default_options, ...options});
                         set(
                             state => produce(state, state => {
                                 state[name].data = data;

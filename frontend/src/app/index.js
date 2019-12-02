@@ -4,7 +4,7 @@ import "!style-loader!css-loader!bootstrap/dist/css/bootstrap.min.css";
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import {BlockContainer} from '../components/BlockContainer/BlockContainer';
 import {Jumbotron} from 'react-bootstrap';
-import {Widget} from '../components/Widget/Widget';
+import {Widget} from '../views/Widget/Widget';
 
 render(
     <BrowserRouter basename={process.env.PUBLIC_PATH}>

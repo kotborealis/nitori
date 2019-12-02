@@ -1,5 +1,5 @@
 import React from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 
-export const LoadingRenderer = () =>
+export const Loading = () =>
     <Spinner animation="border" variant="primary"/>;

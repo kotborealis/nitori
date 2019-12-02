@@ -2,21 +2,21 @@ import React from 'react';
 import {formatDistance} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {Card} from 'react-bootstrap';
-import {PrismAsyncLight as SyntaxHighlighter} from 'react-syntax-highlighter';
-import {tomorrow} from 'react-syntax-highlighter/dist/esm/styles/prism';
+import {CodeCpp} from '../CodeCpp/CodeCpp';
 
-export const TestSpecView = ({_id, name, description, timestamp, sourceFiles}) =>
+export const TestSpec = ({_id, name, description, timestamp, sourceFiles}) =>
     <Card>
         <Card.Body>
             <Card.Title>Тест: {name}</Card.Title>
             <Card.Subtitle>Обновлён {formatDistance(new Date(timestamp), new Date, {locale: ru})} назад</Card.Subtitle>
             <Card.Text>
+                <p>{description}</p>
+
                 {sourceFiles.map(({name, data}) =>
                     <div style={{paddingTop: '20px'}}>
-                        <i>{name}</i>
-                        <SyntaxHighlighter language="cpp" style={tomorrow} showLineNumbers={true}>
+                        <CodeCpp name={name}>
                             {data}
-                        </SyntaxHighlighter>
+                        </CodeCpp>
                     </div>
                 )}
             </Card.Text>

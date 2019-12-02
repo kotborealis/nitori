@@ -1,15 +1,15 @@
 import React, {useRef, useState} from 'react';
-import {TestSpecForm} from './TestSpecForm/TestSpecForm';
+import {TestSpecForm} from './TestSpecForm';
 import {ProgressbarStages} from '../ProgressbarStages/ProgressbarStages';
 import {BlockContainer} from '../BlockContainer/BlockContainer';
 import {Col, Row} from 'react-bootstrap';
 import {api} from '../../api';
-import {ErrorRenderer} from '../ErrorRenderer/ErrorRenderer';
-import TtyRenderer from '../TtyRenderer/TtyRenderer';
-import {useStore} from '../../store/store';
+import {Error} from '../InvalidState/Error';
+import {Tty} from '../Tty/Tty';
+import {useParams} from 'react-router-dom';
 
 export const TestSpecCreate = ({}) => {
-    const widgetId = useStore(({widgetId}) => widgetId);
+    const {widgetId} = useParams();
 
     const [outputState, setOutputState] = useState(null);
     const [outputLoading, setOutputLoading] = useState(false);
@@ -66,8 +66,8 @@ export const TestSpecCreate = ({}) => {
             <Row>
                 <Col>
                     {isError
-                        ? <ErrorRenderer error={outputError.current}/>
-                        : <TtyRenderer title="Компиляция" {...outputState}/>
+                        ? <Error error={outputError.current}/>
+                        : <Tty title="Компиляция" {...outputState}/>
                     }
                 </Col>
             </Row>

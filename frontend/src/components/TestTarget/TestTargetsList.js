@@ -1,14 +1,14 @@
 import React from 'react';
 import {Badge, Table} from 'react-bootstrap';
-import {ErrorRenderer} from '../ErrorRenderer/ErrorRenderer';
-import {LoadingRenderer} from '../LoadingRenderer/LoadingRenderer';
+import {Error} from '../InvalidState/Error';
+import {Loading} from '../InvalidState/Loading';
 import {exitCodeToVariant} from '../../helpers/exitCodeToVariant';
 import {formatDistance} from 'date-fns';
 import {ru} from 'date-fns/locale';
 
 export const TestTargetsList = ({data, loading, error, testSpecs}) => {
-    if(loading) return <LoadingRenderer/>;
-    if(error) return <ErrorRenderer error={error}/>;
+    if(loading) return <Loading/>;
+    if(error) return <Error error={error}/>;
 
     return (
         <Table stripped bordered hover>

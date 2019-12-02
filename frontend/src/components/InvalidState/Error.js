@@ -1,7 +1,7 @@
 import React from 'react';
 import {Alert} from 'react-bootstrap';
 
-export const ErrorRenderer = ({error: {errors = [], message = ""}}) =>
+export const Error = ({error: {errors = [], message = ""}}) =>
     <Alert variant="danger">
         <Alert.Heading>Error: {message}</Alert.Heading>
         <p>

@@ -1,6 +1,6 @@
 import React from 'react';
 import Ansi from 'ansi-to-react';
-import style from './TtyRenderer.css';
+import style from './Tty.css';
 import {Alert} from 'react-bootstrap';
 
 const exitCodeToAlertVariant = (code) => {
@@ -9,7 +9,7 @@ const exitCodeToAlertVariant = (code) => {
     return 'danger';
 };
 
-export default ({exitCode = undefined, title = "", stdout = ""}) => {
+export const Tty = ({exitCode = undefined, title = "", stdout = ""}) => {
     let pre;
     if(exitCode !== undefined){
         pre = (

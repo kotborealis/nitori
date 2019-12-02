@@ -1,99 +1,55 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Alert, Col, Row} from 'react-bootstrap';
 import {SourceInputForm} from '../../../components/SourceInputForm/SourceInputForm';
-import {TestOutput} from '../../../components/TestOutput/TestOutput';
-import {api} from '../../../api';
-import {ProgressbarStages} from '../../../components/ProgressbarStages/ProgressbarStages';
 import {useStore} from '../../../store/store';
 import {useParams} from 'react-router-dom';
+import {TestTarget} from '../../../components/TestTarget/TestTarget';
+import {Loading} from '../../../components/InvalidState/Loading';
+import {Error} from '../../../components/InvalidState/Error';
 
-const TestTarget = () => {
+export const TestTargetSubmit = () => {
     const {widgetId} = useParams();
 
     const [userDataLoading, userDataError] = useStore(({userData: {loading, error}}) => [loading, error]);
 
     const [tasksList, taskListLoading] = useStore(({testSpecs: {data, loading}}) => [data, loading]);
 
-    const [outputState, setOutputState] = useState({
-        compilerResult: undefined,
-        linkerResult: undefined,
-        runnerResult: undefined
-    });
+    const postTestTarget = useStore(({testTargetSubmit: {fetch}}) => fetch);
 
-    const [outputStateLoading, setOutputStateLoading] = useState(false);
+    const [
+        testTarget,
+        testTargetLoading,
+        testTargetError
+    ] = useStore(({testTargetSubmit: {data, loading, error}}) => [data, loading, error]);
 
-    const [testId, setTestId] = useState("");
+    const testSpecId = testTarget && testTarget.testSpecId;
+    const testSpecLoading = useStore(({testSpecs: {loading}}) => loading);
+    const testSpecError = useStore(({testSpecs: {error}}) => error);
+    const testSpec = useStore(({testSpecs: {data}}) => data.find(({_id}) => _id === testSpecId));
 
-    useEffect(() => {
-        if(testId)
-            window.location.hash = testId;
+    const error = testTargetError || testSpecError;
+    const loading = testTargetLoading;
 
-        return () => {
-            window.location.hash = "";
-        };
-    }, [testId]);
-
-    useEffect(() => {
-        const hash = window.location.hash.slice(1);
-        if(hash){
-            (async () => {
-                try{
-                    const {data} = await api(`/widgets/${widgetId}/test-targets/${hash}`);
-                    setOutputState(data);
-                }
-                catch(error){
-                    alert(JSON.stringify(error));
-                }finally{
-                    setOutputStateLoading(false);
-                }
-            })();
-        }
-    }, [window.location.hash]);
-
-    const onSubmit = async (event) => {
+    const onSubmit = event => {
         event.preventDefault();
 
-        setOutputState({
-            compilerResult: undefined,
-            linkerResult: undefined,
-            runnerResult: undefined
-        });
-
-        setTestId("");
-
         const formData = new FormData(event.target);
+        const testSpecId = formData.get('testSpecId');
 
-        setOutputStateLoading(true);
-        try{
-            const {data} = await api(`/widgets/${widgetId}/test-targets/?testSpecId=${formData.get('testSpecId')}`, {
-                method: "POST",
-                body: formData
-            });
-
-            setOutputState(data);
-            setTestId(data._id);
-        }
-        catch(error){
-            alert(JSON.stringify(error));
-        }finally{
-            setOutputStateLoading(false);
-        }
+        postTestTarget([widgetId, testSpecId], {body: formData});
     };
 
-    const progressStages = [
-        outputState.compilerResult && {
-            variant: outputState.compilerResult.exitCode === 0 ? "success" : "danger",
-            size: 100 / 3
-        },
-        outputState.linkerResult && {
-            variant: outputState.linkerResult.exitCode === 0 ? "success" : "danger",
-            size: 100 / 3
-        },
-        outputState.runnerResult && {
-            variant: outputState.runnerResult.exitCode === 0 ? "success" : "danger",
-            size: 100 / 3
-        },
-    ].filter(id => id);
+    let result = null;
+
+
+    if(loading === true)
+        result = <Loading/>;
+    else if(error)
+        result = <Error error={error}/>;
+    else if(testTarget === null)
+        result = null;
+    else
+        result = <TestTarget output={testTarget} testSpec={testSpec}/>;
 
     return (
         <>
@@ -107,21 +63,12 @@ const TestTarget = () => {
             </Row>)}
             <Row>
                 <Col>
-                    <SourceInputForm {...{onSubmit, tasksList}} disabled={outputStateLoading || taskListLoading}/>
+                    <SourceInputForm {...{onSubmit, tasksList}} disabled={loading || taskListLoading}/>
                 </Col>
             </Row>
             <Row>
-                <Col>
-                    <ProgressbarStages state={progressStages} loading={outputStateLoading}/>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <TestOutput {...outputState}/>
-                </Col>
+                {result}
             </Row>
         </>
     );
 };
-
-export default TestTarget;
