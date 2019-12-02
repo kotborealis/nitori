@@ -1,18 +1,18 @@
 const {Router} = require('express');
-const Database = require('../../../database');
-const filesHandler = require('../../middleware/filesMiddleware');
+const Database = require('../../../../database');
+const filesHandler = require('../../../middleware/filesMiddleware');
 const shortid = require('shortid');
 const md5 = require('md5');
-const {Objcopy} = require('../../../SandboxedGnuUtils');
-const {Compiler} = require('../../../SandboxedGnuUtils');
-const {Sandbox} = require('../../../Sandbox');
+const {Objcopy} = require('../../../../SandboxedGnuUtils');
+const {Compiler} = require('../../../../SandboxedGnuUtils');
+const {Sandbox} = require('../../../../Sandbox');
 const {Docker} = require('node-docker-api');
-const {ObjectCache} = require('../../../ObjectCache');
-const compileTestTarget = require('../../../TestTarget/compile');
+const {ObjectCache} = require('../../../../ObjectCache');
+const compileTestTarget = require('../../../../TestTarget/compile');
 
 module.exports = (config) => {
     const router = Router();
-    const auth = require('../../../auth').auth(config.auth.url);
+    const auth = require('../../../../auth').auth(config.auth.url);
     const db = new Database(require('nano')(config.database), config.database.name);
     const docker = new Docker(config.docker);
     const objectCache = new ObjectCache(config.cache.dir);

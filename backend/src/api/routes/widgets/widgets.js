@@ -52,8 +52,8 @@ module.exports = (config) => {
         res.json(rows[0].doc);
     });
 
-    router.use('/:widgetId/test-specs', require('./test-specs')(config));
-    router.use('/:widgetId/test-targets', require('./test-targets')(config));
+    router.use('/:widgetId/test-specs', require('./test-specs/test-specs')(config));
+    router.use('/:widgetId/test-targets', require('./test-targets/test-targets')(config));
 
     return router;
 };
