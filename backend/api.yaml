@@ -26,6 +26,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/widgetId'
+        403:
+          $ref: "#/components/responses/Unauthorized"
 
   /widgets/{widgetId}:
     get:
@@ -42,7 +44,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/widgetId'
         404:
-          description: Widget does not exists
+          $ref: "#/components/responses/NotFound"
+        403:
+          $ref: "#/components/responses/Unauthorized"
 
   /widgets/{widgetId}/test-specs:
     get:
@@ -81,6 +85,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TestSpecList'
+        404:
+          $ref: "#/components/responses/NotFound"
+        403:
+          $ref: "#/components/responses/Unauthorized"
     post:
       summary: Add TestSpec
       tags:
@@ -115,6 +123,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExecOutput'
+        404:
+          $ref: "#/components/responses/NotFound"
+        403:
+          $ref: "#/components/responses/Unauthorized"
 
   /widgets/{widgetId}/test-specs/{testSpecId}:
     get:
@@ -134,14 +146,34 @@ paths:
           schema:
             type: boolean
       responses:
-        '200':
+        200:
           description: Specified TestSpec
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TestSpec'
-        '404':
-          description: Specified TestSpec not found
+        404:
+          $ref: "#/components/responses/NotFound"
+        403:
+          $ref: "#/components/responses/Unauthorized"
+    delete:
+      summary: Delete TestSpecs by id
+      tags:
+        - TestSpec
+      parameters:
+        - $ref: '#/components/parameters/widgetId'
+        - name: testSpecId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Deleted specified TestSpec
+        404:
+          $ref: "#/components/responses/NotFound"
+        403:
+          $ref: "#/components/responses/Unauthorized"
 
   /widgets/{widgetId}/test-targets:
     get:
@@ -218,6 +250,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TestTargetList'
+        404:
+          $ref: "#/components/responses/NotFound"
+        403:
+          $ref: "#/components/responses/Unauthorized"
     post:
       summary: Submit new TestTarget
       tags:
@@ -247,6 +283,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TestTarget'
+        404:
+          $ref: "#/components/responses/NotFound"
+        403:
+          $ref: "#/components/responses/Unauthorized"
 
   /widgets/{widgetId}/test-targets/{testTargetId}:
     get:
@@ -268,7 +308,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TestTarget'
         404:
-          description: TestTarget does not exists
+          $ref: "#/components/responses/NotFound"
 
 
 components:
@@ -282,6 +322,12 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/widgetId'
+
+  responses:
+    NotFound:
+      description: The specified resource was not found
+    Unathorized:
+      description: Unauthorized
 
   schemas:
 
