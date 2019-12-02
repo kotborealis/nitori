@@ -143,24 +143,6 @@ paths:
         '404':
           description: Specified TestSpec not found
 
-  /widgets/{widgetId}/test-specs/{testSpecId}/source:
-    get:
-      summary: Get source of TestSpecs by id
-      tags:
-        - TestSpec
-      parameters:
-        - $ref: '#/components/parameters/widgetId'
-        - name: testSpecId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Specified TestSpec source
-        '404':
-          description: Specified TestSpec not found
-
   /widgets/{widgetId}/test-targets:
     get:
       summary: Get list of TestTargets
