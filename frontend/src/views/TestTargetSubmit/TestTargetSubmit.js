@@ -2,24 +2,17 @@ import React, {useEffect, useState} from 'react';
 import {Alert, Col, Row} from 'react-bootstrap';
 import {SourceInputForm} from '../../components/SourceInputForm/SourceInputForm';
 import {TestOutput} from '../../components/TestOutput/TestOutput';
-import styles from './TestTarget.css';
 import {api} from '../../api';
 import {ProgressbarStages} from '../../components/ProgressbarStages/ProgressbarStages';
-import {useFetch} from '../../hooks/useFetch';
-import {useApi} from '../../hooks/useApi';
 import {useStore} from '../../store/store';
+import {useParams} from 'react-router-dom';
 
 const TestTarget = () => {
-    const widgetId = useStore(({widgetId}) => widgetId);
+    const {widgetId} = useParams();
 
-    const {
-        status: userDataStatus
-    } = useFetch("/auth/user_data.php");
+    const [userDataLoading, userDataError] = useStore(({userData: {loading, error}}) => [loading, error]);
 
-    const {
-        data: tasksList,
-        loading: taskListLoading
-    } = useApi(`widgets/${widgetId}/test-specs/`, []);
+    const [tasksList, taskListLoading] = useStore(({testSpecs: {data, loading}}) => [data, loading]);
 
     const [outputState, setOutputState] = useState({
         compilerResult: undefined,
@@ -104,7 +97,7 @@ const TestTarget = () => {
 
     return (
         <>
-            {userDataStatus !== 200 && (<Row className={styles.row}>
+            {(!userDataLoading && userDataError) && (<Row>
                 <Col>
                     <Alert variant={"danger"}>
                         <Alert.Heading>Требуется аутентификация</Alert.Heading>
@@ -112,17 +105,17 @@ const TestTarget = () => {
                     </Alert>
                 </Col>
             </Row>)}
-            <Row className={styles.row}>
+            <Row>
                 <Col>
                     <SourceInputForm {...{onSubmit, tasksList}} disabled={outputStateLoading || taskListLoading}/>
                 </Col>
             </Row>
-            <Row className={styles.row}>
+            <Row>
                 <Col>
                     <ProgressbarStages state={progressStages} loading={outputStateLoading}/>
                 </Col>
             </Row>
-            <Row className={styles.row}>
+            <Row>
                 <Col>
                     <TestOutput {...outputState}/>
                 </Col>

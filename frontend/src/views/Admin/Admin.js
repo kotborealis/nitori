@@ -1,24 +1,16 @@
 import {Col, Row} from 'react-bootstrap';
-import React, {useEffect} from 'react';
+import React from 'react';
 import {TestSpecsList} from '../../components/TestSpecsList/TestSpecsList';
 import {TestSpecCreate} from '../../components/TestSpecCreate/TestSpecCreate';
 import {TestTargetsList} from '../../components/TestTargetsList/TestTargetsList';
 import {useStore} from '../../store/store';
 
 export default () => {
-    const widgetId = useStore(({widgetId}) => widgetId);
-
-    const fetchTestSpecs = useStore(({testSpecs: {fetch}}) => fetch);
-    useEffect(() => void fetchTestSpecs(), []);
-
     const [
         testSpecsData,
         testSpecsLoading,
         testSpecsError
     ] = useStore(({testSpecs: {data, loading, error}}) => [data, loading, error]);
-
-    const fetchTestTargets = useStore(({testTargets: {fetch}}) => fetch);
-    useEffect(() => void fetchTestTargets(), []);
 
     const [
         testTargetsData,

@@ -1,25 +1,35 @@
 import React, {useEffect} from 'react';
 import {Route, Switch, useParams, useRouteMatch} from 'react-router-dom';
-import {useStore} from '../../store/store';
 import {BlockContainer} from '../BlockContainer/BlockContainer';
-import TestTarget from '../../views/TestTarget/TestTarget';
+import TestTargetSubmit from '../../views/TestTargetSubmit/TestTargetSubmit';
 import Admin from '../../views/Admin/Admin';
 import TestSpec from '../../views/TestSpec/TestSpec';
+import {useStore} from '../../store/store';
 
 export const Widget = () => {
     const {path} = useRouteMatch();
+    const {widgetId} = useParams();
 
-    const widgetId = useStore(state => state.widgetId);
-    const setWidgetId = useStore(state => state.setWidgetId);
-    const {widgetId: pathWidgetId} = useParams();
-    useEffect(() => setWidgetId(pathWidgetId), [pathWidgetId]);
+    // Fetch data into store:
+
+    // Fetch test specs
+    const fetchTestSpecs = useStore(({testSpecs: {fetch}}) => fetch);
+    useEffect(() => void fetchTestSpecs(widgetId), [widgetId]);
+
+    // Fetch test targets
+    const fetchTestTargets = useStore(({testTargets: {fetch}}) => fetch);
+    useEffect(() => void fetchTestTargets(widgetId), [widgetId]);
+
+    // Fetch user data
+    const fetchUserData = useStore(({userData: {fetch}}) => fetch);
+    useEffect(() => void fetchUserData(), []);
 
     return (
         <>
             <BlockContainer>
                 <Switch>
                     <Route exact path={path}>
-                        <TestTarget/>
+                        <TestTargetSubmit/>
                     </Route>
                     <Route path={`${path}/admin`}>
                         <Admin/>
