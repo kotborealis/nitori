@@ -9,20 +9,24 @@ const exitCodeToAlertVariant = (code) => {
     return 'danger';
 };
 
-export default ({exitCode = undefined, title="", stdout=""}) => {
+export default ({exitCode = undefined, title = "", stdout = ""}) => {
     let pre;
-    if(exitCode !== undefined) {
-        pre = (<pre>
-            <Ansi useClasses linkify={false}>{
-                stdout.replace(/\r/g, '')
-            }</Ansi>
-        </pre>);
+    if(exitCode !== undefined){
+        pre = (
+            <pre>
+                <Ansi useClasses linkify={false}>
+                    {stdout.replace(/\r/g, '')}
+                </Ansi>
+            </pre>
+        );
     }
 
-    return (<div className="output-renderer">
-        <Alert variant={exitCodeToAlertVariant(exitCode)} className={style.title}>
-            {title}
-        </Alert>
-        {pre}
-    </div>)
+    return (
+        <div className="output-renderer">
+            <Alert variant={exitCodeToAlertVariant(exitCode)} className={style.title}>
+                {title}
+            </Alert>
+            {pre}
+        </div>
+    );
 };

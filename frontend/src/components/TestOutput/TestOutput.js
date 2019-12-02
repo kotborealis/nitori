@@ -29,39 +29,41 @@ export const TestOutput = ({
         }
     }, [compilerResult.exitCode, linkerResult.exitCode, runnerResult.exitCode]);
 
-    return (<div>
-        <Tabs activeKey={tab} onSelect={setTab} id={"0"}>
-            {userData !== undefined &&
-                <Tab title={"Инфо"} eventKey={"info"}>
-                    {userData === null || userData === undefined ? null : <div>
-                        <div>{userData.login} ({userData.name}), группа {userData.groupName}</div>
-                        <div>{(new Date(timestamp)).toString()}</div>
-                    </div>}
-                </Tab>
-            }
-            {sourceFiles !== undefined &&
-                <Tab title={"Исходный код"} eventKey={"sourceFiles"}>
-                    {sourceFiles.map(({name, data}) => <div>
-                        <b>{name}</b>
-                        <pre>{data}</pre>
-                    </div>)}
-                </Tab>
-            }
-            {compilerResult !== undefined &&
-                <Tab title={"Компиляция"} eventKey={"compilation"}>
-                    <TtyRenderer {...compilerResult} title={"Результат компиляции:"}/>
-                </Tab>
-            }
-            {linkerResult !== undefined &&
-                <Tab title={"Линковка"} eventKey={"linking"}>
-                    <TtyRenderer {...linkerResult} title={"Результат линковки:"}/>
-                </Tab>
-            }
-            {runnerResult !== undefined &&
-                <Tab title={"Тестирование"} eventKey={"testing"}>
-                    <TtyRenderer {...runnerResult} title={"Результат тестирования:"}/>
-                </Tab>
-            }
-        </Tabs>
-    </div>);
+    return (
+        <div>
+            <Tabs activeKey={tab} onSelect={setTab} id={"0"}>
+                {userData !== undefined &&
+                 <Tab title={"Инфо"} eventKey={"info"}>
+                     {userData === null || userData === undefined ? null : <div>
+                         <div>{userData.login} ({userData.name}), группа {userData.groupName}</div>
+                         <div>{(new Date(timestamp)).toString()}</div>
+                     </div>}
+                 </Tab>
+                }
+                {sourceFiles !== undefined &&
+                 <Tab title={"Исходный код"} eventKey={"sourceFiles"}>
+                     {sourceFiles.map(({name, data}) => <div>
+                         <b>{name}</b>
+                         <pre>{data}</pre>
+                     </div>)}
+                 </Tab>
+                }
+                {compilerResult !== undefined &&
+                 <Tab title={"Компиляция"} eventKey={"compilation"}>
+                     <TtyRenderer {...compilerResult} title={"Результат компиляции:"}/>
+                 </Tab>
+                }
+                {linkerResult !== undefined &&
+                 <Tab title={"Линковка"} eventKey={"linking"}>
+                     <TtyRenderer {...linkerResult} title={"Результат линковки:"}/>
+                 </Tab>
+                }
+                {runnerResult !== undefined &&
+                 <Tab title={"Тестирование"} eventKey={"testing"}>
+                     <TtyRenderer {...runnerResult} title={"Результат тестирования:"}/>
+                 </Tab>
+                }
+            </Tabs>
+        </div>
+    );
 };

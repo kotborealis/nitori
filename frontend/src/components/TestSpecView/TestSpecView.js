@@ -5,7 +5,7 @@ import {Card} from 'react-bootstrap';
 import {PrismAsyncLight as SyntaxHighlighter} from 'react-syntax-highlighter';
 import {tomorrow} from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-export const TestSpecView = ({_id, name, description, timestamp, sourceFiles}) => (
+export const TestSpecView = ({_id, name, description, timestamp, sourceFiles}) =>
     <Card>
         <Card.Body>
             <Card.Title>Тест: {name}</Card.Title>
@@ -21,5 +21,4 @@ export const TestSpecView = ({_id, name, description, timestamp, sourceFiles}) =
                 )}
             </Card.Text>
         </Card.Body>
-    </Card>
-);
+    </Card>;

@@ -25,20 +25,18 @@ export const Widget = () => {
     useEffect(() => void fetchUserData(), []);
 
     return (
-        <>
-            <BlockContainer>
-                <Switch>
-                    <Route exact path={path}>
-                        <TestTargetSubmit/>
-                    </Route>
-                    <Route path={`${path}/admin`}>
-                        <Admin/>
-                    </Route>
-                    <Route path={`${path}/test-specs/:testSpecId`}>
-                        <TestSpec/>
-                    </Route>
-                </Switch>
-            </BlockContainer>
-        </>
+        <BlockContainer>
+            <Switch>
+                <Route exact path={path}>
+                    <TestTargetSubmit/>
+                </Route>
+                <Route path={`${path}/admin`}>
+                    <Admin/>
+                </Route>
+                <Route path={`${path}/test-specs/:testSpecId`}>
+                    <TestSpec/>
+                </Route>
+            </Switch>
+        </BlockContainer>
     );
 };
