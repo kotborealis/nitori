@@ -7,8 +7,10 @@ export const Loading = () =>
         in={true}
         style={{
             transitionDelay: '500ms',
+            marginTop: '15px',
+            marginBottom: '15px',
+            width: '100%'
         }}
-        unmountOnExit
     >
         <LinearProgress variant="query"/>
     </Fade>;
