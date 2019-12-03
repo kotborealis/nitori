@@ -3,6 +3,8 @@ import {devtools} from 'zustand/middleware';
 import {apiStoreHelper, fetchStoreHelper} from './helpers';
 
 const store = (set) => ({
+    ...apiStoreHelper("widgets", set, `/widgets/`, []),
+
     ...apiStoreHelper("testSpecs", set, (widgetId) => `/widgets/${widgetId}/test-specs/`, []),
 
     ...apiStoreHelper("testTargets", set, (widgetId) => `/widgets/${widgetId}/test-targets/`, []),
