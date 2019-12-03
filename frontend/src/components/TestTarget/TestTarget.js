@@ -1,14 +1,17 @@
-import React from 'react';
-import {ProgressbarStages} from '../ProgressbarStages/ProgressbarStages';
-import {TabsControlled} from '../TabsContorlled/TabsControlled';
+import React, {useEffect, useState} from 'react';
 import {execOutputsToProgressStages} from '../../helpers/execOutputsToProgressStages';
-import {Tab} from 'react-bootstrap';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 import {ExecOutput} from '../ExecOutput/ExecOutput';
 import {formatDistance} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {testOutputsToFailedIndex} from '../../helpers/testOutputsToFailedIndex';
 import {CodeCpp} from '../CodeCpp/CodeCpp';
-import Tabs from 'react-bootstrap/Tabs';
+import AttachmentIcon from '@material-ui/icons/Attachment';
+import Paper from '@material-ui/core/Paper';
+import {TestTargetStepper} from './TestTargetStepper';
+
+const TabPanel = ({children, value, index}) => value === index && <div>{children}</div>;
 
 export const TestTarget =
     ({
@@ -28,6 +31,21 @@ export const TestTarget =
         const progressStages = execOutputsToProgressStages(execOutputs);
         const activeTab = testOutputsToFailedIndex(execOutputs);
 
+        const suggestedResultTab = testOutputsToFailedIndex(execOutputs);
+        const [resultTab, setResultTab] = useState(suggestedResultTab);
+
+        useEffect(() => {
+            if(resultTab !== suggestedResultTab)
+                setResultTab(value);
+        }, [suggestedResultTab]);
+
+        const handleResultTabChange = (event, value) => setResultTab(value);
+
+        const [sourceCodeTab, setSourceCodeTab] = useState(0);
+        const handleSourceCodeTabChange = (event, value) => setSourceCodeTab(value);
+
+        const stepperIndex = testOutputsToFailedIndex(execOutputs);
+
         return (
             <div>
                 <div>
@@ -40,27 +58,50 @@ export const TestTarget =
                     </p>
                 </div>
                 <br/>
-                <ProgressbarStages state={progressStages} loading={loading}/>
+
+                <TestTargetStepper
+                    compilerResult={compilerResult}
+                    linkerResult={linkerResult}
+                    runnerResult={runnerResult}
+                />
+
                 <br/>
-                <TabsControlled activeKey={activeTab}>
-                    <Tab title={"Компиляция"} eventKey={0}>
+
+                <Paper square>
+                    <Tabs value={resultTab} onChange={handleResultTabChange}>
+                        <Tab label={"Компиляция"} id={0}/>
+                        <Tab label={"Линковка"} id={1}/>
+                        <Tab label={"Тестирование"} id={2}/>
+                    </Tabs>
+                </Paper>
+
+                <Paper square>
+                    <TabPanel value={resultTab} index={0}>
                         <ExecOutput {...compilerResult}/>
-                    </Tab>
-                    <Tab title={"Линковка"} eventKey={1}>
+                    </TabPanel>
+                    <TabPanel value={resultTab} index={1}>
                         <ExecOutput {...linkerResult}/>
-                    </Tab>
-                    <Tab title={"Тестирование"} eventKey={2}>
+                    </TabPanel>
+                    <TabPanel value={resultTab} index={2}>
                         <ExecOutput {...runnerResult}/>
-                    </Tab>
-                </TabsControlled>
+                    </TabPanel>
+                </Paper>
+
                 <br/>
-                <Tabs defaultActiveKey={0} id={"source-files-tabs"}>
-                    {sourceFiles.map(({name, data}, index) =>
-                        <Tab title={name} eventKey={index}>
-                            <CodeCpp>{data}</CodeCpp>
-                        </Tab>
-                    )}
-                </Tabs>
+
+                <Paper square>
+                    <Tabs value={sourceCodeTab} onChange={handleSourceCodeTabChange}>
+                        {sourceFiles.map(({name}, index) =>
+                            <Tab label={name} id={index} icon={<AttachmentIcon/>}/>
+                        )}
+                    </Tabs>
+                </Paper>
+
+                {sourceFiles.map(({data}, index) =>
+                    <TabPanel value={sourceCodeTab} index={index}>
+                        <CodeCpp>{data}</CodeCpp>
+                    </TabPanel>
+                )}
             </div>
         );
     };

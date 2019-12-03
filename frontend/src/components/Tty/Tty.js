@@ -1,7 +1,10 @@
 import React from 'react';
 import Ansi from 'ansi-to-react';
-import style from './Tty.css';
-import {Alert} from 'react-bootstrap';
+import './Tty.css';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import CardHeader from '@material-ui/core/CardHeader';
+import {exitCodeToIcon} from '../../helpers/exitCodeToIcon';
 
 const exitCodeToAlertVariant = (code) => {
     if(code === 0) return 'success';
@@ -21,12 +24,18 @@ export const Tty = ({exitCode = undefined, title = "", stdout = ""}) => {
         );
     }
 
+    const StatusIcon = exitCodeToIcon(exitCode);
+
     return (
-        <div className="output-renderer">
-            <Alert variant={exitCodeToAlertVariant(exitCode)} className={style.title}>
-                {title}
-            </Alert>
-            {pre}
-        </div>
+        <Card>
+            <CardHeader
+                title={"Результат выполнения"}
+                avatar={<StatusIcon/>}
+                subheader={title}
+            />
+            <CardContent className="output-renderer">
+                {pre}
+            </CardContent>
+        </Card>
     );
 };

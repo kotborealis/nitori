@@ -1,7 +1,7 @@
 import {Tab, Tabs} from 'react-bootstrap';
 import {Tty} from '../../Tty/Tty';
 import React, {useEffect, useState} from 'react';
-import {exitCodeToVariant} from '../../../helpers/exitCodeToVariant';
+import {exitCodeToColor} from '../../../helpers/exitCodeToColor';
 
 export const TestTargetOutput =
     ({
@@ -16,11 +16,11 @@ export const TestTargetOutput =
         const [tab, setTab] = useState('compilation');
 
         useEffect(() => {
-            if(exitCodeToVariant(compilerResult.exitCode) === "danger"){
+            if(exitCodeToColor(compilerResult.exitCode) === "danger"){
                 if(tab !== 'compilation')
                     setTab('compilation');
             }
-            else if(exitCodeToVariant(linkerResult.exitCode) === "danger"){
+            else if(exitCodeToColor(linkerResult.exitCode) === "danger"){
                 if(tab !== 'linking')
                     setTab('linking');
             }

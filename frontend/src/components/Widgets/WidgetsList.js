@@ -1,11 +1,15 @@
 import React from 'react';
-import {ListGroup} from 'react-bootstrap';
+import List from '@material-ui/core/List';
+import Paper from '@material-ui/core/Paper';
+import {ListItemLink} from '../ListItemLink/ListItemLink';
 
 export const WidgetsList = ({widgets = []}) =>
-    <ListGroup>
-        {widgets.map(({_id, name}) =>
-            <ListGroup.Item action href={`/widgets/${_id}/`}>
-                {name}
-            </ListGroup.Item>
-        )}
-    </ListGroup>;
+    <Paper>
+        <List>
+            {widgets.map(({_id, name}) =>
+                <ListItemLink to={`/widgets/${_id}/`}>
+                    {name}
+                </ListItemLink>
+            )}
+        </List>
+    </Paper>;

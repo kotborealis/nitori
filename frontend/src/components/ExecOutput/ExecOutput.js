@@ -6,5 +6,7 @@ export const ExecOutput = ({
                                exitCode = undefined
                            }) =>
     <Tty stdout={stdout} exitCode={exitCode} title={
-        `Код возврата: ${exitCode}`
+        exitCode !== undefined
+            ? `Код возврата: ${exitCode}`
+            : 'Не выполнено'
     }/>;
