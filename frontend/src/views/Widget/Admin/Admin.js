@@ -1,10 +1,10 @@
-import {Col, Row} from 'react-bootstrap';
 import React, {useEffect} from 'react';
 import {TestSpecsList} from '../../../components/TestSpec/TestSpecsList';
 import {TestSpecCreate} from '../../../components/TestSpec/TestSpecCreate';
 import {TestTargetsList} from '../../../components/TestTarget/TestTargetsList';
 import {useStore} from '../../../store/store';
 import {useParams} from 'react-router-dom';
+import Grid from '@material-ui/core/Grid';
 
 export default () => {
     const {widgetId} = useParams();
@@ -25,34 +25,28 @@ export default () => {
     ] = useStore(({testTargets: {data, loading, error}}) => [data, loading, error]);
 
     return (
-        <>
-            <Row>
-                <Col>
-                    <h2>Добавить тест</h2>
-                    <TestSpecCreate/>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <h2>Список тестов</h2>
-                    <TestSpecsList
-                        data={testSpecsData}
-                        loading={testSpecsLoading}
-                        error={testSpecsError}
-                    />
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <h2>Список таргетов</h2>
-                    <TestTargetsList
-                        data={testTargetsData}
-                        loading={testTargetsLoading || testSpecsLoading}
-                        error={testTargetsError || testSpecsLoading}
-                        testSpecs={testSpecsData}
-                    />
-                </Col>
-            </Row>
-        </>
+        <Grid container>
+            <Grid item xs={12}>
+                <h2>Добавить тест</h2>
+                <TestSpecCreate/>
+            </Grid>
+            <Grid item xs={12}>
+                <h2>Список тестов</h2>
+                <TestSpecsList
+                    data={testSpecsData}
+                    loading={testSpecsLoading}
+                    error={testSpecsError}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <h2>Список таргетов</h2>
+                <TestTargetsList
+                    data={testTargetsData}
+                    loading={testTargetsLoading || testSpecsLoading}
+                    error={testTargetsError || testSpecsLoading}
+                    testSpecs={testSpecsData}
+                />
+            </Grid>
+        </Grid>
     );
 };

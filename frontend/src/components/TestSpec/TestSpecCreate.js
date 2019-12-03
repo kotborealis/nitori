@@ -1,28 +1,19 @@
 import React, {useRef, useState} from 'react';
 import {TestSpecForm} from './TestSpecForm';
-import {ProgressbarStages} from '../ProgressbarStages/ProgressbarStages';
-import {BlockContainer} from '../BlockContainer/BlockContainer';
-import {Col, Row} from 'react-bootstrap';
 import {api} from '../../api';
 import {Error} from '../InvalidState/Error';
 import {Tty} from '../Tty/Tty';
 import {useParams} from 'react-router-dom';
+import Grid from '@material-ui/core/Grid';
 
 export const TestSpecCreate = ({}) => {
     const {widgetId} = useParams();
 
-    const [outputState, setOutputState] = useState(null);
+    const [outputState, setOutputState] = useState({});
     const [outputLoading, setOutputLoading] = useState(false);
     const [isError, setIsError] = useState(false);
 
     const outputError = useRef({});
-
-    const progressStages = [
-        outputState && {
-            variant: outputState.exitCode === 0 ? "success" : "danger",
-            size: 100
-        }
-    ].filter(id => id);
 
     const testSpecFormSubmit = async (event) => {
         event.preventDefault();
@@ -52,25 +43,23 @@ export const TestSpecCreate = ({}) => {
     };
 
     return (
-        <BlockContainer>
-            <Row>
-                <Col>
-                    <TestSpecForm onSubmit={testSpecFormSubmit}/>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <ProgressbarStages state={progressStages} loading={outputLoading}/>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    {isError
-                        ? <Error error={outputError.current}/>
-                        : <Tty title="Компиляция" {...outputState}/>
-                    }
-                </Col>
-            </Row>
-        </BlockContainer>
+        <Grid container>
+            <Grid item xs={12}>
+                <TestSpecForm onSubmit={testSpecFormSubmit}/>
+            </Grid>
+            <Grid item xs={12}>
+                {isError
+                    ? <Error error={outputError.current}/>
+                    : <Tty
+                        title={
+                            outputState.exitCode === undefined
+                                ? `Не выполнено`
+                                : `Код возврата: ${outputState.exitCode}`
+                        }
+                        {...outputState}
+                    />
+                }
+            </Grid>
+        </Grid>
     );
 };
