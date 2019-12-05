@@ -6,6 +6,7 @@ import Admin from './Admin/Admin';
 import TestSpecView from './TestSpecView/TestSpecView';
 import {useStore} from '../../store/store';
 import {TestTargetView} from './TestTargetView/TestTargetView';
+import {AuthBanner} from '../../components/AuthBanner/AuthBanner';
 
 export const Widget = () => {
     const {path} = useRouteMatch();
@@ -21,8 +22,11 @@ export const Widget = () => {
     const fetchUserData = useStore(({userData: {fetch}}) => fetch);
     useEffect(() => void fetchUserData(), []);
 
+    const [userDataLoading, userDataError] = useStore(({userData: {loading, error}}) => [loading, error]);
+
     return (
         <BlockContainer>
+            <AuthBanner show={true || !userDataLoading && userDataError}/>
             <Switch>
                 <Route exact path={path}>
                     <TestTargetSubmit/>
