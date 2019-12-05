@@ -83,6 +83,7 @@ export const TestSpecInputForm = ({onSubmit, initialName = "", initialDescriptio
                                 rowsMax="5"
                                 margin="normal"
                                 variant="outlined"
+                                name="description"
                             />
                         </FormControl>
                     </Grid>
