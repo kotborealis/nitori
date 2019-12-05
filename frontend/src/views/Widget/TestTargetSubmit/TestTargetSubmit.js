@@ -1,6 +1,6 @@
 import React from 'react';
 import {Alert, Col, Row} from 'react-bootstrap';
-import {SourceInputForm} from '../../../components/SourceInputForm/SourceInputForm';
+import {TestTargetInputForm} from '../../../components/TestTarget/TestTargetInputForm';
 import {useStore} from '../../../store/store';
 import {useParams} from 'react-router-dom';
 import {TestTarget} from '../../../components/TestTarget/TestTarget';
@@ -63,7 +63,7 @@ export const TestTargetSubmit = () => {
             </Row>)}
             <Row>
                 <Col>
-                    <SourceInputForm {...{onSubmit, tasksList}} disabled={loading || taskListLoading}/>
+                    <TestTargetInputForm {...{onSubmit, tasksList}} disabled={loading || taskListLoading}/>
                 </Col>
             </Row>
             <Row>

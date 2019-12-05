@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export const SourceInputForm = ({onSubmit = undefined, disabled = false, tasksList = []}) => {
+export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tasksList = []}) => {
     const classes = useStyles();
 
     const [formState, setFormState] = useState({

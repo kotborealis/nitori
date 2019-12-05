@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {TestSpecForm} from './TestSpecForm';
+import {TestSpecInputForm} from './TestSpecInputForm';
 import {api} from '../../api';
 import {Error} from '../InvalidState/Error';
 import {Tty} from '../Tty/Tty';
@@ -45,7 +45,7 @@ export const TestSpecCreate = ({}) => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <TestSpecForm onSubmit={testSpecFormSubmit}/>
+                <TestSpecInputForm onSubmit={testSpecFormSubmit}/>
             </Grid>
             <Grid item xs={12}>
                 {isError
