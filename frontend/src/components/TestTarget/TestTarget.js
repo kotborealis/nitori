@@ -5,11 +5,10 @@ import {ExecOutput} from '../ExecOutput/ExecOutput';
 import {formatDistance} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {testOutputsToFailedIndex} from '../../helpers/testOutputsToFailedIndex';
-import {CodeCpp} from '../CodeCpp/CodeCpp';
-import AttachmentIcon from '@material-ui/icons/Attachment';
 import Paper from '@material-ui/core/Paper';
 import {TestTargetStepper} from './TestTargetStepper';
 import Grid from '@material-ui/core/Grid';
+import {FileViewer} from '../FileViewer/FileViewer';
 
 const TabPanel = ({children, value, index}) => value === index && <div>{children}</div>;
 
@@ -86,19 +85,7 @@ export const TestTarget =
                 </Grid>
 
                 <Grid item xs={12}>
-                    <Paper square>
-                        <Tabs value={sourceCodeTab} onChange={handleSourceCodeTabChange}>
-                            {sourceFiles.map(({name}, index) =>
-                                <Tab label={name} id={index} icon={<AttachmentIcon/>}/>
-                            )}
-                        </Tabs>
-                    </Paper>
-
-                    {sourceFiles.map(({data}, index) =>
-                        <TabPanel value={sourceCodeTab} index={index}>
-                            <CodeCpp>{data}</CodeCpp>
-                        </TabPanel>
-                    )}
+                    <FileViewer files={sourceFiles}/>
                 </Grid>
             </Grid>
         );
