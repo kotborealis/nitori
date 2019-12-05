@@ -1,13 +1,26 @@
 import React from 'react';
-import {Alert, Col, Row} from 'react-bootstrap';
 import {TestTargetInputForm} from '../../../components/TestTarget/TestTargetInputForm';
 import {useStore} from '../../../store/store';
 import {useParams} from 'react-router-dom';
 import {TestTarget} from '../../../components/TestTarget/TestTarget';
 import {Loading} from '../../../components/InvalidState/Loading';
 import {Error} from '../../../components/InvalidState/Error';
+import Grid from '@material-ui/core/Grid';
+import {makeStyles, Typography} from '@material-ui/core';
+import {red} from '@material-ui/core/colors';
+import Paper from '@material-ui/core/Paper';
+import Link from '@material-ui/core/Link';
+
+const useStyles = makeStyles(theme => ({
+    auth_needed: {
+        padding: theme.spacing(3, 2),
+        backgroundColor: red[100]
+    }
+}));
 
 export const TestTargetSubmit = () => {
+    const classes = useStyles();
+
     const {widgetId} = useParams();
 
     const [userDataLoading, userDataError] = useStore(({userData: {loading, error}}) => [loading, error]);
@@ -52,23 +65,32 @@ export const TestTargetSubmit = () => {
         result = <TestTarget output={testTarget} testSpec={testSpec}/>;
 
     return (
-        <>
-            {(!userDataLoading && userDataError) && (<Row>
-                <Col>
-                    <Alert variant={"danger"}>
-                        <Alert.Heading>Требуется аутентификация</Alert.Heading>
-                        <p><a href={process.env.AUTH_PATH}>Аутентификация</a></p>
-                    </Alert>
-                </Col>
-            </Row>)}
-            <Row>
-                <Col>
-                    <TestTargetInputForm {...{onSubmit, tasksList}} disabled={loading || taskListLoading}/>
-                </Col>
-            </Row>
-            <Row>
+        <Grid container>
+            {(!userDataLoading && userDataError) && (
+                <Grid item xs={12}>
+                    <Paper className={classes.auth_needed}>
+                        <Typography variant="h5" component="h3">
+                            Требуется аутентификация
+                        </Typography>
+                        <Typography>
+                            <Link
+                                href={process.env.AUTH_PATH}
+                                target="_blank"
+                                rel="noopener"
+                                color="primary"
+                            >
+                                Аутентификация
+                            </Link>
+                        </Typography>
+                    </Paper>
+                </Grid>
+            )}
+            <Grid item xs={12}>
+                <TestTargetInputForm {...{onSubmit, tasksList}} disabled={loading || taskListLoading}/>
+            </Grid>
+            <Grid item xs={12}>
                 {result}
-            </Row>
-        </>
+            </Grid>
+        </Grid>
     );
 };

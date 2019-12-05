@@ -1,6 +1,5 @@
 import React from 'react';
 import {render} from 'react-dom';
-import "!style-loader!css-loader!bootstrap/dist/css/bootstrap.min.css";
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import {Widget} from '../views/Widget/Widget';
 import {WidgetList} from '../views/WidgetList/WidgetList';

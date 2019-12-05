@@ -2,7 +2,6 @@ import React from 'react';
 import {TestSpec} from '../../../components/TestSpec/TestSpec';
 import {useParams} from 'react-router-dom';
 import {useApi} from '../../../hooks/useApi';
-import {Col, Row} from 'react-bootstrap';
 import {Loading} from '../../../components/InvalidState/Loading';
 import {Error} from '../../../components/InvalidState/Error';
 
@@ -24,11 +23,5 @@ export default () => {
     else
         child = <TestSpec {...data}/>;
 
-    return (<>
-        <Row>
-            <Col>
-                {child}
-            </Col>
-        </Row>
-    </>);
+    return (child);
 };
