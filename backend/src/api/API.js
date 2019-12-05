@@ -56,8 +56,8 @@ module.exports = (config) => {
     app.use(function(err, req, res, next) {
         debug("Error handler: ", err);
 
-        res.status(err.status).json({
-            message: err.message,
+        res.status(err.status || 500).json({
+            message: err.message || err.toString(),
             errors: err.errors || [err.message]
         });
     });
