@@ -26,7 +26,7 @@ export const Widget = () => {
 
     return (
         <BlockContainer>
-            <AuthBanner show={true || !userDataLoading && userDataError}/>
+            <AuthBanner show={!userDataLoading && userDataError}/>
             <Switch>
                 <Route exact path={path}>
                     <TestTargetSubmit/>

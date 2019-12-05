@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tasksList = []}) => {
+export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, testSpecs = []}) => {
     const classes = useStyles();
 
     const [formState, setFormState] = useState({
@@ -68,7 +68,7 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tas
                                 onChange={handleTestSpecSelect}
                                 disabled={disabled}
                             >
-                                {tasksList.map(({name, _id}) =>
+                                {testSpecs.map(({name, _id}) =>
                                     <MenuItem value={_id}>{name}</MenuItem>
                                 )}
                             </Select>

@@ -10,7 +10,7 @@ import Grid from '@material-ui/core/Grid';
 export const TestTargetSubmit = () => {
     const {widgetId} = useParams();
 
-    const [tasksList, taskListLoading] = useStore(({testSpecs: {data, loading}}) => [data, loading]);
+    const [testSpecs, testSpecsLoading] = useStore(({testSpecs: {data, loading}}) => [data, loading]);
 
     const postTestTarget = useStore(({testTargetSubmit: {fetch}}) => fetch);
 
@@ -21,7 +21,6 @@ export const TestTargetSubmit = () => {
     ] = useStore(({testTargetSubmit: {data, loading, error}}) => [data, loading, error]);
 
     const testSpecId = testTarget && testTarget.testSpecId;
-    const testSpecLoading = useStore(({testSpecs: {loading}}) => loading);
     const testSpecError = useStore(({testSpecs: {error}}) => error);
     const testSpec = useStore(({testSpecs: {data}}) => data.find(({_id}) => _id === testSpecId));
 
@@ -52,7 +51,7 @@ export const TestTargetSubmit = () => {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <TestTargetInputForm {...{onSubmit, tasksList}} disabled={loading || taskListLoading}/>
+                <TestTargetInputForm {...{onSubmit, testSpecs}} disabled={loading || testSpecsLoading}/>
             </Grid>
             <Grid item xs={12}>
                 {result}
