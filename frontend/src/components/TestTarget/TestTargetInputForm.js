@@ -45,6 +45,7 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tas
                                 color="secondary"
                                 component="label"
                                 startIcon={<CloudUploadIcon/>}
+                                disabled={disabled}
                             >
                                 Исходный код
                                 <input
@@ -65,6 +66,7 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tas
                                 value={formState.task}
                                 name={"testSpecId"}
                                 onChange={handleTestSpecSelect}
+                                disabled={disabled}
                             >
                                 {tasksList.map(({name, _id}) =>
                                     <MenuItem value={_id}>{name}</MenuItem>
@@ -79,6 +81,7 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tas
                             color="primary"
                             component="button"
                             endIcon={<SendIcon/>}
+                            disabled={disabled}
                         >
                             Отправить
                         </Button>
