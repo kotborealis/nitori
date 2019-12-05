@@ -43,10 +43,8 @@ export const TestTargetsList = ({data, loading, error, testSpecs}) => {
                                    compilerResult,
                                    linkerResult,
                                    runnerResult
-                               }) => <TableRow component={Link} to={`/widgets/${widgetId}/test-specs/${_id}`}>
-                        <TableCell>
-                            <Link to={`/widgets/${widgetId}/test-targets/${_id}`}>{_id}</Link>
-                        </TableCell>
+                               }) => <TableRow component={Link} to={`/widgets/${widgetId}/test-targets/${_id}`}>
+                        <TableCell>{_id}</TableCell>
                         <TableCell>{formatDistance(new Date(timestamp), new Date, {locale: ru})} назад</TableCell>
                         <TableCell>{testSpecs.find(({_id}) => _id === testSpecId).name}</TableCell>
                         <TableCell>{name ? `${name} (${login})` : login}</TableCell>
