@@ -49,10 +49,15 @@ module.exports = (config) => {
                 userDataGroupName: userDataGroupName ? {"$eq": userDataGroupName} : undefined,
             };
 
+            const sort = [
+                ...[(req.query.sortBy && {[req.query.sortBy]: req.query.orderBy})]
+            ].filter(id => id);
+
             const {docs} = await db.find({
                 limit,
                 skip,
-                selector
+                selector,
+                sort
             });
 
             res.json(docs);

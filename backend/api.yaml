@@ -87,15 +87,27 @@ paths:
           schema:
             type: number
             default: 0
-        - name: name
-          in: query
-          schema:
-            type: string
         - name: includeSources
           in: query
           required: false
           schema:
             type: boolean
+        #       Filter
+        - name: name
+          in: query
+          schema:
+            type: string
+        #       Sorting
+        - name: sortBy
+          description: Specify field to sort by
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - timestamp
+            default: timestamp
+        - $ref: '#/components/parameters/orderBy'
       responses:
         200:
           description: List of TestSpecs
@@ -200,6 +212,7 @@ paths:
         - TestTargets
       parameters:
         - $ref: '#/components/parameters/widgetId'
+        #       Filters
         - name: limit
           description: Limit
           in: query
@@ -261,6 +274,17 @@ paths:
           required: false
           schema:
             type: string
+        #       Sorting
+        - name: sortBy
+          description: Specify field to sort by
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - timestamp
+            default: timestamp
+        - $ref: '#/components/parameters/orderBy'
       responses:
         200:
           description: List of TestTargets
@@ -341,10 +365,21 @@ components:
       schema:
         $ref: '#/components/schemas/widgetId'
 
+    orderBy:
+      name: orderBy
+      description: Specify sorting order
+      in: query
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        default: desc
+
   responses:
     NotFound:
       description: The specified resource was not found
-    Unathorized:
+    Unauthorized:
       description: Unauthorized
 
   schemas:
