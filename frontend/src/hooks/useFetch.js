@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-export const useFetch = (url, init = null, options = {}, deps = [url]) => {
+export const useFetch = (url, query = {}, init = null, options = {}, deps = [url]) => {
     const [data, setData] = useState(init);
     const [error, setError] = useState(null);
     const [status, setStatus] = useState(null);

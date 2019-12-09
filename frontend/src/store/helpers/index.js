@@ -1,5 +1,6 @@
 import {produce} from 'immer';
 import {api} from '../../api';
+import {encodeGetParams} from '../../helpers/encodeGetParams';
 
 const fetchStoreHelperGeneric = (fetcher) => (name, set, url, init = [], default_options = {}) => {
     const nameGen = (...args) => `${name}::${args.join('::')}`;
@@ -21,7 +22,7 @@ const fetchStoreHelperGeneric = (fetcher) => (name, set, url, init = [], default
                     );
 
                     try{
-                        const {data} = await fetcher(fetch_url, {...default_options, ...options});
+                        const data = await fetcher(fetch_url, {...default_options, ...options});
                         set(
                             state => produce(state, state => {
                                 state[name].data = data;
@@ -49,8 +50,8 @@ const fetchStoreHelperGeneric = (fetcher) => (name, set, url, init = [], default
     };
 };
 
-export const fetchStoreHelper = fetchStoreHelperGeneric(async (...args) => {
-    const res = await fetch(...args);
-    return {data: await res.json(), status: res.status};
+export const fetchStoreHelper = fetchStoreHelperGeneric(async (path, query = {}, options = {}) => {
+    const res = await fetch(`${path}?${encodeGetParams(query)}`, options);
+    return res.json();
 });
 export const apiStoreHelper = fetchStoreHelperGeneric(api);
