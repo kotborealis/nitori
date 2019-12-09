@@ -25,7 +25,11 @@ export const TestSpecCreate = ({}) => {
         setOutputLoading(true);
 
         try{
-            const {data} = await api(`widgets/${widgetId}/test-specs/?name=${formData.get('name')}&description=${formData.get('description')}`,
+            const {data} = await api(`widgets/${widgetId}/test-specs/`,
+                {
+                    name: formData.get('name'),
+                    description: formData.get('description')
+                },
                 {
                     method: "POST",
                     body: formData
