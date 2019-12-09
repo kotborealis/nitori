@@ -30,7 +30,11 @@ export const TestSpecsList = ({data, loading, error}) => {
                 </TableHead>
                 <TableBody>
                     {data.map(({_id, name, description, timestamp}) =>
-                        <TableRow component={Link} to={`/widgets/${widgetId}/test-specs/${_id}`}>
+                        <TableRow
+                            component={Link}
+                            to={`/widgets/${widgetId}/test-specs/${_id}`}
+                            style={{textDecoration: 'none'}}
+                        >
                             <TableCell>{_id}</TableCell>
                             <TableCell>{name}</TableCell>
                             <TableCell>{description}</TableCell>

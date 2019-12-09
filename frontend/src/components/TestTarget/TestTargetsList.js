@@ -43,31 +43,36 @@ export const TestTargetsList = ({data, loading, error, testSpecs}) => {
                                    compilerResult,
                                    linkerResult,
                                    runnerResult
-                               }) => <TableRow component={Link} to={`/widgets/${widgetId}/test-targets/${_id}`}>
-                        <TableCell>{_id}</TableCell>
-                        <TableCell>{formatDistance(new Date(timestamp), new Date, {locale: ru})} назад</TableCell>
-                        <TableCell>{testSpecs.find(({_id}) => _id === testSpecId).name}</TableCell>
-                        <TableCell>{name ? `${name} (${login})` : login}</TableCell>
-                        <TableCell>
-                            {(() => {
-                                const CompilerIcon = exitCodeToIcon(compilerResult.exitCode);
-                                const LinkerIcon = exitCodeToIcon(linkerResult.exitCode);
-                                const RunnerIcon = exitCodeToIcon(runnerResult.exitCode);
+                               }) =>
+                        <TableRow
+                            component={Link}
+                            to={`/widgets/${widgetId}/test-targets/${_id}`}
+                            style={{textDecoration: 'none'}}
+                        >
+                            <TableCell>{_id}</TableCell>
+                            <TableCell>{formatDistance(new Date(timestamp), new Date, {locale: ru})} назад</TableCell>
+                            <TableCell>{testSpecs.find(({_id}) => _id === testSpecId).name}</TableCell>
+                            <TableCell>{name ? `${name} (${login})` : login}</TableCell>
+                            <TableCell>
+                                {(() => {
+                                    const CompilerIcon = exitCodeToIcon(compilerResult.exitCode);
+                                    const LinkerIcon = exitCodeToIcon(linkerResult.exitCode);
+                                    const RunnerIcon = exitCodeToIcon(runnerResult.exitCode);
 
-                                const compilerColor = exitCodeToColor(compilerResult.exitCode);
-                                const linkerColor = exitCodeToColor(linkerResult.exitCode);
-                                const runnerColor = exitCodeToColor(runnerResult.exitCode);
+                                    const compilerColor = exitCodeToColor(compilerResult.exitCode);
+                                    const linkerColor = exitCodeToColor(linkerResult.exitCode);
+                                    const runnerColor = exitCodeToColor(runnerResult.exitCode);
 
-                                return (
-                                    <>
-                                        <Chip icon={<CompilerIcon/>} color={compilerColor} label="Компиляция"/>
-                                        <Chip icon={<LinkerIcon/>} color={linkerColor} label="Линковка"/>
-                                        <Chip icon={<RunnerIcon/>} color={runnerColor} label="Тесты"/>
-                                    </>
-                                );
-                            })()}
-                        </TableCell>
-                    </TableRow>)}
+                                    return (
+                                        <>
+                                            <Chip icon={<CompilerIcon/>} color={compilerColor} label="Компиляция"/>
+                                            <Chip icon={<LinkerIcon/>} color={linkerColor} label="Линковка"/>
+                                            <Chip icon={<RunnerIcon/>} color={runnerColor} label="Тесты"/>
+                                        </>
+                                    );
+                                })()}
+                            </TableCell>
+                        </TableRow>)}
                 </TableBody>
             </Table>
         </Paper>

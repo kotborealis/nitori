@@ -9,6 +9,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SendIcon from '@material-ui/icons/Send';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -16,7 +17,7 @@ const useStyles = makeStyles(theme => ({
     },
     formControl: {
         margin: theme.spacing(1),
-        minWidth: 120,
+        minWidth: 300,
     }
 }));
 
@@ -38,7 +39,27 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tes
         <Paper className={classes.root}>
             <form onSubmit={onSubmit}>
                 <Grid container spacing={3}>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
+                        <Typography>Выберите задание из предложенного списка:</Typography>
+                        <FormControl className={classes.formControl}>
+                            <InputLabel id="test-spec-select-label">Задание</InputLabel>
+                            <Select
+                                labelId="test-spec-select-label"
+                                id="test-spec-select"
+                                value={formState.task}
+                                name={"testSpecId"}
+                                onChange={handleTestSpecSelect}
+                                disabled={disabled}
+                                fullWidth
+                            >
+                                {testSpecs.map(({name, _id}) =>
+                                    <MenuItem value={_id}>{name}</MenuItem>
+                                )}
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Typography>Выберите исходный код для проверки:</Typography>
                         <FormControl className={classes.formControl}>
                             <Button
                                 variant="outlined"
@@ -57,34 +78,19 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tes
                             </Button>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
                         <FormControl className={classes.formControl}>
-                            <InputLabel id="test-spec-select-label">Задание</InputLabel>
-                            <Select
-                                labelId="test-spec-select-label"
-                                id="test-spec-select"
-                                value={formState.task}
-                                name={"testSpecId"}
-                                onChange={handleTestSpecSelect}
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                component="button"
+                                endIcon={<SendIcon/>}
                                 disabled={disabled}
                             >
-                                {testSpecs.map(({name, _id}) =>
-                                    <MenuItem value={_id}>{name}</MenuItem>
-                                )}
-                            </Select>
+                                Отправить на проверку
+                            </Button>
                         </FormControl>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            component="button"
-                            endIcon={<SendIcon/>}
-                            disabled={disabled}
-                        >
-                            Отправить
-                        </Button>
                     </Grid>
                 </Grid>
             </form>

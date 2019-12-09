@@ -5,6 +5,7 @@ import {TestTargetsList} from '../../../components/TestTarget/TestTargetsList';
 import {useStore} from '../../../store/store';
 import {useParams} from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
+import {Typography} from '@material-ui/core';
 
 export default () => {
     const {widgetId} = useParams();
@@ -25,21 +26,21 @@ export default () => {
     ] = useStore(({testTargets: {data, loading, error}}) => [data, loading, error]);
 
     return (
-        <Grid container>
-            <Grid item xs={12}>
-                <h2>Добавить тест</h2>
+        <Grid container direction="column" spacing={10}>
+            <Grid item>
+                <Typography variant="h5">Добавить тест</Typography>
                 <TestSpecCreate/>
             </Grid>
-            <Grid item xs={12}>
-                <h2>Список тестов</h2>
+            <Grid item>
+                <Typography variant="h5">Список тестов</Typography>
                 <TestSpecsList
                     data={testSpecsData}
                     loading={testSpecsLoading}
                     error={testSpecsError}
                 />
             </Grid>
-            <Grid item xs={12}>
-                <h2>Список таргетов</h2>
+            <Grid item>
+                <Typography variant="h5">Список таргетов</Typography>
                 <TestTargetsList
                     data={testTargetsData}
                     loading={testTargetsLoading || testSpecsLoading}
