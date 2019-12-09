@@ -48,4 +48,16 @@ module.exports = async ({database}) => {
                 }
             })
     );
+
+    debug("Creating indexes");
+    const indexes = require('./indexes/indexes');
+    for await(let indexName of Object.keys(indexes)){
+        const index = indexes[indexName];
+        debug("Create index", indexName);
+        await db.createIndex({
+            index,
+            type: "json",
+            name: indexName
+        });
+    }
 };
