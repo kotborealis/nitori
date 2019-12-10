@@ -1,21 +1,28 @@
-const debug = require('debug')('nitori:database');
-
 module.exports = class {
     nano;
     db;
 
-    constructor(nano, db){
-        this.nano = nano;
-        this.db = this.nano.use(db);
-    }
-
-    insert = (...args) => this.db.insert(...args);
-    get = (...args) => this.db.get(...args);
     multipart = {
-        insert: (...args) => this.db.multipart.insert(...args),
-        update: async (data, files, doc) => {
+        /**
+         *
+         * @param doc
+         * @param attachments
+         * @param params
+         * @returns {Promise<nano.DocumentInsertResponse>}
+         */
+        insert: (doc, attachments, params) => this.db.multipart.insert(doc, attachments, params),
+
+        /**
+         * Multipart equivalent of db.update
+         * @param data
+         * @param files
+         * @param doc
+         * @param rev
+         * @returns {Promise<nano.DocumentInsertResponse>}
+         */
+        update: async (data, files, doc, rev = null) => {
             try{
-                const {_rev} = await this.db.get(doc);
+                const {_rev} = rev === null ? await this.db.get(doc) : rev;
                 return await this.db.multipart.insert({...data, _rev}, files, doc);
             }
             catch(e){
@@ -24,12 +31,86 @@ module.exports = class {
         },
     };
 
-    find = (...args) => this.db.find(...args);
-    view = (...args) => this.db.view(...args);
+    /**
+     *
+     * @param nano Nano instance
+     * @param db Database name
+     */
+    constructor(nano, db) {
+        this.nano = nano;
+        this.db = this.nano.use(db);
+    }
 
-    async exists(id) {
+    /**
+     *
+     * @param doc
+     * @param params
+     * @returns {Promise<nano.DocumentInsertResponse>}
+     */
+    insert = (doc, params = {}) => this.db.insert(doc, params);
+
+    /**
+     *
+     * @param docname
+     * @returns {*}
+     */
+    get = (docname) => this.db.get(docname);
+
+    /**
+     * Update document by id. If it does not exists, create it
+     * @param data
+     * @param docname
+     * @param rev
+     * @returns {Promise<nano.DocumentInsertResponse>}
+     */
+    update = async (data, docname, rev = null) => {
         try{
-            await this.db.head(id);
+            const {_rev} = rev === null ? await this.db.get(docname) : rev;
+            return await this.db.insert({...data, _rev}, docname);
+        }
+        catch(e){
+            return await this.db.insert(data, docname);
+        }
+    };
+
+    /**
+     * Force remove document
+     * @param docname
+     * @param rev
+     * @returns {Promise<*>}
+     */
+    remove = async (docname, rev = null) => {
+        const {_rev} = rev === null ? await this.db.get(docname) : rev;
+        return await this.db.destroy(docname, _rev);
+    };
+
+
+    /**
+     *
+     * @param selector
+     * @returns {Promise<nano.MangoResponse<any>> | * | number | bigint}
+     */
+    find = (selector) => this.db.find(selector);
+
+    /**
+     *
+     * @param designname
+     * @param viewname
+     * @param params
+     * @returns {Promise<nano.DocumentViewResponse<any, any>> | *}
+     */
+    view = (designname, viewname, params = {}) => this.db.view(designname, viewname, params);
+
+    /**
+     * Check if specified doc exists
+     *
+     * Uses head internally
+     * @param docname
+     * @returns {Promise<boolean>}
+     */
+    async exists(docname) {
+        try{
+            await this.db.head(docname);
             return true;
         }
         catch(e){
@@ -37,33 +118,32 @@ module.exports = class {
         }
     }
 
+    /**
+     * Get first attachemnt of specified doc as {name, data} object
+     * @param docname
+     * @returns {Promise<any>}
+     */
     async getFirstAttachment(docname) {
         const {_attachments} = await this.db.get(docname);
         const filename = Object.keys(_attachments)[0];
         return this.db.attachment.get(docname, filename);
     }
 
+    /**
+     * Get all attachments of specified doc as array of {name, data} objects
+     * @param docname
+     * @returns {Promise<[]>}
+     */
     async getAllAttachments(docname) {
         const {_attachments} = await this.db.get(docname);
         const filenames = Object.keys(_attachments);
         const res = [];
-        for await (let name of filenames) {
+        for await (let name of filenames){
             res.push({
                 name,
                 data: await this.db.attachment.get(docname, name)
             });
         }
         return res;
-    }
-
-    async update(id, data) {
-        try{
-            const {_rev} = await this.db.get(id);
-            return await this.db.insert({...data, _rev}, id);
-        }
-        catch(e){
-            debug(e);
-            return await this.db.insert(data, id);
-        }
     }
 };

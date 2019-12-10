@@ -1,4 +1,5 @@
 module.exports = {
     Compiler: require('./Compiler'),
-    Objcopy: require('./Objcopy')
+    Objcopy: require('./Objcopy'),
+    Ar: require('./Ar')
 };

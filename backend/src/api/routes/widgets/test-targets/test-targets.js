@@ -8,7 +8,7 @@ const {Compiler} = require('../../../../SandboxedGnuUtils');
 const {Sandbox} = require('../../../../Sandbox');
 const {Docker} = require('node-docker-api');
 const {ObjectCache} = require('../../../../ObjectCache');
-const compileTestTarget = require('../../../../TestTarget/compile');
+const compileTestTarget = require('../../../../TestTarget/compileTestTarget');
 
 module.exports = (config) => {
     const router = Router();

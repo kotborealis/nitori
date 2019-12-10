@@ -2,7 +2,7 @@ const {Router} = require('express');
 const filesMiddleware = require('../../../middleware/filesMiddleware');
 const shortid = require('shortid');
 const Database = require('../../../../database');
-const {precompile} = require('../../../../TestSpec/precompile');
+const {compileTestSpec} = require('../../../../TestSpec/compileTestSpec');
 
 module.exports = (config) => {
 
@@ -11,8 +11,6 @@ module.exports = (config) => {
 
     router.route('/')
         .get(async (req, res) => {
-            const {includeSources = false} = req.query;
-
             const {
                 limit,
                 skip,
@@ -38,69 +36,99 @@ module.exports = (config) => {
                 sort
             });
 
-            if(includeSources)
-                await Promise.all(docs.map(async doc => doc.sourceFiles = await db.getAllAttachments(doc._id)));
-
             res.json(docs);
         })
         .post(//authHandler([({isAdmin}) => isAdmin === true]),
-            filesMiddleware(config.api.limits, 1, 1),
-            async function(req, res) {
-                const [file] = req.files;
+            filesMiddleware(config.api.limits, 1, 10),
+            async (req, res) => {
+                const files = req.files;
                 const {widgetId} = req;
-                const {name, description = ""} = req.body;
+                const {name, description} = req.query;
 
-                const {docs: [test]} = await db.find({
-                    selector: {
-                        widgetId,
+                const id = shortid.generate();
+
+                await db.multipart.insert({
+                        type: "TestSpec",
                         name,
+                        widgetId,
+                        description,
+                        timestamp: Date.now(),
+                    },
+                    files.map(({name, content: data, content_type}) => ({name, data, content_type})),
+                    id
+                );
+
+                const compilerResult = await compileTestSpec(config, files);
+                res.json(compilerResult);
+            }
+        );
+
+    router.route('/:testSpecId')
+        .get(//authHandler([({isAdmin}) => isAdmin === true]),
+            async function(req, res) {
+                const {testSpecId: _id} = req.params;
+                const {includeSources = false} = req.query;
+
+                const {docs: [doc]} = await db.find({
+                    selector: {
+                        _id,
                         type: "TestSpec"
                     }
                 });
 
-                let id = test ? test._id : shortid.generate();
-
-                await db.multipart.update({
-                    type: "TestSpec",
-                    name,
-                    widgetId,
-                    description,
-                    timestamp: Date.now(),
-                }, [{
-                    name: file.name,
-                    data: file.content,
-                    content_type: file.content_type
-                }], id);
-
-                const compilerResult = await precompile(config, id);
-
-                res.json(compilerResult);
-            });
-
-    router.route('/:testSpecId')
-        .get(async function(req, res) {
-            const {testSpecId: _id} = req.params;
-            const {includeSources = false} = req.query;
-
-            const {docs: [doc]} = await db.find({
-                selector: {
-                    _id,
-                    type: "TestSpec"
+                if(!doc){
+                    const err = new Error("Not found");
+                    err.status = 404;
+                    throw err;
                 }
-            });
 
-            if(!doc){
-                const err = new Error("Not found");
-                err.status = 404;
-                throw err;
+                if(includeSources)
+                    doc.sourceFiles = await db.getAllAttachments(_id);
+
+
+                res.json(doc);
+            })
+        .put(//authHandler([({isAdmin}) => isAdmin === true]),
+            filesMiddleware(config.api.limits, 0, 10),
+            async (req, res) => {
+                const files = req.files;
+                const id = req.testSpecId;
+                const {name, description} = req.query;
+
+                const testSpec = await db.get(id);
+
+                if(name)
+                    testSpec.name = name;
+                if(description)
+                    testSpec.description = description;
+
+                testSpec.timestamp = Date.now();
+
+                if(files.length){
+                    const attachments = files.map(({name, content: data, content_type}) => ({
+                        name,
+                        data,
+                        content_type
+                    }));
+                    await db.multipart.update(testSpec, attachments, id, testSpec._rev);
+
+                    const compilerResult = await compileTestSpec(config, files);
+                    res.json(compilerResult);
+                }
+                else{
+                    await db.update(testSpec, id, testSpec._rev);
+                    res.json({
+                        compilerResult: {exitCode: 0, stdout: "Loaded from cache", stderr: ""}
+                    });
+                }
             }
-
-            if(includeSources)
-                doc.sourceFiles = await db.getAllAttachments(_id);
-
-
-            res.json(doc);
-        });
+        )
+        .delete(//authHandler([({isAdmin}) => isAdmin === true]),
+            async (req, res) => {
+                await db.remove(req.testSpecId);
+                res.json(true);
+            }
+        );
 
     return router;
 };
