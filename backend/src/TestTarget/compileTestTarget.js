@@ -5,13 +5,11 @@ const {Sandbox} = require('../Sandbox');
 const {Docker} = require('node-docker-api');
 const {ObjectCache} = require('../ObjectCache');
 
-module.exports = async (config, test_source, files) => {
+module.exports = async (config, cache, files) => {
     const docker = new Docker(config.docker);
     const objectCache = new ObjectCache(config.cache.dir);
     const sandbox = new Sandbox(docker, config);
     await sandbox.start();
-
-    const cache_key = md5(test_source);
 
     const compiler = new Compiler(sandbox, config.timeout.compilation);
     const working_dir = config.sandbox.working_dir;
@@ -25,17 +23,17 @@ module.exports = async (config, test_source, files) => {
     const objcopy = new Objcopy(sandbox);
     await objcopy.redefine_sym(targetBinaries, "main", config.testing.hijack_main, {working_dir});
 
-    if(!objectCache.has(cache_key)){
+    if(!objectCache.has(cache)){
         const err = new Error("Failed to fetch TestSpec binary from cache");
         err.status = 500;
         throw err;
     }
     else{
-        await sandbox.fs_put(objectCache.get(cache_key), working_dir);
+        await sandbox.fs_put(objectCache.get(cache), working_dir);
     }
 
     const {exec: linkerResult, output} = await compiler.link(
-        [...targetBinaries, config.testing.test_obj_name]
+        [...targetBinaries, config.testing.test_archive_name]
     );
 
     if(linkerResult.exitCode !== 0){

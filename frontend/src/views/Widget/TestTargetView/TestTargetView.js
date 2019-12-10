@@ -23,10 +23,17 @@ export const TestTargetView = () => {
     const testTarget = useStore(({testTarget: {data}}) => data);
 
     const testSpecId = testTarget && testTarget.testSpecId;
+    const testSpecRev = testTarget && testTarget.testSpecRev;
 
-    const testSpec = useStore(({testSpecs: {data}}) => data ? data.find(({_id}) => _id === testSpecId) : null);
+    const testSpecLoading = useStore((state => state.testSpec.loading));
+    const testSpecFetch = useStore((state => state.testSpec.fetch));
+    const testSpec = useStore((state => state.testSpec.data));
 
-    if(loading || loading === null) return <Loading/>;
+    useEffect(() =>
+            void (testTarget && testSpecFetch({testSpecId, testSpecRev})),
+        [testSpecId, testSpecRev]);
+
+    if(loading || testSpecLoading) return <Loading/>;
     if(error) return <Error error={error}/>;
 
     return <BlockContainer>

@@ -14,8 +14,6 @@ module.exports = (config) => {
     const router = Router();
     const auth = require('../../../../auth').auth(config.auth.url);
     const db = new Database(require('nano')(config.database), config.database.name);
-    const docker = new Docker(config.docker);
-    const objectCache = new ObjectCache(config.cache.dir);
 
     router.route('/')
         .get(async function(req, res) {
@@ -69,9 +67,9 @@ module.exports = (config) => {
                 const {widgetId} = req;
                 const {testSpecId} = req.query;
                 const id = shortid.generate();
-                const test_source = await db.getFirstAttachment(testSpecId);
+                const {_rev: testSpecRev, cache} = await db.get(testSpecId);
 
-                const testTargetRes = await compileTestTarget(config, test_source, req.files);
+                const testTargetRes = await compileTestTarget(config, cache, req.files);
 
                 const sources = req.files.map(({name, content: data, content_type}) => ({
                     name, data, content_type
@@ -82,7 +80,8 @@ module.exports = (config) => {
                     widgetId,
                     timestamp: Date.now(),
                     userData,
-                    testSpecId: testSpecId,
+                    testSpecId,
+                    testSpecRev,
                     ...{
                         compilerResult: {exitCode: undefined, stdout: ""},
                         linkerResult: {exitCode: undefined, stdout: ""},

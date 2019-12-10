@@ -52,9 +52,10 @@ module.exports = class {
     /**
      *
      * @param docname
+     * @param params
      * @returns {*}
      */
-    get = (docname) => this.db.get(docname);
+    get = (docname, params = {}) => this.db.get(docname, params);
 
     /**
      * Update document by id. If it does not exists, create it

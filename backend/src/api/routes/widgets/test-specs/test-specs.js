@@ -3,6 +3,7 @@ const filesMiddleware = require('../../../middleware/filesMiddleware');
 const shortid = require('shortid');
 const Database = require('../../../../database');
 const {compileTestSpec} = require('../../../../TestSpec/compileTestSpec');
+const debug = require('debug')('nitori:api:widget:test-spec');
 
 module.exports = (config) => {
 
@@ -45,21 +46,28 @@ module.exports = (config) => {
                 const {widgetId} = req;
                 const {name, description} = req.query;
 
-                const id = shortid.generate();
+                const {compilerResult, cache} = await compileTestSpec(config, files);
 
-                await db.multipart.insert({
-                        type: "TestSpec",
-                        name,
-                        widgetId,
-                        description,
-                        timestamp: Date.now(),
-                    },
-                    files.map(({name, content: data, content_type}) => ({name, data, content_type})),
-                    id
-                );
+                debug("Cache key is", cache);
 
-                const compilerResult = await compileTestSpec(config, files);
-                res.json(compilerResult);
+                if(compilerResult.exitCode === 0){
+                    const id = shortid.generate();
+                    await db.multipart.insert({
+                            type: "TestSpec",
+                            name,
+                            widgetId,
+                            description,
+                            cache,
+                            timestamp: Date.now(),
+                        },
+                        files.map(({name, content: data, content_type}) => ({name, data, content_type})),
+                        id
+                    );
+                    res.json({compilerResult, testSpecId: id});
+                }
+                else{
+                    res.json({compilerResult});
+                }
             }
         );
 
@@ -67,16 +75,11 @@ module.exports = (config) => {
         .get(//authHandler([({isAdmin}) => isAdmin === true]),
             async function(req, res) {
                 const {testSpecId: _id} = req.params;
-                const {includeSources = false} = req.query;
+                const {includeSources = false, rev = undefined} = req.query;
 
-                const {docs: [doc]} = await db.find({
-                    selector: {
-                        _id,
-                        type: "TestSpec"
-                    }
-                });
+                const doc = await db.get(_id, {rev});
 
-                if(!doc){
+                if(doc.type !== "TestSpec"){
                     const err = new Error("Not found");
                     err.status = 404;
                     throw err;
@@ -85,17 +88,22 @@ module.exports = (config) => {
                 if(includeSources)
                     doc.sourceFiles = await db.getAllAttachments(_id);
 
-
                 res.json(doc);
             })
         .put(//authHandler([({isAdmin}) => isAdmin === true]),
             filesMiddleware(config.api.limits, 0, 10),
             async (req, res) => {
                 const files = req.files;
-                const id = req.testSpecId;
+                const testSpecId = req.testSpecId;
                 const {name, description} = req.query;
 
                 const testSpec = await db.get(id);
+
+                if(testSpec.type !== "TestSpec"){
+                    const err = new Error("Not found");
+                    err.status = 404;
+                    throw err;
+                }
 
                 if(name)
                     testSpec.name = name;
@@ -105,20 +113,24 @@ module.exports = (config) => {
                 testSpec.timestamp = Date.now();
 
                 if(files.length){
-                    const attachments = files.map(({name, content: data, content_type}) => ({
-                        name,
-                        data,
-                        content_type
-                    }));
-                    await db.multipart.update(testSpec, attachments, id, testSpec._rev);
+                    const {compilerResult, cache} = await compileTestSpec(config, files);
 
-                    const compilerResult = await compileTestSpec(config, files);
-                    res.json(compilerResult);
+                    if(compilerResult.exitCode === 0){
+                        const attachments = files.map(({name, content: data, content_type}) => ({
+                            name,
+                            data,
+                            content_type
+                        }));
+                        testSpec.cache = cache;
+                        await db.multipart.update(testSpec, attachments, testSpecId, testSpec._rev);
+                    }
+                    res.json({compilerResult, testSpecId});
                 }
                 else{
-                    await db.update(testSpec, id, testSpec._rev);
+                    await db.update(testSpec, testSpecId, testSpec._rev);
                     res.json({
-                        compilerResult: {exitCode: 0, stdout: "Loaded from cache", stderr: ""}
+                        compilerResult: {exitCode: 0, stdout: "Loaded from cache", stderr: ""},
+                        testSpecId
                     });
                 }
             }

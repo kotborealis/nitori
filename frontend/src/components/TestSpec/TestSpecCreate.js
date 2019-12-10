@@ -25,18 +25,20 @@ export const TestSpecCreate = ({}) => {
         setOutputLoading(true);
 
         try{
-            const {data} = await api(`widgets/${widgetId}/test-specs/`,
+            const {compilerResult} = await api(`widgets/${widgetId}/test-specs/`,
                 {
-                    name: formData.get('name'),
-                    description: formData.get('description')
-                },
-                {
-                    method: "POST",
-                    body: formData
+                    query: {
+                        name: formData.get('name'),
+                        description: formData.get('description')
+                    },
+                    options: {
+                        method: "POST",
+                        body: formData
+                    }
                 }
             );
 
-            setOutputState(data);
+            setOutputState(compilerResult);
         }
         catch(error){
             outputError.current = error;

@@ -12,12 +12,13 @@ export const WidgetList = () => {
     const [
         widgets,
         loading,
-        error
-    ] = useStore(({widgets: {data, loading, error}}) => [data, loading, error]);
+        error,
+        init
+    ] = useStore(({widgets: {data, loading, error, init}}) => [data, loading, error, init]);
 
     let child = null;
 
-    if(loading)
+    if(loading || init)
         child = <Loading/>;
     else if(error)
         child = <Error error={error}/>;

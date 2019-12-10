@@ -24,8 +24,7 @@ export const TestTarget =
              userData = {},
              sourceFiles = [],
          } = {},
-         testSpec = {},
-         loading = false
+         testSpec = {}
      } = {}) => {
         const execOutputs = [compilerResult, linkerResult, runnerResult];
 
@@ -50,7 +49,7 @@ export const TestTarget =
                     <Paper>
                         <Typography variant="body1" style={{padding: '20px'}}>
                             Решение для <Link to={
-                            `/widgets/${testSpec.widgetId}/test-specs/${testSpec._id}/`
+                            `/widgets/${testSpec.widgetId}/test-specs/${testSpec._id}/${testSpec._rev}`
                         }>{testSpec.name}</Link>,
                             от пользователя {userData.name} ({userData.login}), {userData.groupName},
                             отправлено {formatDistance(new Date(timestamp), new Date, {locale: ru})} назад

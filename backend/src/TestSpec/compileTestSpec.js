@@ -12,22 +12,27 @@ const compileTestSpec = async (config, files) => {
     const sandbox = new Sandbox(docker, config);
     await sandbox.start();
 
-    const cache_key = md5(files.map(({content}) => md5(content)));
-    debug("cache key", cache_key);
+    const cache = md5(files.map(({content}) => md5(content)));
+    debug("cache key", cache);
 
-    if(objectCache.has(cache_key)){
+    if(objectCache.has(cache)){
         debug(`Test already precompiled, skipping...`);
         return {
-            compilerResult: {exitCode: 0, stdout: "Loaded from cache", stderr: ""}
+            compilerResult: {exitCode: 0, stdout: "Loaded from cache", stderr: ""},
+            cache
         };
     }
 
     // compile code
     const compiler = new Compiler(sandbox, config.timeout.compilation);
     const working_dir = config.sandbox.working_dir;
-    const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(files, {working_dir});
+    const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(files, {
+        working_dir,
+        I: ["/opt/nitori/"]
+    });
 
     if(compilerResult.exitCode){
+        debug(`Failed to compile test with cache key ${cache}`);
         await sandbox.stop();
         return {compilerResult};
     }
@@ -37,11 +42,11 @@ const compileTestSpec = async (config, files) => {
     await ar.cr(config.testing.test_archive_name, targetBinaries, {working_dir});
 
     const testObjStream = await sandbox.fs_get(working_dir + "/" + config.testing.test_archive_name);
-    objectCache.put(cache_key, testObjStream);
-    debug(`Compiled test with cache key ${cache_key}`);
+    objectCache.put(cache, testObjStream);
+    debug(`Compiled test with cache key ${cache}`);
 
     await sandbox.stop();
-    return {compilerResult};
+    return {compilerResult, cache};
 };
 
 const precompileTestSpecs = async (config) => {
@@ -60,7 +65,7 @@ const precompileTestSpecs = async (config) => {
         const files =
             (await db.getAllAttachments(test)).map(({name, data}) => ({name, content: data}));
 
-        await compile(config, files);
+        await compileTestSpec(config, files);
     }
 
     debug("Precompiled all TestSpecs");

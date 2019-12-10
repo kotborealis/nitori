@@ -19,8 +19,8 @@ const storeFetchControlled = (set, get) => ({
     widgets: () => api(`/widgets/`),
 
     testSpecs: () => api(`/widgets/${get().widgetId}/test-specs`),
-    testSpec: ({testSpecId}) => api(`/widgets/${get().widgetId}/test-specs/${testSpecId}`,
-        {query: {includeSources: true}}),
+    testSpec: ({testSpecId, testSpecRev}) => api(`/widgets/${get().widgetId}/test-specs/${testSpecId}`,
+        {query: {includeSources: true, rev: testSpecRev}}),
 
     testTargets: () => api(`/widgets/${get().widgetId}/test-targets`),
     testTarget: ({testTargetId}) => api(`/widgets/${get().widgetId}/test-targets/${testTargetId}`),

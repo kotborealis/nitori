@@ -18,11 +18,10 @@ const fetchStoreHelperGeneric = (name, set, fetcher) => {
     return {
         data: null,
         init: true,
-        loading: false,
+        loading: true,
         error: null,
 
         fetch: async (...args) => {
-            console.log(nameGen("fetch called"));
             set(
                 state => produce(state, state => {
                     state[name].init = false;

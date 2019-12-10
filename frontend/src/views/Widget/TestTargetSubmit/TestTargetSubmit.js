@@ -40,7 +40,9 @@ export const TestTargetSubmit = () => {
 
     let result = null;
 
-    if(testTargetLoading)
+    if(testTargetInit)
+        result = null;
+    else if(testTargetLoading)
         result = <Loading/>;
     else if(testTargetError)
         result = <Error error={error}/>;

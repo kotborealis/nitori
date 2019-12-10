@@ -34,7 +34,7 @@ export const Widget = () => {
                 <Route path={`${path}/admin`}>
                     <Admin/>
                 </Route>
-                <Route path={`${path}/test-specs/:testSpecId`}>
+                <Route path={`${path}/test-specs/:testSpecId/:testSpecRev?`}>
                     <TestSpecView/>
                 </Route>
                 <Route path={`${path}/test-targets/:testTargetId`}>

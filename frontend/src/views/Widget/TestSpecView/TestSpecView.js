@@ -7,7 +7,7 @@ import {useStore} from '../../../store/store';
 
 export default () => {
     const widgetId = useStore(state => state.widgetId);
-    const {testSpecId} = useParams();
+    const {testSpecId, testSpecRev} = useParams();
 
     const {
         fetch,
@@ -17,12 +17,10 @@ export default () => {
     } = useStore(state => state.testSpec);
 
     useEffect(() =>
-            void setTimeout(() => fetch({testSpecId}), 0),
+            void setTimeout(() => fetch({testSpecId, testSpecRev}), 0),
         [testSpecId, widgetId]);
 
     let child;
-
-    console.log(loading, error, data);
 
     if(loading)
         child = <Loading/>;
