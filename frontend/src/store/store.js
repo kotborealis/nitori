@@ -8,13 +8,12 @@ import {produce} from 'immer';
  * Store props, controlled by fetch functions (see ./api/: fetchJSON, fetchPlainText, api)
  *
  * For each [name] prop in creates next structure in the store:
- * name: {fetch, data, loading, error, ready}
+ * name: {fetch, data, loading, error}
  *
- * * fetch --- calls specified fetch function and sets data, loading, error and ready accordingly to it's execution
+ * * fetch --- calls specified fetch function and sets data, loading and error accordingly to it's execution
  * * data --- return value of fetch function, null by default
- * * loading --- loading status, true/false, null by default
+ * * loading --- loading status, true/false, true by default
  * * error --- error thrown by fetch function, null by default
- * * ready --- true if not loading and no error, false otherwise
  */
 const storeFetchControlled = (set, get) => ({
     widgets: () => api(`/widgets/`),
@@ -26,9 +25,9 @@ const storeFetchControlled = (set, get) => ({
     testTargets: () => api(`/widgets/${get().widgetId}/test-targets`),
     testTarget: ({testTargetId}) => api(`/widgets/${get().widgetId}/test-targets/${testTargetId}`),
 
-    testTargetSubmit: ({testSpecId}) => api(`/widgets/${get().widgetId}/test-targets/`, {
+    testTargetSubmit: ({testSpecId, formData}) => api(`/widgets/${get().widgetId}/test-targets/`, {
         query: {testSpecId},
-        options: {method: 'POST'}
+        options: {method: 'POST', body: formData}
     }),
 
     userData: () => fetchJSON(`/auth/user_data.php`)

@@ -44,12 +44,16 @@ export const TestSpecInputForm = ({onSubmit, initialName = "", initialDescriptio
                                 startIcon={<CloudUploadIcon/>}
                                 style={{width: 300}}
                             >
-                                Исходный код
+                                {!formState.files && "Исходный код"}
+                                {formState.files && `Файлы: ${formState.files.length}`}
                                 <input
                                     type="file"
                                     name={"sources"}
                                     multiple={true}
                                     style={{display: "none"}}
+                                    onChange={({target: {files}}) =>
+                                        setFormState(state => ({...state, files}))
+                                    }
                                 />
                             </Button>
                         </FormControl>

@@ -17,17 +17,17 @@ const fetchStoreHelperGeneric = (name, set, fetcher) => {
 
     return {
         data: null,
-        loading: null,
+        init: true,
+        loading: false,
         error: null,
-        ready: false,
 
         fetch: async (...args) => {
             console.log(nameGen("fetch called"));
             set(
                 state => produce(state, state => {
+                    state[name].init = false;
                     state[name].loading = true;
                     state[name].error = null;
-                    state[name].ready = false;
                 }),
                 nameGen('fetchStart')
             );
@@ -38,7 +38,6 @@ const fetchStoreHelperGeneric = (name, set, fetcher) => {
                     state => produce(state, state => {
                         state[name].data = data;
                         state[name].error = null;
-                        state[name].ready = true;
                     }),
                     nameGen('fetchData')
                 );
@@ -49,7 +48,6 @@ const fetchStoreHelperGeneric = (name, set, fetcher) => {
                     state => produce(state, state => {
                         state[name].data = null;
                         state[name].error = error;
-                        state[name].ready = false;
                     }),
                     nameGen('fetchError')
                 );

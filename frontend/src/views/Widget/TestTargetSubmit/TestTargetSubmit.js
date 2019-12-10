@@ -10,22 +10,24 @@ import Grid from '@material-ui/core/Grid';
 export const TestTargetSubmit = () => {
     const {widgetId} = useParams();
 
-    const [testSpecs, testSpecsLoading] = useStore(({testSpecs: {data, loading}}) => [data, loading]);
+    const [
+        testSpecs,
+        testSpecsLoading,
+        testSpecsInit,
+        testSpecsError
+    ] = useStore(({testSpecs: {data, loading, init, error}}) => [data, loading, init, error]);
 
-    const postTestTarget = useStore(({testTargetSubmit: {fetch}}) => fetch);
+    const submitTestTarget = useStore(state => state.testTargetSubmit.fetch);
 
     const [
         testTarget,
         testTargetLoading,
+        testTargetInit,
         testTargetError
-    ] = useStore(({testTargetSubmit: {data, loading, error}}) => [data, loading, error]);
+    ] = useStore(({testTargetSubmit: {data, loading, init, error}}) => [data, loading, init, error]);
 
     const testSpecId = testTarget && testTarget.testSpecId;
-    const testSpecError = useStore(({testSpecs: {error}}) => error);
-    const testSpec = useStore(({testSpecs: {data}}) => data.find(({_id}) => _id === testSpecId));
-
-    const error = testTargetError || testSpecError;
-    const loading = testTargetLoading;
+    const testSpec = useStore(({testSpecs: {data}}) => data ? data.find(({_id}) => _id === testSpecId) : null);
 
     const onSubmit = event => {
         event.preventDefault();
@@ -33,25 +35,29 @@ export const TestTargetSubmit = () => {
         const formData = new FormData(event.target);
         const testSpecId = formData.get('testSpecId');
 
-        postTestTarget([widgetId, testSpecId], {body: formData});
+        void submitTestTarget({testSpecId, formData});
     };
 
     let result = null;
 
-
-    if(loading === true)
+    if(testTargetLoading)
         result = <Loading/>;
-    else if(error)
+    else if(testTargetError)
         result = <Error error={error}/>;
-    else if(testTarget === null)
-        result = null;
-    else
+    else if(!testTargetInit)
         result = <TestTarget output={testTarget} testSpec={testSpec}/>;
 
     return (
         <Grid container>
             <Grid item xs={12}>
-                <TestTargetInputForm {...{onSubmit, testSpecs}} disabled={loading || testSpecsLoading}/>
+                {testSpecsLoading && <Loading/>}
+                {testSpecsError && <Error error={testSpecsError}/>}
+                {!testSpecsLoading && !testSpecsError && !testSpecsInit &&
+                 <TestTargetInputForm
+                     {...{onSubmit, testSpecs}}
+                     disabled={(testTargetLoading && !testTargetInit) || testSpecsLoading}
+                 />
+                }
             </Grid>
             <Grid item xs={12}>
                 {result}

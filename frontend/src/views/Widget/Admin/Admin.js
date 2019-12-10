@@ -20,15 +20,13 @@ export default () => {
         testSpecsData,
         testSpecsLoading,
         testSpecsError,
-        testSpecsReady,
-    ] = useStore(({testSpecs: {data, loading, error, ready}}) => [data, loading, error, ready]);
+    ] = useStore(({testSpecs: {data, loading, error}}) => [data, loading, error]);
 
     const [
         testTargetsData,
         testTargetsLoading,
-        testTargetsError,
-        testTargetsReady
-    ] = useStore(({testTargets: {data, loading, error, ready}}) => [data, loading, error, ready]);
+        testTargetsError
+    ] = useStore(({testTargets: {data, loading, error}}) => [data, loading, error]);
 
     return (
         <Grid container direction="column" spacing={10}>
@@ -40,7 +38,7 @@ export default () => {
                 <Typography variant="h5">Список тестов</Typography>
                 {testSpecsLoading && <Loading/>}
                 {testSpecsError && <Error error={testSpecsError}/>}
-                {testSpecsReady && <TestSpecsList
+                {!testSpecsLoading && !testSpecsError && <TestSpecsList
                     data={testSpecsData}
                 />}
             </Grid>
@@ -48,10 +46,11 @@ export default () => {
                 <Typography variant="h5">Список таргетов</Typography>
                 {testTargetsLoading || testSpecsLoading && <Loading/>}
                 {testTargetsError || testSpecsError && <Error error={testTargetsError}/>}
-                {testTargetsReady && testSpecsReady && <TestTargetsList
-                    data={testTargetsData}
-                    testSpecs={testSpecsData}
-                />}
+                {!testSpecsLoading && !testSpecsError && !testTargetsLoading && !testTargetsError &&
+                 <TestTargetsList
+                     data={testTargetsData}
+                     testSpecs={testSpecsData}
+                 />}
             </Grid>
         </Grid>
     );

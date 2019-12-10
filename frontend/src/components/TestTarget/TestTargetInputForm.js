@@ -25,7 +25,7 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tes
     const classes = useStyles();
 
     const [formState, setFormState] = useState({
-        files: undefined,
+        files: null,
         task: ""
     });
 
@@ -68,12 +68,16 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tes
                                 startIcon={<CloudUploadIcon/>}
                                 disabled={disabled}
                             >
-                                Исходный код
+                                {!formState.files && "Исходный код"}
+                                {formState.files && `Файлы: ${formState.files.length}`}
                                 <input
                                     type="file"
                                     name={"sources"}
                                     multiple={true}
                                     style={{display: "none"}}
+                                    onChange={({target: {files}}) =>
+                                        setFormState(state => ({...state, files}))
+                                    }
                                 />
                             </Button>
                         </FormControl>

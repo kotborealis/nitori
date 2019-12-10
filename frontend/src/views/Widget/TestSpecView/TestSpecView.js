@@ -13,8 +13,7 @@ export default () => {
         fetch,
         data,
         loading,
-        error,
-        ready
+        error
     } = useStore(state => state.testSpec);
 
     useEffect(() =>
@@ -29,10 +28,8 @@ export default () => {
         child = <Loading/>;
     else if(error)
         child = <Error error={error}/>;
-    else if(ready)
-        child = <TestSpec {...data}/>;
     else
-        child = null;
+        child = <TestSpec {...data}/>;
 
     return (child);
 };
