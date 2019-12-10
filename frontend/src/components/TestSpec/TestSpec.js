@@ -16,8 +16,8 @@ export const TestSpec = ({_id, name, description, timestamp, sourceFiles}) =>
             subheader={`Обновлён ${formatDistance(new Date(timestamp), new Date, {locale: ru})} назад`}
         />
         <CardContent>
-            <Typography variant="p" component="p" style={{padding: "20px"}}>
-                Описание: <br/> {description}
+            <Typography variant="body1" style={{padding: "20px"}}>
+                {description}
             </Typography>
             <FileViewer files={sourceFiles}/>
         </CardContent>

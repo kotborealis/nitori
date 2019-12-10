@@ -6,9 +6,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-
-import {Error} from '../InvalidState/Error';
-import {Loading} from '../InvalidState/Loading';
 import {formatDistance} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {exitCodeToIcon} from '../../helpers/exitCodeToIcon';
@@ -16,11 +13,8 @@ import Chip from '@material-ui/core/Chip';
 import {exitCodeToColor} from '../../helpers/exitCodeToColor';
 import {Link, useParams} from 'react-router-dom';
 
-export const TestTargetsList = ({data, loading, error, testSpecs}) => {
+export const TestTargetsList = ({data, testSpecs}) => {
     const {widgetId} = useParams();
-
-    if(loading) return <Loading/>;
-    if(error) return <Error error={error}/>;
 
     return (
         <Paper>

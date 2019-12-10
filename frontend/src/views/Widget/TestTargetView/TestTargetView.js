@@ -9,8 +9,13 @@ import {BlockContainer} from '../../../components/BlockContainer/BlockContainer'
 export const TestTargetView = () => {
     const {testTargetId, widgetId} = useParams();
 
-    const fetch = useStore(({testTarget: {fetch}}) => fetch);
-    useEffect(() => void fetch([widgetId, testTargetId]), [testTargetId, widgetId]);
+    const fetchTestTarget = useStore(state => state.testTarget.fetch);
+    useEffect(() => void setTimeout(() => fetchTestTarget({testTargetId}), 0),
+        [testTargetId, widgetId]);
+
+    const fetchTestSpecs = useStore(state => state.testSpecs.fetch);
+    useEffect(() => void setTimeout(fetchTestSpecs, 0),
+        [testTargetId, widgetId]);
 
     const error = useStore(({testTarget: {error: _1}, testSpecs: {error: _2}}) => _1 || _2);
     const loading = useStore(({testTarget: {loading: _1}, testSpecs: {loading: _2}}) => _1 || _2);
@@ -19,12 +24,10 @@ export const TestTargetView = () => {
 
     const testSpecId = testTarget && testTarget.testSpecId;
 
-    const testSpec = useStore(({testSpecs: {data}}) => data.find(({_id}) => _id === testSpecId));
+    const testSpec = useStore(({testSpecs: {data}}) => data ? data.find(({_id}) => _id === testSpecId) : null);
 
-    if(testTarget === undefined) return null;
-    if(loading) return <Loading/>;
+    if(loading || loading === null) return <Loading/>;
     if(error) return <Error error={error}/>;
-    if(!testTarget) return <Error error={{message: "Specified resource not found"}}/>;
 
     return <BlockContainer>
         <TestTarget output={testTarget} testSpec={testSpec} loading={loading}/>

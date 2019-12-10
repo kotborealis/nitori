@@ -9,6 +9,8 @@ import Paper from '@material-ui/core/Paper';
 import {TestTargetStepper} from './TestTargetStepper';
 import Grid from '@material-ui/core/Grid';
 import {FileViewer} from '../FileViewer/FileViewer';
+import {Link} from 'react-router-dom';
+import Typography from '@material-ui/core/Typography';
 
 const TabPanel = ({children, value, index}) => value === index && <div>{children}</div>;
 
@@ -46,13 +48,13 @@ export const TestTarget =
             <Grid container>
                 <Grid item xs={12}>
                     <Paper>
-                        <p style={{padding: '20px'}}>
-                            Решение для <a href={
+                        <Typography variant="body1" style={{padding: '20px'}}>
+                            Решение для <Link to={
                             `/widgets/${testSpec.widgetId}/test-specs/${testSpec._id}/`
-                        }>{testSpec.name}</a>,
+                        }>{testSpec.name}</Link>,
                             от пользователя {userData.name} ({userData.login}), {userData.groupName},
                             отправлено {formatDistance(new Date(timestamp), new Date, {locale: ru})} назад
-                        </p>
+                        </Typography>
 
                         <TestTargetStepper
                             compilerResult={compilerResult}

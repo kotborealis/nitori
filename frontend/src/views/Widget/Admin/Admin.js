@@ -6,24 +6,29 @@ import {useStore} from '../../../store/store';
 import {useParams} from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import {Typography} from '@material-ui/core';
+import {Loading} from '../../../components/InvalidState/Loading';
+import {Error} from '../../../components/InvalidState/Error';
 
 export default () => {
     const {widgetId} = useParams();
+
     // Fetch test targets
-    const fetchTestTargets = useStore(({testTargets: {fetch}}) => fetch);
-    useEffect(() => void fetchTestTargets([widgetId]), [widgetId]);
+    const fetchTestTargets = useStore(state => state.testTargets.fetch);
+    useEffect(() => void setTimeout(fetchTestTargets, 0), [widgetId]);
 
     const [
         testSpecsData,
         testSpecsLoading,
-        testSpecsError
-    ] = useStore(({testSpecs: {data, loading, error}}) => [data, loading, error]);
+        testSpecsError,
+        testSpecsReady,
+    ] = useStore(({testSpecs: {data, loading, error, ready}}) => [data, loading, error, ready]);
 
     const [
         testTargetsData,
         testTargetsLoading,
-        testTargetsError
-    ] = useStore(({testTargets: {data, loading, error}}) => [data, loading, error]);
+        testTargetsError,
+        testTargetsReady
+    ] = useStore(({testTargets: {data, loading, error, ready}}) => [data, loading, error, ready]);
 
     return (
         <Grid container direction="column" spacing={10}>
@@ -33,20 +38,20 @@ export default () => {
             </Grid>
             <Grid item>
                 <Typography variant="h5">Список тестов</Typography>
-                <TestSpecsList
+                {testSpecsLoading && <Loading/>}
+                {testSpecsError && <Error error={testSpecsError}/>}
+                {testSpecsReady && <TestSpecsList
                     data={testSpecsData}
-                    loading={testSpecsLoading}
-                    error={testSpecsError}
-                />
+                />}
             </Grid>
             <Grid item>
                 <Typography variant="h5">Список таргетов</Typography>
-                <TestTargetsList
+                {testTargetsLoading || testSpecsLoading && <Loading/>}
+                {testTargetsError || testSpecsError && <Error error={testTargetsError}/>}
+                {testTargetsReady && testSpecsReady && <TestTargetsList
                     data={testTargetsData}
-                    loading={testTargetsLoading || testSpecsLoading}
-                    error={testTargetsError || testSpecsLoading}
                     testSpecs={testSpecsData}
-                />
+                />}
             </Grid>
         </Grid>
     );

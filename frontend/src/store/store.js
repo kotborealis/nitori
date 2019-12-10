@@ -1,33 +1,37 @@
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
-import {apiStoreHelper, fetchStoreHelper} from './helpers';
+import {generateFetchStore} from './helpers';
+import {api, fetchJSON} from '../api';
+import {produce} from 'immer';
 
-const store = (set) => ({
-    ...apiStoreHelper("widgets", set, `/widgets/`, []),
+const storeFetchControlled = (set, get) => ({
+    widgets: () => api(`/widgets/`),
 
-    ...apiStoreHelper("testSpecs", set,
-        (widgetId) => `/widgets/${widgetId}/test-specs/`,
-        []),
+    testSpecs: () => api(`/widgets/${get().widgetId}/test-specs`),
+    testSpec: ({testSpecId}) => api(`/widgets/${get().widgetId}/test-specs/${testSpecId}`,
+        {query: {includeSources: true}}),
 
-    ...apiStoreHelper("testTargets", set,
-        (widgetId) => `/widgets/${widgetId}/test-targets/`,
-        []),
+    testTargets: () => api(`/widgets/${get().widgetId}/test-targets`),
+    testTarget: ({testTargetId}) => api(`/widgets/${get().widgetId}/test-targets/${testTargetId}`),
 
-    ...fetchStoreHelper("userData", set,
-        `/auth/user_data.php`,
-        {}),
+    testTargetSubmit: ({testSpecId}) => api(`/widgets/${get().widgetId}/test-targets/`, {
+        query: {testSpecId},
+        options: {method: 'POST'}
+    }),
 
-    ...apiStoreHelper("testTarget", set,
-        (widgetId, testTargetId) => `/widgets/${widgetId}/test-targets/${testTargetId}`,
-        {}),
-
-    ...apiStoreHelper("testTargetSubmit", set,
-        (widgetId, testSpecId) => `/widgets/${widgetId}/test-targets/?testSpecId=${testSpecId}`,
-        null,
-        {
-            method: "POST"
-        }
-    ),
+    userData: () => fetchJSON(`/auth/user_data.php`)
 });
 
-export const [useStore, storeApi] = create(devtools(store, "AppStore"));
+const store = (set, get) => ({
+    set: fn => set(produce(fn), "set"),
+
+    widgetId: null,
+});
+
+export const [useStore, storeApi] =
+    create(
+        devtools((set, get) => ({
+            ...generateFetchStore(storeFetchControlled)(set, get),
+            ...store(set, get)
+        }), "store")
+    );

@@ -1,6 +1,4 @@
 import React from 'react';
-import {Error} from '../InvalidState/Error';
-import {Loading} from '../InvalidState/Loading';
 import {formatDistance} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import {Link, useParams} from 'react-router-dom';
@@ -11,11 +9,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
-export const TestSpecsList = ({data, loading, error}) => {
+export const TestSpecsList = ({data}) => {
     const {widgetId} = useParams();
-
-    if(loading) return <Loading/>;
-    if(error) return <Error error={error}/>;
 
     return (
         <Paper>

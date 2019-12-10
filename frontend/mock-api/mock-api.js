@@ -9,7 +9,7 @@ module.exports = [
     },
     {
         bypass: (req, res) => {
-            if(req.url !== '/auth/user_data.php') return '/index.html';
+            if(req.url.indexOf('/auth/user_data.php') < 0) return '/index.html';
 
             res.json({
                 "userId": 5,

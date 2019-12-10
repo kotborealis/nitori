@@ -15,11 +15,11 @@ export const Widget = () => {
     // Fetch data into store:
 
     // Fetch test specs
-    const fetchTestSpecs = useStore(({testSpecs: {fetch}}) => fetch);
-    useEffect(() => void fetchTestSpecs([widgetId]), [widgetId]);
+    const fetchTestSpecs = useStore(state => state.testSpecs.fetch);
+    useEffect(() => void setTimeout(fetchTestSpecs, 0), [widgetId]);
 
     // Fetch user data
-    const fetchUserData = useStore(({userData: {fetch}}) => fetch);
+    const fetchUserData = useStore(state => state.userData.fetch);
     useEffect(() => void fetchUserData(), []);
 
     const [userDataLoading, userDataError] = useStore(({userData: {loading, error}}) => [loading, error]);

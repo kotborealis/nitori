@@ -1,56 +1,66 @@
 import {produce} from 'immer';
-import {api} from '../../api';
 
-const fetchStoreHelperGeneric = (fetcher) => (name, set, url, init = [], default_options = {}) => {
-    const nameGen = (...args) => `${name}::${args.join('::')}`;
-    return {
-        [name]:
-            {
-                data: init,
-                loading: false,
-                error: null,
+export const generateFetchStore = (fn) => (set, get, api) => {
+    const data = fn(set, get);
+    const store = {};
 
-                fetch: async (args = [], options = {}) => {
-                    const fetch_url = typeof url === "function" ? url(...args) : url;
-                    set(
-                        state => produce(state, state => {
-                            state[name].loading = true;
-                            state[name].error = null;
-                        }),
-                        nameGen('fetchStart')
-                    );
+    for(let name of Object.keys(data)){
+        const fetcher = data[name];
+        store[name] = fetchStoreHelperGeneric(name, set, fetcher);
+    }
 
-                    try{
-                        const data = await fetcher(fetch_url, {...default_options, ...options});
-                        set(
-                            state => produce(state, state => {
-                                state[name].data = data;
-                                state[name].error = null;
-                            }),
-                            nameGen('fetchData')
-                        );
-                    }
-                    catch(error){
-                        set(
-                            state => produce(state, state => {
-                                state[name].data = init;
-                                state[name].error = error;
-                            }),
-                            nameGen('fetchError')
-                        );
-                    }finally{
-                        set(
-                            state => produce(state, state => void (state[name].loading = false)),
-                            nameGen('fetchEnd')
-                        );
-                    }
-                }
-            }
-    };
+    return store;
 };
 
-export const fetchStoreHelper = fetchStoreHelperGeneric(async (path, options = {}) => {
-    const res = await fetch(path, options);
-    return res.json();
-});
-export const apiStoreHelper = fetchStoreHelperGeneric(api);
+const fetchStoreHelperGeneric = (name, set, fetcher) => {
+    const nameGen = (...args) => `${name}::${args.join('::')}`;
+
+    return {
+        data: null,
+        loading: null,
+        error: null,
+        ready: false,
+
+        fetch: async (...args) => {
+            console.log(nameGen("fetch called"));
+            set(
+                state => produce(state, state => {
+                    state[name].loading = true;
+                    state[name].error = null;
+                    state[name].ready = false;
+                }),
+                nameGen('fetchStart')
+            );
+
+            try{
+                const data = await fetcher(...args);
+                set(
+                    state => produce(state, state => {
+                        state[name].data = data;
+                        state[name].error = null;
+                        state[name].ready = true;
+                    }),
+                    nameGen('fetchData')
+                );
+            }
+            catch(error){
+                console.error(nameGen("error"), error);
+                set(
+                    state => produce(state, state => {
+                        state[name].data = null;
+                        state[name].error = error;
+                        state[name].ready = false;
+                    }),
+                    nameGen('fetchError')
+                );
+            }finally{
+                set(
+                    state => produce(state, state => {
+                        state[name].loading = false;
+                    }),
+                    nameGen('fetchEnd')
+                );
+            }
+        }
+    };
+};
