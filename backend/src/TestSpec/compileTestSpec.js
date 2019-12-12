@@ -10,7 +10,6 @@ const compileTestSpec = async (config, files) => {
     const objectCache = new ObjectCache(config.cache.dir);
     const docker = new Docker(config.docker);
     const sandbox = new Sandbox(docker, config);
-    await sandbox.start();
 
     const cache = md5(files.map(({content}) => md5(content)));
     debug("cache key", cache);
@@ -24,6 +23,7 @@ const compileTestSpec = async (config, files) => {
     }
 
     // compile code
+    await sandbox.start();
     const compiler = new Compiler(sandbox, config.timeout.compilation);
     const working_dir = config.sandbox.working_dir;
     const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(files, {
