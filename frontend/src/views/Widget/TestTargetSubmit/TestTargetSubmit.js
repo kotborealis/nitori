@@ -1,21 +1,23 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {TestTargetInputForm} from '../../../components/TestTarget/TestTargetInputForm';
 import {useStore} from '../../../store/store';
-import {useParams} from 'react-router-dom';
 import {TestTarget} from '../../../components/TestTarget/TestTarget';
 import {Loading} from '../../../components/InvalidState/Loading';
 import {Error} from '../../../components/InvalidState/Error';
 import Grid from '@material-ui/core/Grid';
 
 export const TestTargetSubmit = () => {
-    const {widgetId} = useParams();
+    const widgetId = useStore(state => state.widgetId);
 
     const [
+        testSpecsFetch,
         testSpecs,
         testSpecsLoading,
         testSpecsInit,
         testSpecsError
-    ] = useStore(({testSpecs: {data, loading, init, error}}) => [data, loading, init, error]);
+    ] = useStore(({testSpecs: {fetch, data, loading, init, error}}) => [fetch, data, loading, init, error]);
+
+    useEffect(() => void testSpecsFetch(), [widgetId]);
 
     const submitTestTarget = useStore(state => state.testTargetSubmit.fetch);
 
@@ -33,9 +35,7 @@ export const TestTargetSubmit = () => {
         event.preventDefault();
 
         const formData = new FormData(event.target);
-        const testSpecId = formData.get('testSpecId');
-
-        void submitTestTarget({testSpecId, formData});
+        void submitTestTarget({formData});
     };
 
     let result = null;

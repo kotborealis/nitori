@@ -11,10 +11,11 @@ import {ru} from 'date-fns/locale';
 import {exitCodeToIcon} from '../../helpers/exitCodeToIcon';
 import Chip from '@material-ui/core/Chip';
 import {exitCodeToColor} from '../../helpers/exitCodeToColor';
-import {Link, useParams} from 'react-router-dom';
+import {Link} from 'react-router-dom';
+import {useStore} from '../../store/store';
 
 export const TestTargetsList = ({data, testSpecs}) => {
-    const {widgetId} = useParams();
+    const widgetId = useStore(state => state.widgetId);
 
     return (
         <Paper>

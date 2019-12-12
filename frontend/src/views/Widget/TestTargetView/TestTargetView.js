@@ -7,7 +7,8 @@ import {TestTarget} from '../../../components/TestTarget/TestTarget';
 import {BlockContainer} from '../../../components/BlockContainer/BlockContainer';
 
 export const TestTargetView = () => {
-    const {testTargetId, widgetId} = useParams();
+    const {testTargetId} = useParams();
+    const widgetId = useStore(state => state.widgetId);
 
     const fetchTestTarget = useStore(state => state.testTarget.fetch);
     useEffect(() => void setTimeout(() => fetchTestTarget({testTargetId}), 0),

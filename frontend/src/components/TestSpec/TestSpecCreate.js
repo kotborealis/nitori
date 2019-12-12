@@ -3,11 +3,11 @@ import {TestSpecInputForm} from './TestSpecInputForm';
 import {api} from '../../api';
 import {Error} from '../InvalidState/Error';
 import {Tty} from '../Tty/Tty';
-import {useParams} from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
+import {useStore} from '../../store/store';
 
 export const TestSpecCreate = ({}) => {
-    const {widgetId} = useParams();
+    const widgetId = useStore(state => state.widgetId);
 
     const [outputState, setOutputState] = useState({});
     const [outputLoading, setOutputLoading] = useState(false);
