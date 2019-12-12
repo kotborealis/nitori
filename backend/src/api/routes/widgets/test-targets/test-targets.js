@@ -15,6 +15,11 @@ module.exports = (config) => {
     const auth = require('../../../../auth').auth(config.auth.url);
     const db = new Database(require('nano')(config.database), config.database.name);
 
+    const plainedDoc = async (doc) => ({
+        ...doc,
+        testSpec: await db.get(doc.testSpecId, {rev: doc.testSpecRev})
+    });
+
     router.route('/')
         .get(async function(req, res) {
             const {widgetId} = req;
@@ -58,7 +63,7 @@ module.exports = (config) => {
                 sort
             });
 
-            res.json(docs);
+            res.json(await Promise.all(docs.map(plainedDoc)));
         })
         .post(filesHandler(config.api.limits, 1, 10),
             async (req, res) => {
@@ -95,7 +100,7 @@ module.exports = (config) => {
                     ...file,
                     data: file.data.toString()
                 }));
-                res.json(data);
+                res.json(await plainedDoc(data));
             });
 
     router.route('/:testTargetId')
@@ -112,7 +117,7 @@ module.exports = (config) => {
             }
 
             test.sourceFiles = await db.getAllAttachments(_id);
-            res.json(test);
+            res.json(await plainedDoc(test));
         });
 
     return router;

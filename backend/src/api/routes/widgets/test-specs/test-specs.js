@@ -77,6 +77,8 @@ module.exports = (config) => {
                 const {testSpecId: _id} = req.params;
                 const {includeSources = false, rev = undefined} = req.query;
 
+                debug("Get testspec", _id, rev);
+
                 const doc = await db.get(_id, {rev});
 
                 if(doc.type !== "TestSpec"){
@@ -86,7 +88,7 @@ module.exports = (config) => {
                 }
 
                 if(includeSources)
-                    doc.sourceFiles = await db.getAllAttachments(_id);
+                    doc.sourceFiles = await db.getAllAttachments(_id, {rev});
 
                 res.json(doc);
             })
@@ -97,7 +99,7 @@ module.exports = (config) => {
                 const testSpecId = req.testSpecId;
                 const {name, description} = req.query;
 
-                const testSpec = await db.get(id);
+                const testSpec = await db.get(testSpecId);
 
                 if(testSpec.type !== "TestSpec"){
                     const err = new Error("Not found");

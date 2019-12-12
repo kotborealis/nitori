@@ -1,5 +1,6 @@
 module.exports = class {
     nano;
+    db_name;
     db;
 
     multipart = {
@@ -39,6 +40,7 @@ module.exports = class {
     constructor(nano, db) {
         this.nano = nano;
         this.db = this.nano.use(db);
+        this.db_name = db;
     }
 
     /**
@@ -133,16 +135,17 @@ module.exports = class {
     /**
      * Get all attachments of specified doc as array of {name, data} objects
      * @param docname
+     * @param rev
      * @returns {Promise<[]>}
      */
-    async getAllAttachments(docname) {
-        const {_attachments} = await this.db.get(docname);
+    async getAllAttachments(docname, {rev} = {}) {
+        const {_attachments} = await this.get(docname, {rev});
         const filenames = Object.keys(_attachments);
         const res = [];
         for await (let name of filenames){
             res.push({
                 name,
-                data: await this.db.attachment.get(docname, name)
+                data: await this.db.attachment.get(docname, name, {rev})
             });
         }
         return res;

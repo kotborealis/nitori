@@ -41,7 +41,7 @@ module.exports = (config) => {
         apiSpec: './api.yaml',
         validateRequests: true,
         validateResponses: {
-            removeAdditional: false
+            removeAdditional: true
         },
         multerOpts: {
             limits: {
