@@ -411,6 +411,7 @@ components:
       in: query
       schema:
         type: string
+        default: ''
 
     orderBy:
       name: orderBy
