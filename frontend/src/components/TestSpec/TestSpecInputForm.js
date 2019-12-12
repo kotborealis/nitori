@@ -8,7 +8,6 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SendIcon from '@material-ui/icons/Send';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import {useStore} from '../../store/store';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -22,8 +21,6 @@ const useStyles = makeStyles(theme => ({
 
 export const TestSpecInputForm = ({onSubmit, initialName = "", initialDescription = ""}) => {
     const classes = useStyles();
-
-    const testSpecs = useStore(({testSpecs: {data}}) => data);
 
     const [formState, setFormState] = useState({
         files: undefined,
@@ -63,7 +60,7 @@ export const TestSpecInputForm = ({onSubmit, initialName = "", initialDescriptio
                             <Autocomplete
                                 id="test-spec-name"
                                 freeSolo={true}
-                                options={testSpecs}
+                                options={[]}
                                 getOptionLabel={({name}) => name}
                                 style={{width: 300}}
                                 renderInput={params => (

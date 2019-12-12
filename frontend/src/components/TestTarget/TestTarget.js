@@ -23,8 +23,8 @@ export const TestTarget =
              timestamp = 0,
              userData = {},
              sourceFiles = [],
-         } = {},
-         testSpec = {}
+             testSpec = {}
+         } = {}
      } = {}) => {
         const execOutputs = [compilerResult, linkerResult, runnerResult];
 

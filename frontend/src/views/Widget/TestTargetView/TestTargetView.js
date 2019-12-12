@@ -14,30 +14,12 @@ export const TestTargetView = () => {
     useEffect(() => void setTimeout(() => fetchTestTarget({testTargetId}), 0),
         [testTargetId, widgetId]);
 
-    const fetchTestSpecs = useStore(state => state.testSpecs.fetch);
-    useEffect(() => void setTimeout(fetchTestSpecs, 0),
-        [testTargetId, widgetId]);
+    const [testTarget, error, loading] = useStore(({testTarget: {data, error, loading}}) => [data, error, loading]);
 
-    const error = useStore(({testTarget: {error: _1}, testSpecs: {error: _2}}) => _1 || _2);
-    const loading = useStore(({testTarget: {loading: _1}, testSpecs: {loading: _2}}) => _1 || _2);
-
-    const testTarget = useStore(({testTarget: {data}}) => data);
-
-    const testSpecId = testTarget && testTarget.testSpecId;
-    const testSpecRev = testTarget && testTarget.testSpecRev;
-
-    const testSpecLoading = useStore((state => state.testSpec.loading));
-    const testSpecFetch = useStore((state => state.testSpec.fetch));
-    const testSpec = useStore((state => state.testSpec.data));
-
-    useEffect(() =>
-            void (testTarget && testSpecFetch({testSpecId, testSpecRev})),
-        [testSpecId, testSpecRev]);
-
-    if(loading || testSpecLoading) return <Loading/>;
+    if(loading) return <Loading/>;
     if(error) return <Error error={error}/>;
 
     return <BlockContainer>
-        <TestTarget output={testTarget} testSpec={testSpec} loading={loading}/>
+        <TestTarget output={testTarget} loading={loading}/>
     </BlockContainer>;
 };

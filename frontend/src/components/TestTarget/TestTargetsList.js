@@ -14,7 +14,7 @@ import {exitCodeToColor} from '../../helpers/exitCodeToColor';
 import {Link} from 'react-router-dom';
 import {useStore} from '../../store/store';
 
-export const TestTargetsList = ({data, testSpecs}) => {
+export const TestTargetsList = ({data}) => {
     const widgetId = useStore(state => state.widgetId);
 
     return (
@@ -37,7 +37,8 @@ export const TestTargetsList = ({data, testSpecs}) => {
                                    testSpecId,
                                    compilerResult,
                                    linkerResult,
-                                   runnerResult
+                                   runnerResult,
+                                   testSpec
                                }) =>
                         <TableRow
                             component={Link}
@@ -46,7 +47,7 @@ export const TestTargetsList = ({data, testSpecs}) => {
                         >
                             <TableCell>{_id}</TableCell>
                             <TableCell>{formatDistance(new Date(timestamp), new Date, {locale: ru})} назад</TableCell>
-                            <TableCell>{testSpecs.find(({_id}) => _id === testSpecId).name}</TableCell>
+                            <TableCell>{testSpec.name}</TableCell>
                             <TableCell>{name ? `${name} (${login})` : login}</TableCell>
                             <TableCell>
                                 {(() => {
