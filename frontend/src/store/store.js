@@ -25,10 +25,28 @@ const storeFetchControlled = (set, get) => ({
     testTargets: () => api(`/widgets/${get().widgetId}/test-targets`),
     testTarget: ({testTargetId}) => api(`/widgets/${get().widgetId}/test-targets/${testTargetId}`),
 
-    testTargetSubmit: ({testSpecId, formData}) => api(`/widgets/${get().widgetId}/test-targets/`, {
-        query: {testSpecId},
-        options: {method: 'POST', body: formData}
-    }),
+    testTargetSubmit: ({formData}) =>
+        api(`/widgets/${get().widgetId}/test-targets/`, {
+            query: {
+                testSpecId: formData.get('testSpecId')
+            },
+            options: {
+                method: 'POST',
+                body: formData
+            }
+        }),
+
+    testSpecSubmit: ({formData, testSpecId = false}) =>
+        api(`/widgets/${get().widgetId}/test-specs/${testSpecId || ""}`, {
+            query: {
+                name: formData.get('name'),
+                description: formData.get('description')
+            },
+            options: {
+                method: testSpecId === false ? 'POST' : 'PUT',
+                body: formData
+            }
+        }),
 
     userData: () => fetchJSON(`/auth/user_data.php`)
 });
@@ -36,7 +54,7 @@ const storeFetchControlled = (set, get) => ({
 /**
  * Usual store
  *
- * Set --- immer_ized set function
+ * Set --- immerized set function
  */
 const store = (set, get) => ({
     set: fn => set(produce(fn), "set"),
