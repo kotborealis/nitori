@@ -63,7 +63,14 @@ module.exports = (config) => {
                         files.map(({name, content: data, content_type}) => ({name, data, content_type})),
                         id
                     );
-                    res.json({compilerResult, testSpecId: id});
+
+                    res.json({
+                        compilerResult,
+                        testSpec: {
+                            ...await db.get(id),
+                            sourceFiles: await db.getAllAttachments(id)
+                        }
+                    });
                 }
                 else{
                     res.json({compilerResult});
@@ -124,13 +131,24 @@ module.exports = (config) => {
                         testSpec.cache = cache;
                         await db.multipart.update(testSpec, attachments, testSpecId, testSpec._rev);
                     }
-                    res.json({compilerResult, testSpecId});
+
+                    res.json({
+                        compilerResult,
+                        testSpec: {
+                            ...await db.get(testSpecId),
+                            sourceFiles: await db.getAllAttachments(testSpecId)
+                        }
+                    });
                 }
                 else{
                     await db.update(testSpec, testSpecId, testSpec._rev);
+
                     res.json({
-                        compilerResult: {exitCode: 0, stdout: "Loaded from cache", stderr: ""},
-                        testSpecId
+                        compilerResult,
+                        testSpec: {
+                            ...await db.get(testSpecId),
+                            sourceFiles: await db.getAllAttachments(testSpecId)
+                        }
                     });
                 }
             }

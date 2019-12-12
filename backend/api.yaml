@@ -153,7 +153,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExecOutput'
+                type: object
+                properties:
+                  compilationResult:
+                    $ref: '#/components/schemas/ExecOutput'
+                  testSpec:
+                    $ref: '#/components/schemas/TestSpec'
         404:
           $ref: "#/components/responses/NotFound"
         403:
@@ -221,7 +226,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExecOutput'
+                type: object
+                properties:
+                  compilationResult:
+                    $ref: '#/components/schemas/ExecOutput'
+                  testSpec:
+                    $ref: '#/components/schemas/TestSpec'
         404:
           $ref: "#/components/responses/NotFound"
         403:
