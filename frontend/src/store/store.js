@@ -48,6 +48,13 @@ const storeFetchControlled = (set, get) => ({
             }
         }),
 
+    testSpecDelete: ({testSpecId}) =>
+        api(`/widgets/${get().widgetId}/test-specs/${testSpecId}`, {
+            options: {
+                method: 'DELETE',
+            }
+        }),
+
     userData: () => fetchJSON(`/auth/user_data.php`)
 });
 
@@ -67,10 +74,10 @@ const store = (set, get) => ({
  */
 export const [useStore, storeApi] =
     create(
-        devtools((set, get) => ({
-            ...generateFetchStore(storeFetchControlled)(set, get),
-            ...store(set, get)
-        }), "store")
+        devtools((set, get, api) => ({
+            ...generateFetchStore(storeFetchControlled)(set, get, api),
+            ...store(set, get, api)
+        }))
     );
 
 export const useApiStore = createUseApiStore(useStore, storeApi);

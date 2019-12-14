@@ -41,16 +41,29 @@ export const TestSpecSubmit = () => {
         </>;
     }
 
+    let form = null;
+
+    if(!testSpecId)
+        form = <TestSpecInputForm
+            {...{onSubmit}}
+            disabled={testSpecSubmit.loading && !testSpecSubmit.init}
+        />;
+    else if(testSpec.loading)
+        form = <Loading/>;
+    else if(testSpec.error)
+        form = <Error error={testSpec.error}/>;
+    else
+        form = <TestSpecInputForm
+            {...{onSubmit}}
+            name={testSpec.data && testSpec.data.name}
+            description={testSpec.data && testSpec.data.description}
+            disabled={testSpecSubmit.loading && !testSpecSubmit.init}
+        />;
+
     return (
         <Grid container>
             <Grid item xs={12}>
-                {testSpecId && testSpec.loading && <Loading/>}
-                {testSpecId && testSpec.data && <TestSpecInputForm
-                    {...{onSubmit}}
-                    name={testSpec.data && testSpec.data.name}
-                    description={testSpec.data && testSpec.data.description}
-                    disabled={testSpecSubmit.loading && !testSpecSubmit.init}
-                />}
+                {form}
             </Grid>
             <Grid item xs={12}>
                 {result}

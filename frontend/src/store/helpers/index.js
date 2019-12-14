@@ -1,4 +1,4 @@
-import {produce} from 'immer';
+import {shallow} from 'zustand';
 
 export const generateFetchStore = (fn) => (set, get, api) => {
     const data = fn(set, get);
@@ -59,16 +59,15 @@ const fetchStoreHelperGeneric = (name, set, fetcher) => {
         error: null,
 
         fetch: async (...args) => {
-            console.log("CALLED FETCH", nameGen());
             fetchCancelManager.cancel();
             const id = fetchCancelManager.pend();
 
             set(
-                state => produce(state, state => {
+                state => {
                     state[name].init = false;
                     state[name].loading = true;
                     state[name].error = null;
-                }),
+                },
                 nameGen('fetchStart', id)
             );
 
@@ -77,10 +76,10 @@ const fetchStoreHelperGeneric = (name, set, fetcher) => {
 
                 if(!fetchCancelManager.cancelled(id)){
                     set(
-                        state => produce(state, state => {
+                        state => {
                             state[name].data = data;
                             state[name].error = null;
-                        }),
+                        },
                         nameGen('fetchData', id)
                     );
                 }
@@ -91,10 +90,10 @@ const fetchStoreHelperGeneric = (name, set, fetcher) => {
                     console.error(nameGen("error"), error);
 
                     set(
-                        state => produce(state, state => {
+                        state => {
                             state[name].data = null;
                             state[name].error = error;
-                        }),
+                        },
                         nameGen('fetchError', id)
                     );
                 }
@@ -103,9 +102,9 @@ const fetchStoreHelperGeneric = (name, set, fetcher) => {
                     fetchCancelManager.clear(id);
 
                     set(
-                        state => produce(state, state => {
+                        state => {
                             state[name].loading = false;
-                        }),
+                        },
                         nameGen('fetchEnd', id)
                     );
                 }
@@ -124,18 +123,26 @@ export const createUseApiStore =
     (useStore, storeApi) =>
         (name) =>
             useStore(state => {
+                console.log("called usestore", name);
                 if(state.hasOwnProperty(name))
-                    return state[name];
+                    return {
+                        ...state[name],
+                        name
+                    };
 
                 const [baseName] = name.split('@');
 
                 if(state.hasOwnProperty(baseName)){
+                    console.log("CREATE", name);
                     const props = fetchStoreHelperGeneric(name, state[baseName].set, state[baseName].fetcher);
 
-                    storeApi.setState({
+                    state[baseName].set({
                         [name]: props
                     });
 
-                    return props;
+                    return {
+                        ...props,
+                        name
+                    };
                 }
-            });
+            }, shallow);

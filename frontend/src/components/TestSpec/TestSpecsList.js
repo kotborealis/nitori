@@ -6,7 +6,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
 import {useStore} from '../../store/store';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 
@@ -37,12 +36,6 @@ export const TestSpecsList = ({data, onDelete, onEdit}) => {
                             <TableCell>{description}</TableCell>
                             <TableCell><TimeUpdated>{timestamp}</TimeUpdated></TableCell>
                             <TableCell>
-                                <Button variant="contained" color="primary" onClick={() => onEdit(_id)}>
-                                    Изменить
-                                </Button>
-                                <Button variant="contained" color="secondary" onClick={() => onDelete(_id)}>
-                                    Удалить
-                                </Button>
                             </TableCell>
                         </TableRow>
                     )}

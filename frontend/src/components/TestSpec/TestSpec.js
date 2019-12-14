@@ -12,7 +12,7 @@ export const TestSpec = ({_id, name, description, timestamp, sourceFiles}) =>
         <CardHeader
             title={name}
             avatar={<ReceiptIcon/>}
-            subheader={`Обновлён ${<TimeUpdated>{timestamp}</TimeUpdated>}`}
+            subheader={<>Обновлён <TimeUpdated>{timestamp}</TimeUpdated></>}
         />
         <CardContent>
             <Typography variant="body1" style={{padding: "20px"}}>
