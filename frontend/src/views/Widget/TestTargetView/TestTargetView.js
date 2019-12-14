@@ -11,8 +11,9 @@ export const TestTargetView = () => {
     const widgetId = useStore(state => state.widgetId);
 
     const testTarget = useApiStore("testTarget@testTargetView");
-    useEffect(() => void setTimeout(() => testTarget.fetch({testTargetId}), 0),
-        [testTargetId, widgetId]);
+    console.log("testTarget", testTarget);
+
+    useEffect(() => void testTarget.fetch({testTargetId}), [testTargetId, widgetId]);
 
     if(testTarget.loading) return <Loading/>;
     if(testTarget.error) return <Error error={testTarget.error}/>;

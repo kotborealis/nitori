@@ -59,6 +59,7 @@ const fetchStoreHelperGeneric = (name, set, fetcher) => {
         error: null,
 
         fetch: async (...args) => {
+            console.log("CALLED FETCH", nameGen());
             fetchCancelManager.cancel();
             const id = fetchCancelManager.pend();
 
@@ -121,20 +122,20 @@ const fetchStoreHelperGeneric = (name, set, fetcher) => {
  */
 export const createUseApiStore =
     (useStore, storeApi) =>
-        (name) => {
-            const state = storeApi.getState();
+        (name) =>
+            useStore(state => {
+                if(state.hasOwnProperty(name))
+                    return state[name];
 
-            if(state[name])
-                return useStore(state => state[name]);
+                const [baseName] = name.split('@');
 
-            const [baseName] = name.split('@');
-            if(state[baseName]){
-                storeApi.setState({
-                    [name]: fetchStoreHelperGeneric(name, state[baseName].set, state[baseName].fetcher)
-                });
+                if(state.hasOwnProperty(baseName)){
+                    const props = fetchStoreHelperGeneric(name, state[baseName].set, state[baseName].fetcher);
 
-                return useStore(state => state[name]);
-            }
+                    storeApi.setState({
+                        [name]: props
+                    });
 
-            throw new Error();
-        };
+                    return props;
+                }
+            });

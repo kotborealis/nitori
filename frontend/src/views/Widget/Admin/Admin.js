@@ -12,7 +12,7 @@ export default () => {
 
     // Fetch test targets
     const testTargets = useApiStore("testTargets");
-    useEffect(() => void setTimeout(testTargets.fetch, 0), [widgetId]);
+    useEffect(() => testTargets.fetch(), [widgetId]);
 
     const testSpecs = useApiStore("testSpecs");
 

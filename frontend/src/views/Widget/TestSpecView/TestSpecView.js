@@ -11,8 +11,7 @@ export default () => {
 
     const testSpec = useApiStore("testSpec@testSpecView");
 
-    useEffect(() =>
-            void setTimeout(() => testSpec.fetch({testSpecId, testSpecRev}), 0),
+    useEffect(() => void testSpec.fetch({testSpecId, testSpecRev}),
         [testSpecId, widgetId]);
 
     let child;

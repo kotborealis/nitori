@@ -17,7 +17,7 @@ export const Widget = () => {
 
     // Fetch test specs
     const testSpecs = useApiStore("testSpecs");
-    useEffect(() => void setTimeout(testSpecs.fetch, 0), [widgetId]);
+    useEffect(() => void testSpecs.fetch(), [widgetId]);
 
     // Fetch user data
     const userData = useApiStore("userData");
