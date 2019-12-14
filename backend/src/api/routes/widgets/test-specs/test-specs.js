@@ -101,7 +101,7 @@ module.exports = (config) => {
             filesMiddleware(config.api.limits, 0, 10),
             async (req, res) => {
                 const files = req.files;
-                const testSpecId = req.testSpecId;
+                const {testSpecId} = req.params;
                 const {name, description} = req.query;
 
                 const testSpec = await db.get(testSpecId);
@@ -144,7 +144,7 @@ module.exports = (config) => {
                     await db.update(testSpec, testSpecId, testSpec._rev);
 
                     res.json({
-                        compilerResult,
+                        compilerResult: {exitCode: 0, stdout: "Loaded from cache", stderr: ""},
                         testSpec: {
                             ...await db.get(testSpecId),
                             sourceFiles: await db.getAllAttachments(testSpecId)

@@ -17,7 +17,7 @@ module.exports = (limits, minFiles = -Infinity, maxFiles = Infinity) => function
         ||
         (maxFiles !== Infinity && req.files.length > maxFiles)
     ){
-        const err = new Error(`Only ${minFiles}--${maxFiles} files must be specified, got ${req.files.length}`);
+        const err = new Error(`${minFiles}--${maxFiles} files must be specified, got ${req.files.length}`);
         err.status = 400;
         next(err);
         return;

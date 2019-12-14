@@ -7,7 +7,6 @@ import FormControl from '@material-ui/core/FormControl';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SendIcon from '@material-ui/icons/Send';
 import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -19,13 +18,13 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export const TestSpecInputForm = ({onSubmit, initialName = "", initialDescription = ""}) => {
+export const TestSpecInputForm = ({onSubmit, name = "", description = ""}) => {
     const classes = useStyles();
 
     const [formState, setFormState] = useState({
         files: undefined,
-        name: initialName,
-        description: initialDescription,
+        name,
+        description,
     });
 
     return (
@@ -57,21 +56,15 @@ export const TestSpecInputForm = ({onSubmit, initialName = "", initialDescriptio
                     </Grid>
                     <Grid item xs={12}>
                         <FormControl className={classes.formControl}>
-                            <Autocomplete
-                                id="test-spec-name"
-                                freeSolo={true}
-                                options={[]}
-                                getOptionLabel={({name}) => name}
-                                style={{width: 300}}
-                                renderInput={params => (
-                                    <TextField
-                                        {...params}
-                                        label="Название теста"
-                                        variant="outlined"
-                                        fullWidth
-                                        name="name"
-                                    />
-                                )}
+                            <TextField
+                                label="Название теста"
+                                variant="outlined"
+                                fullWidth
+                                name="name"
+                                value={formState.name}
+                                onChange={({target: {value: name}}) =>
+                                    setFormState(state => ({...state, name}))
+                                }
                             />
                         </FormControl>
                     </Grid>
@@ -85,6 +78,10 @@ export const TestSpecInputForm = ({onSubmit, initialName = "", initialDescriptio
                                 margin="normal"
                                 variant="outlined"
                                 name="description"
+                                value={formState.description}
+                                onChange={({target: {value: description}}) =>
+                                    setFormState(state => ({...state, description}))
+                                }
                             />
                         </FormControl>
                     </Grid>

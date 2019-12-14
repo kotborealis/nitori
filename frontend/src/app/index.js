@@ -1,10 +1,10 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {render} from 'react-dom';
-import {BrowserRouter, Route, Switch, useParams} from 'react-router-dom';
+import {BrowserRouter, matchPath, Route, Switch, withRouter} from 'react-router-dom';
 import {Widget} from '../views/Widget/Widget';
 import {WidgetList} from '../views/WidgetList/WidgetList';
 import Container from '@material-ui/core/Container';
-import {useStore} from '../store/store';
+import {storeApi} from '../store/store';
 
 const RouterRoot = ({children}) => {
     return (
@@ -16,20 +16,22 @@ const RouterRoot = ({children}) => {
     );
 };
 
-const Routes = () =>
-    <Container maxWidth="lg">
+const Routes = () => {
+    return (<Container maxWidth="lg">
         <Route path="/widgets/:widgetId"><RouteWidget/></Route>
         <Route exact path="/"><WidgetList/></Route>
-    </Container>;
+    </Container>);
+};
 
-const RouteWidget = () => {
-    const {widgetId} = useParams();
-    const setStore = useStore(store => store.set);
+const RouteWidget = withRouter(({location: {pathname}}) => {
+    const {params: {widgetId}} = matchPath(pathname, {
+        path: "/widgets/:widgetId"
+    });
 
-    useEffect(() => void setStore(store => void (store.widgetId = widgetId)), [widgetId]);
+    storeApi.setState({widgetId});
 
     return <Widget/>;
-};
+});
 
 render(<RouterRoot>
     <Routes/>
