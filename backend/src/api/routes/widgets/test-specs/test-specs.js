@@ -155,8 +155,8 @@ module.exports = (config) => {
         )
         .delete(//authHandler([({isAdmin}) => isAdmin === true]),
             async (req, res) => {
-                await db.remove(req.testSpecId);
-                res.json(true);
+                await db.remove(req.params.testSpecId);
+                res.status(200);
             }
         );
 

@@ -83,7 +83,7 @@ module.exports = class {
      * @returns {Promise<*>}
      */
     remove = async (docname, rev = null) => {
-        const {_rev} = rev === null ? await this.db.get(docname) : rev;
+        const _rev = rev === null ? (await this.db.get(docname))._rev : {rev};
         return await this.db.destroy(docname, _rev);
     };
 
