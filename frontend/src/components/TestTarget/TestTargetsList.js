@@ -6,13 +6,12 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import {formatDistance} from 'date-fns';
-import {ru} from 'date-fns/locale';
 import {exitCodeToIcon} from '../../helpers/exitCodeToIcon';
 import Chip from '@material-ui/core/Chip';
 import {exitCodeToColor} from '../../helpers/exitCodeToColor';
 import {Link} from 'react-router-dom';
 import {useStore} from '../../store/store';
+import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 
 export const TestTargetsList = ({data}) => {
     const widgetId = useStore(state => state.widgetId);
@@ -46,7 +45,7 @@ export const TestTargetsList = ({data}) => {
                             style={{textDecoration: 'none'}}
                         >
                             <TableCell>{_id}</TableCell>
-                            <TableCell>{formatDistance(new Date(timestamp), new Date, {locale: ru})} назад</TableCell>
+                            <TableCell><TimeUpdated>{timestamp}</TimeUpdated></TableCell>
                             <TableCell>{testSpec.name}</TableCell>
                             <TableCell>{name ? `${name} (${login})` : login}</TableCell>
                             <TableCell>

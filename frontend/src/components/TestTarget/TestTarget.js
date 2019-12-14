@@ -2,8 +2,6 @@ import React, {useEffect, useState} from 'react';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import {ExecOutput} from '../ExecOutput/ExecOutput';
-import {formatDistance} from 'date-fns';
-import {ru} from 'date-fns/locale';
 import {testOutputsToFailedIndex} from '../../helpers/testOutputsToFailedIndex';
 import Paper from '@material-ui/core/Paper';
 import {TestTargetStepper} from './TestTargetStepper';
@@ -11,6 +9,7 @@ import Grid from '@material-ui/core/Grid';
 import {FileViewer} from '../FileViewer/FileViewer';
 import {Link} from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
+import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 
 const TabPanel = ({children, value, index}) => value === index && <div>{children}</div>;
 
@@ -38,21 +37,16 @@ export const TestTarget =
 
         const handleResultTabChange = (event, value) => setResultTab(value);
 
-        const [sourceCodeTab, setSourceCodeTab] = useState(0);
-        const handleSourceCodeTabChange = (event, value) => setSourceCodeTab(value);
-
-        const stepperIndex = testOutputsToFailedIndex(execOutputs);
-
         return (
             <Grid container>
                 <Grid item xs={12}>
                     <Paper>
                         <Typography variant="body1" style={{padding: '20px'}}>
-                            Решение для <Link to={
+                            Решение для задачи "<Link to={
                             `/widgets/${testSpec.widgetId}/test-specs/${testSpec._id}/${testSpec._rev}`
-                        }>{testSpec.name}</Link>,
-                            от пользователя {userData.name} ({userData.login}), {userData.groupName},
-                            отправлено {formatDistance(new Date(timestamp), new Date, {locale: ru})} назад
+                        }>{testSpec.name}</Link>",
+                            {userData.name} ({userData.login}), {userData.groupName},
+                            отправлено <TimeUpdated>{timestamp}</TimeUpdated>
                         </Typography>
 
                         <TestTargetStepper
