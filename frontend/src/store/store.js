@@ -1,6 +1,6 @@
 import create from 'zustand';
 import {devtools} from 'zustand/middleware';
-import {generateFetchStore} from './helpers';
+import {createUseApiStore, generateFetchStore} from './helpers';
 import {api, fetchJSON} from '../api';
 import {produce} from 'immer';
 
@@ -72,3 +72,5 @@ export const [useStore, storeApi] =
             ...store(set, get)
         }), "store")
     );
+
+export const useApiStore = createUseApiStore(useStore, storeApi);

@@ -3,31 +3,26 @@ import {TestSpec} from '../../../components/TestSpec/TestSpec';
 import {useParams} from 'react-router-dom';
 import {Loading} from '../../../components/InvalidState/Loading';
 import {Error} from '../../../components/InvalidState/Error';
-import {useStore} from '../../../store/store';
+import {useApiStore, useStore} from '../../../store/store';
 
 export default () => {
     const widgetId = useStore(state => state.widgetId);
     const {testSpecId, testSpecRev} = useParams();
 
-    const {
-        fetch,
-        data,
-        loading,
-        error
-    } = useStore(state => state.testSpec);
+    const testSpec = useApiStore("testSpec@testSpecView");
 
     useEffect(() =>
-            void setTimeout(() => fetch({testSpecId, testSpecRev}), 0),
+            void setTimeout(() => testSpec.fetch({testSpecId, testSpecRev}), 0),
         [testSpecId, widgetId]);
 
     let child;
 
-    if(loading)
+    if(testSpec.loading)
         child = <Loading/>;
-    else if(error)
-        child = <Error error={error}/>;
+    else if(testSpec.error)
+        child = <Error error={testSpec.error}/>;
     else
-        child = <TestSpec {...data}/>;
+        child = <TestSpec {...testSpec.data}/>;
 
     return (child);
 };

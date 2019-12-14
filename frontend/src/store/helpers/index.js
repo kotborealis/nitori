@@ -51,6 +51,8 @@ const fetchStoreHelperGeneric = (name, set, fetcher) => {
     const nameGen = (...args) => `${name}::${args.join('::')}`;
 
     return {
+        fetcher,
+        set,
         data: null,
         init: true,
         loading: true,
@@ -110,3 +112,29 @@ const fetchStoreHelperGeneric = (name, set, fetcher) => {
         }
     };
 };
+
+/**
+ * Use store fetch controlled props by name.
+ * @param useStore
+ * @param storeApi
+ * @returns {function(...[*]=)}
+ */
+export const createUseApiStore =
+    (useStore, storeApi) =>
+        (name) => {
+            const state = storeApi.getState();
+
+            if(state[name])
+                return useStore(state => state[name]);
+
+            const [baseName] = name.split('@');
+            if(state[baseName]){
+                storeApi.setState({
+                    [name]: fetchStoreHelperGeneric(name, state[baseName].set, state[baseName].fetcher)
+                });
+
+                return useStore(state => state[name]);
+            }
+
+            throw new Error();
+        };
