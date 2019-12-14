@@ -22,6 +22,7 @@ module.exports = (config) => {
 
             const selector = {
                 type: "TestSpec",
+                removed: false,
                 name,
                 widgetId
             };
@@ -59,6 +60,7 @@ module.exports = (config) => {
                             description,
                             cache,
                             timestamp: Date.now(),
+                            removed: false
                         },
                         files.map(({name, content: data, content_type}) => ({name, data, content_type})),
                         id
@@ -155,8 +157,13 @@ module.exports = (config) => {
         )
         .delete(//authHandler([({isAdmin}) => isAdmin === true]),
             async (req, res) => {
-                await db.remove(req.params.testSpecId);
-                res.status(200);
+                const {testSpecId} = req.params;
+                const testSpec = await db.get(testSpecId);
+                await db.update({
+                    ...testSpec,
+                    removed: true
+                }, testSpecId, testSpec._rev);
+                res.json(testSpecId);
             }
         );
 

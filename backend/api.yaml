@@ -250,6 +250,10 @@ paths:
       responses:
         200:
           description: Deleted specified TestSpec
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/widgetId'
         404:
           $ref: "#/components/responses/NotFound"
         403:

@@ -123,7 +123,6 @@ export const createUseApiStore =
     (useStore, storeApi) =>
         (name) =>
             useStore(state => {
-                console.log("called usestore", name);
                 if(state.hasOwnProperty(name))
                     return {
                         ...state[name],

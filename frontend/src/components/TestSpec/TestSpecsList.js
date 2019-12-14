@@ -8,6 +8,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import {useStore} from '../../store/store';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
+import Button from '@material-ui/core/Button';
 
 export const TestSpecsList = ({data, onDelete, onEdit}) => {
     const widgetId = useStore(state => state.widgetId);
@@ -27,15 +28,31 @@ export const TestSpecsList = ({data, onDelete, onEdit}) => {
                 <TableBody>
                     {data.map(({_id, name, description, timestamp}) =>
                         <TableRow
-                            component={Link}
-                            to={`/widgets/${widgetId}/test-specs/${_id}`}
                             style={{textDecoration: 'none'}}
                         >
-                            <TableCell>{_id}</TableCell>
-                            <TableCell>{name}</TableCell>
+                            <TableCell
+                                component={Link}
+                                to={`/widgets/${widgetId}/test-specs/${_id}`}
+                            >{_id}</TableCell>
+                            <TableCell
+                                component={Link}
+                                to={`/widgets/${widgetId}/test-specs/${_id}`}
+                            >{name}</TableCell>
                             <TableCell>{description}</TableCell>
                             <TableCell><TimeUpdated>{timestamp}</TimeUpdated></TableCell>
                             <TableCell>
+                                <Button variant="contained" color="primary" onClick={() => {
+                                    onEdit(_id);
+                                    return false;
+                                }}>
+                                    Изменить
+                                </Button>
+                                <Button variant="contained" color="secondary" onClick={() => {
+                                    onDelete(_id);
+                                    return false;
+                                }}>
+                                    Удалить
+                                </Button>
                             </TableCell>
                         </TableRow>
                     )}
