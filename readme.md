@@ -1,5 +1,3 @@
-# Nitori 🔑🐳
-
 🔑 Contest-like system for testing simple C++ programs w/ unit-tests inside docker 🐳
 
 It's made specifically to make teaching C++ easier,
@@ -15,14 +13,14 @@ Usual workflow is:
 
 ## Production environment
 
-Edit [docker-compose.prod.yml](docker-compose.prod.yml) and [backend/.config.prod.js](backend/.config.prod.js) to specify prod environment.
+Create `.env` to specify env variables for both frontend and backend (see `.env.dev` for reference).
 Especially specify public path and auth endpoint to use.
 For deployment, use `docker-compose.yml` combined with `docker-compose.prod.yml`:
 
 ```shell
-$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d database
-$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d backend
-$ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d frontend
+$ docker-compose up --build -d database
+$ docker-compose up --build -d backend
+$ docker-compose up --build -d frontend
 ```
 
 ## Development environment

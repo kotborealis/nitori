@@ -2,7 +2,13 @@ version: "3"
 
 services:
   backend:
-    build: ./backend/
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+      args:
+        AUTH_API: "${BACKEND_AUTH_API}"
+    env_file:
+      - .env
     entrypoint:
       - node
       - src/index
@@ -14,15 +20,18 @@ services:
       - database
     depends_on:
       - database
+
   frontend:
     build:
       context: ./frontend/
       dockerfile: Dockerfile
       args:
-        PUBLIC_PATH: /
-        AUTH_PATH: "/#"
+        PUBLIC_PATH: "${FRONTEND_PUBLIC_PATH}"
+        AUTH_PATH: "${FRONTEND_AUTH_PATH}"
+    env_file:
+      - .env
     ports:
-      - "8080:80"
+      - "${FRONTEND_PUBLIC_PORT}:80"
     links:
       - backend
     depends_on:
