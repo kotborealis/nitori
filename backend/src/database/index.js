@@ -1,3 +1,7 @@
+/**
+ * Database class
+ * @type {exports}
+ */
 module.exports = class {
     nano;
     db_name;

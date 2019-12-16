@@ -1,3 +1,6 @@
+/**
+ * TestTarget model: views, lists, etc
+ */
 module.exports = {
     views: {
         list: {
