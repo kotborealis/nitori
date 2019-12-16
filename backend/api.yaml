@@ -406,7 +406,6 @@ paths:
         404:
           $ref: "#/components/responses/NotFound"
 
-
 components:
 
   parameters:
@@ -544,3 +543,12 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/TestTarget'
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+
+security:
+  - cookieAuth: []

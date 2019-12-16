@@ -23,6 +23,8 @@ module.exports = (config) => {
     });
 
     router.get('/', async (req, res) => {
+        req.auth([({isAdmin}) => isAdmin === true]);
+
         const {rows} = await db.view("Widget", "list", {
             include_docs: true
         });
@@ -31,8 +33,9 @@ module.exports = (config) => {
     });
 
     router.post('/', async (req, res) => {
-        const {name} = req.query;
+        req.auth([({isAdmin}) => isAdmin === true]);
 
+        const {name} = req.query;
         const _id = shortid.generate();
 
         await db.insert({

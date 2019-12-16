@@ -1,10 +1,10 @@
-const debug = require('debug')('nitori:api:filesHandler');
+const debug = require('debug')('nitori:api:filesMiddleware');
 
 function fileSizesValid(files) {
     return files.map(({truncated}) => truncated).every(i => !i);
 }
 
-module.exports = (limits, minFiles = -Infinity, maxFiles = Infinity) => function(req, res, next) {
+const files = (limits, minFiles = -Infinity, maxFiles = Infinity) => function(req, res, next) {
     if(!fileSizesValid(req.files)){
         const err = new Error(`All files must be smaller than ${limits.fileSize} bytes`);
         err.status = 400;
@@ -41,3 +41,5 @@ module.exports = (limits, minFiles = -Infinity, maxFiles = Infinity) => function
 
     next();
 };
+
+module.exports = {filesMiddleware: files};

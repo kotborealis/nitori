@@ -14,15 +14,12 @@ const debug = require('debug')('nitori:api');
 const express = require('express');
 require('express-async-errors');
 
-const Database = require('../database');
+const {authMiddleware} = require('./middleware/auth');
 
 const {Sandbox} = require('../Sandbox');
 const {Docker} = require('node-docker-api');
 
 module.exports = (config) => {
-    const authHandler = require('../auth').middleware(config.auth.url);
-    const db = new Database(require('nano')(config.database), config.database.name);
-
     const port = config.api.port;
 
     const app = express();
@@ -33,9 +30,10 @@ module.exports = (config) => {
     app.use(bodyParser.urlencoded({extended: true}));
 
     app.use(cookieParser());
-    //app.use(authHandler());
 
     app.use('/swagger/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+    app.use(authMiddleware(config.auth.url));
 
     new OpenApiValidator({
         apiSpec: './api.yaml',

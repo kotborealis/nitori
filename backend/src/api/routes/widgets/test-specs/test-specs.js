@@ -1,7 +1,8 @@
 const {Router} = require('express');
-const filesMiddleware = require('../../../middleware/filesMiddleware');
+const {filesMiddleware} = require('../../../middleware/files');
 const shortid = require('shortid');
 const Database = require('../../../../database');
+const {authMiddleware} = require('../../../middleware/auth');
 const {compileTestSpec} = require('../../../../TestSpec/compileTestSpec');
 const debug = require('debug')('nitori:api:widget:test-spec');
 
@@ -40,9 +41,11 @@ module.exports = (config) => {
 
             res.json(docs);
         })
-        .post(//authHandler([({isAdmin}) => isAdmin === true]),
+        .post(
             filesMiddleware(config.api.limits, 1, 10),
             async (req, res) => {
+                req.auth([({isAdmin}) => isAdmin === true]);
+
                 const files = req.files;
                 const {widgetId} = req;
                 const {name, description} = req.query;
@@ -81,8 +84,10 @@ module.exports = (config) => {
         );
 
     router.route('/:testSpecId')
-        .get(//authHandler([({isAdmin}) => isAdmin === true]),
+        .get(
             async function(req, res) {
+                req.auth([({isAdmin}) => isAdmin === true]);
+
                 const {testSpecId: _id} = req.params;
                 const {includeSources = false, rev = undefined} = req.query;
 
@@ -99,9 +104,11 @@ module.exports = (config) => {
 
                 res.json(doc);
             })
-        .put(//authHandler([({isAdmin}) => isAdmin === true]),
+        .put(
             filesMiddleware(config.api.limits, 0, 10),
             async (req, res) => {
+                req.auth([({isAdmin}) => isAdmin === true]);
+
                 const files = req.files;
                 const {testSpecId} = req.params;
                 const {name, description} = req.query;
@@ -155,8 +162,10 @@ module.exports = (config) => {
                 }
             }
         )
-        .delete(//authHandler([({isAdmin}) => isAdmin === true]),
+        .delete(
             async (req, res) => {
+                req.auth([({isAdmin}) => isAdmin === true]);
+
                 const {testSpecId} = req.params;
                 const testSpec = await db.get(testSpecId);
                 await db.update({

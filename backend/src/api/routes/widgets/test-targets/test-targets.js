@@ -1,13 +1,7 @@
 const {Router} = require('express');
 const Database = require('../../../../database');
-const filesHandler = require('../../../middleware/filesMiddleware');
+const {filesMiddleware} = require('../../../middleware/files');
 const shortid = require('shortid');
-const md5 = require('md5');
-const {Objcopy} = require('../../../../SandboxedGnuUtils');
-const {Compiler} = require('../../../../SandboxedGnuUtils');
-const {Sandbox} = require('../../../../Sandbox');
-const {Docker} = require('node-docker-api');
-const {ObjectCache} = require('../../../../ObjectCache');
 const compileTestTarget = require('../../../../TestTarget/compileTestTarget');
 
 module.exports = (config) => {
@@ -65,7 +59,7 @@ module.exports = (config) => {
 
             res.json(await Promise.all(docs.map(plainedDoc)));
         })
-        .post(filesHandler(config.api.limits, 1, 10),
+        .post(filesMiddleware(config.api.limits, 1, 10),
             async (req, res) => {
                 const userData = await auth(req.cookies.PHPSESSID);
 
