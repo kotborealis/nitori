@@ -1,6 +1,13 @@
 const YAML = require('yamljs');
 const swaggerDocument = YAML.load('./api.yaml');
 
+if(process.env.PROD_API){
+    swaggerDocument.servers.push({
+        url: process.env.PROD_API,
+        description: 'Current production server'
+    });
+}
+
 const swaggerUi = require('swagger-ui-express');
 const {OpenApiValidator} = require('express-openapi-validator');
 const cors = require('cors');
