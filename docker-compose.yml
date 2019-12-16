@@ -13,7 +13,7 @@ services:
       - node
       - src/index
       - --api
-      - --config=./.config.docker.js
+      - --config=./.config.js
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     links:
