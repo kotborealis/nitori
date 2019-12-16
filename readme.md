@@ -18,9 +18,8 @@ Especially specify public path and auth endpoint to use.
 For deployment, use `docker-compose.yml` combined with `docker-compose.prod.yml`:
 
 ```shell
-$ docker-compose up --build -d database
-$ docker-compose up --build -d backend
-$ docker-compose up --build -d frontend
+$ docker-compose build
+$ docker-compose up
 ```
 
 ## Development environment
