@@ -1,12 +1,15 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
+import Paper from '@material-ui/core/Paper';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 import {TestSpecsList} from '../../../components/TestSpec/TestSpecsList';
 import {TestTargetsList} from '../../../components/TestTarget/TestTargetsList';
 import {useApiStore, useStore} from '../../../store/store';
-import Grid from '@material-ui/core/Grid';
-import {Typography} from '@material-ui/core';
 import {Loading} from '../../../components/InvalidState/Loading';
 import {Error} from '../../../components/InvalidState/Error';
 import {useHistory} from "react-router-dom";
+import {TabPanel} from '../../../components/TabPanel/TabPanel';
+import {TestSpecSubmit} from '../TestSpecSubmit/TestSpecSubmit';
 
 export default () => {
     const history = useHistory();
@@ -22,10 +25,19 @@ export default () => {
 
     useEffect(() => void testSpecs.fetch(), [testSpecDelete.data]);
 
-    return (
-        <Grid container direction="column" spacing={10}>
-            <Grid item>
-                <Typography variant="h5">Список тестов</Typography>
+    const [tab, setTab] = useState(0);
+    const handleTabChange = (event, value) => setTab(value);
+
+    return (<>
+        <Paper square>
+            <Tabs value={tab} onChange={handleTabChange}>
+                <Tab label={"Тесты"} id={0}/>
+                <Tab label={"Попытки"} id={1}/>
+                <Tab label={"Добавить тест"} id={2}/>
+            </Tabs>
+        </Paper>
+        <Paper square>
+            <TabPanel value={tab} index={0}>
                 {testSpecs.loading && <Loading/>}
                 {testSpecs.error && <Error error={testSpecs.error}/>}
                 {!testSpecs.loading && !testSpecs.error && <TestSpecsList
@@ -33,16 +45,18 @@ export default () => {
                     onEdit={id => history.push(`/widgets/${widgetId}/test-specs-submit/${id}`)}
                     onDelete={id => testSpecDelete.fetch({testSpecId: id})}
                 />}
-            </Grid>
-            <Grid item>
-                <Typography variant="h5">Список таргетов</Typography>
+            </TabPanel>
+            <TabPanel value={tab} index={1}>
                 {testTargets.loading && <Loading/>}
                 {testTargets.error && <Error error={testTargets.error}/>}
                 {!testTargets.loading && !testTargets.error &&
                  <TestTargetsList
                      data={testTargets.data}
                  />}
-            </Grid>
-        </Grid>
-    );
+            </TabPanel>
+            <TabPanel value={tab} index={2}>
+                <TestSpecSubmit/>
+            </TabPanel>
+        </Paper>
+    </>);
 };

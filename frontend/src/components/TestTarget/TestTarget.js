@@ -10,8 +10,7 @@ import {FileViewer} from '../FileViewer/FileViewer';
 import {Link} from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
-
-const TabPanel = ({children, value, index}) => value === index && <div>{children}</div>;
+import {TabPanel} from '../TabPanel/TabPanel';
 
 export const TestTarget =
     ({

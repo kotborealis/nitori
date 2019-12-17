@@ -21,10 +21,9 @@ export const TestTargetsList = ({data}) => {
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell>#</TableCell>
-                        <TableCell>Отправлено</TableCell>
                         <TableCell>Тест</TableCell>
                         <TableCell>Пользователь</TableCell>
+                        <TableCell>Отправлено</TableCell>
                         <TableCell>Проверки</TableCell>
                     </TableRow>
                 </TableHead>
@@ -44,10 +43,9 @@ export const TestTargetsList = ({data}) => {
                             to={`/widgets/${widgetId}/test-targets/${_id}`}
                             style={{textDecoration: 'none'}}
                         >
-                            <TableCell>{_id}</TableCell>
-                            <TableCell><TimeUpdated>{timestamp}</TimeUpdated></TableCell>
                             <TableCell>{testSpec.name}</TableCell>
                             <TableCell>{name ? `${name} (${login})` : login}</TableCell>
+                            <TableCell><TimeUpdated>{timestamp}</TimeUpdated></TableCell>
                             <TableCell>
                                 {(() => {
                                     const CompilerIcon = exitCodeToIcon(compilerResult.exitCode);

@@ -18,7 +18,6 @@ export const TestSpecsList = ({data, onDelete, onEdit}) => {
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell>#</TableCell>
                         <TableCell>Название</TableCell>
                         <TableCell>Описание</TableCell>
                         <TableCell>Обновлено</TableCell>
@@ -32,10 +31,7 @@ export const TestSpecsList = ({data, onDelete, onEdit}) => {
                         >
                             <TableCell
                                 component={Link}
-                                to={`/widgets/${widgetId}/test-specs/${_id}`}
-                            >{_id}</TableCell>
-                            <TableCell
-                                component={Link}
+                                style={{textDecoration: 'none'}}
                                 to={`/widgets/${widgetId}/test-specs/${_id}`}
                             >{name}</TableCell>
                             <TableCell>{description}</TableCell>
