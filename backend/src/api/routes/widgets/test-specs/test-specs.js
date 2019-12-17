@@ -13,8 +13,6 @@ module.exports = (config) => {
 
     router.route('/')
         .get(async (req, res) => {
-            req.auth([({isAdmin}) => isAdmin === true]);
-
             const {
                 limit,
                 skip,
