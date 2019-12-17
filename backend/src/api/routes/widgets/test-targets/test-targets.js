@@ -16,6 +16,8 @@ module.exports = (config) => {
 
     router.route('/')
         .get(async function(req, res) {
+            req.auth([({isAdmin}) => isAdmin === true]);
+
             const {widgetId} = req;
 
             const {
