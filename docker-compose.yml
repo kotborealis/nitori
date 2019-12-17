@@ -17,6 +17,7 @@ services:
       - --config=./.config.js
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - object_cache:/app/data/cache
     links:
       - database
     depends_on:
@@ -47,3 +48,4 @@ services:
 
 volumes:
     database:
+    object_cache:
