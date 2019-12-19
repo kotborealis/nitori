@@ -18,8 +18,23 @@ import {produce} from 'immer';
 const storeFetchControlled = (set, get) => ({
     widgets: () => api(`/widgets/`),
 
-    testSpecs: () => api(`/widgets/${get().widgetId}/test-specs`,
-        {query: {sortBy: 'name', orderBy: 'asc'}}),
+    testSpecs:
+        ({
+             limit = 100,
+             skip = 0,
+             name,
+             sortBy = 'name',
+             orderBy = 'asc',
+         } = {}) => api(`/widgets/${get().widgetId}/test-specs`, {
+            query: {
+                limit,
+                skip,
+                ...(name ? {name} : {}),
+                sortBy,
+                orderBy,
+            }
+        }),
+
     testSpec: ({testSpecId}) => api(`/widgets/${get().widgetId}/test-specs/${testSpecId}`,
         {query: {includeSources: true}}),
 

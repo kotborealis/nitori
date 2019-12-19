@@ -6,12 +6,37 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import {useStore} from '../../store/store';
+import {useApiStore, useStore} from '../../store/store';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 import Button from '@material-ui/core/Button';
+import MaterialTable from 'material-table';
 
-export const TestSpecsList = ({data, onDelete, onEdit}) => {
+export const TestSpecsList = ({onDelete, onEdit}) => {
+    const testSpecs = useApiStore("testSpecs");
     const widgetId = useStore(state => state.widgetId);
+
+    return <MaterialTable columns={[
+        {title: "Название", field: "name"},
+        {title: "Описание", field: "description"},
+        {
+            title: "Обновлено",
+            field: "timestamp",
+            render: ({timestamp}) => <TimeUpdated>{timestamp}</TimeUpdated>
+        }
+    ]} data={async query => {
+        console.log(query);
+        await testSpecs.fetch({
+            limit: query.pageSize,
+            skip: query.pageSize * query.page,
+            sortBy: query.orderBy,
+            orderBy: query.orderDirection
+        });
+        return {
+            data: testSpecs.data,
+            page: query.page,
+            totalCount: 10000000
+        };
+    }}/>;
 
     return (
         <Paper>
