@@ -15,31 +15,36 @@ Usual workflow is:
 
 Create `.env` to specify env variables for both frontend and backend (see `.env.dev` for reference).
 Especially specify public path and auth endpoint to use.
-For deployment, use `docker-compose.yml` combined with `docker-compose.prod.yml`:
 
-```shell
-$ docker-compose build
-$ docker-compose up
+```shell script
+cd ./sandbox && ./build.sh && cd ..
+docker-compose build
+docker-compose up
 ```
 
 ## Development environment
 
+Build sandbox image:
+```shell script
+cd ./sandbox && ./build.sh && cd ..
+```
+
 Run `database` via docker-compose, using `docker-compose.dev.yml`:
 
-```shell
-$ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d database
+```shell script
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d database
 ```
 
 Run `backend` with dev config (`./backend/.config.dev.js`):
-```shell
-$ cd backend
-$ node src/index --config .config.dev.js
+```shell script
+cd backend
+node src/index --config .config.dev.js
 ```
 
 Run `frontend` via webpack-dev-server:
-```shell
-$ cd frontend
-$ npm start
+```shell script
+cd frontend
+npm start
 ```
 
 `frontend` proxies calls to `backend` on `/api/v1/` endpoint and mocks auth api on `/auth/user_data.php` ([frontend/mock-api/mock-api.js](frontend/mock-api/mock-api.js)).
