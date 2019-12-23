@@ -11,7 +11,7 @@ const compileTestSpec = async (config, files) => {
     const docker = new Docker(config.docker);
     const sandbox = new Sandbox(docker, config);
 
-    const cache = md5(files.map(({content}) => md5(content)));
+    const cache = md5(files.map(({content}) => content.toString()).join("\n"));
     debug("cache key", cache);
 
     if(objectCache.has(cache)){
@@ -56,7 +56,7 @@ const precompileTestSpecs = async (config) => {
     const db = new Database(nano, config.database.name);
 
     const {docs: rows} = await db.find({
-        selector: {type: "TestSpec"}
+        selector: {type: "TestSpec", removed: false}
     });
 
     const spec_ids = rows.map(({_id}) => _id);
