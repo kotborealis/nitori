@@ -1,4 +1,3 @@
-const md5 = require('md5');
 const {Objcopy} = require('../SandboxedGnuUtils');
 const {Compiler} = require('../SandboxedGnuUtils');
 const {Sandbox} = require('../Sandbox');
