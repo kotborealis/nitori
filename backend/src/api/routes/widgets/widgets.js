@@ -36,7 +36,7 @@ module.exports = (config) => {
         req.auth([({isAdmin}) => isAdmin === true]);
 
         const {name} = req.query;
-        const _id = shortid.generate();
+        const _id = req.query.id || shortid.generate();
 
         await db.insert({
             type: "Widget",

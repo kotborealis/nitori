@@ -39,6 +39,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: id
+          description: Widget's desired id. If not set, generated randomly.
+          in: query
+          schema:
+            type: string
       responses:
         201:
           description: Created new widget
