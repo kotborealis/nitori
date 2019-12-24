@@ -1,3 +1,4 @@
+const debug = require('debug')('nitori:api:widgets:testTargets');
 const {Router} = require('express');
 const Database = require('../../../../database');
 const {filesMiddleware} = require('../../../middleware/files');
@@ -11,7 +12,7 @@ module.exports = (config) => {
 
     const plainedDoc = async (doc) => ({
         ...doc,
-        testSpec: await db.get(doc.testSpecId, {rev: doc.testSpecRev})
+        testSpec: await db.get(doc.testSpecId)
     });
 
     router.route('/')
@@ -59,6 +60,11 @@ module.exports = (config) => {
                 sort
             });
 
+            for await (let doc of docs){
+                debug("plain doc", doc);
+                await plainedDoc(doc);
+            }
+
             res.json(await Promise.all(docs.map(plainedDoc)));
         })
         .post(filesMiddleware(config.api.limits, 1, 10),
@@ -68,7 +74,7 @@ module.exports = (config) => {
                 const {widgetId} = req;
                 const {testSpecId} = req.query;
                 const id = shortid.generate();
-                const {_rev: testSpecRev, cache} = await db.get(testSpecId);
+                const {cache} = await db.get(testSpecId);
 
                 const testTargetRes = await compileTestTarget(config, cache, req.files);
 
@@ -82,7 +88,6 @@ module.exports = (config) => {
                     timestamp: Date.now(),
                     userData,
                     testSpecId,
-                    testSpecRev,
                     ...{
                         compilerResult: {exitCode: undefined, stdout: ""},
                         linkerResult: {exitCode: undefined, stdout: ""},

@@ -33,7 +33,7 @@ export const Widget = () => {
                 <Route path={`${path}/test-targets/:testTargetId`}>
                     <TestTargetView/>
                 </Route>
-                <Route path={`${path}/test-specs/:testSpecId/:testSpecRev?`}>
+                <Route path={`${path}/test-specs/:testSpecId`}>
                     <TestSpecView/>
                 </Route>
                 <Route path={`${path}/test-specs-submit/:testSpecId?`}>

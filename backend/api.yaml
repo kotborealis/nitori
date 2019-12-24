@@ -176,7 +176,6 @@ paths:
           required: true
           schema:
             type: string
-        - $ref: '#/components/parameters/revision'
         - name: includeSources
           in: query
           required: false
@@ -418,14 +417,6 @@ components:
       schema:
         $ref: '#/components/schemas/widgetId'
 
-    revision:
-      name: rev
-      description: Revision of specified resource
-      in: query
-      schema:
-        type: string
-        default: ''
-
     orderBy:
       name: orderBy
       description: Specify sorting order
@@ -523,8 +514,6 @@ components:
         userData:
           $ref: '#/components/schemas/UserData'
         testSpecId:
-          type: string
-        testSpecRev:
           type: string
         testSpec:
           $ref: '#/components/schemas/TestSpec'

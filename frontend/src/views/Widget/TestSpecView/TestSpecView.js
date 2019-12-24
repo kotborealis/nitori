@@ -7,11 +7,11 @@ import {useApiStore, useStore} from '../../../store/store';
 
 export default () => {
     const widgetId = useStore(state => state.widgetId);
-    const {testSpecId, testSpecRev} = useParams();
+    const {testSpecId} = useParams();
 
     const testSpec = useApiStore("testSpec@testSpecView");
 
-    useEffect(() => void testSpec.fetch({testSpecId, testSpecRev}),
+    useEffect(() => void testSpec.fetch({testSpecId}),
         [testSpecId, widgetId]);
 
     let child;
