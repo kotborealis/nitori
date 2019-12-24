@@ -1,11 +1,12 @@
 #pragma once
 
 #include <iostream>
-#include <sstream>
+#include <fstream>
 #include <algorithm>
 #include <functional>
 #include <cctype>
 #include <locale>
+#include <cstdio>
 
 extern "C" {
     int __NITORI_HIJACK_MAIN__(int argc, char** argv);
@@ -42,66 +43,100 @@ static inline std::string trim(std::string s) {
     return ltrim(rtrim(s));
 }
 
+/**
+ * Read file into string
+ */
+static inline std::string readFile(std::string filename) {
+    std::ifstream file(filename);
+    std::string content((std::istreambuf_iterator<char>(file)),
+             std::istreambuf_iterator<char>());
+    file.close();
+    return content;
 }
 
-namespace internal {
-
-std::stringstream stdout;
-std::stringstream stderr;
-std::stringstream stdin;
+/**
+ * Write string into file
+ */
+static inline void writeFile(std::string filename, std::string content) {
+    std::ofstream file(filename);
+    file << content;
+    file.close();
+}
 
 }
 
 /**
- * Replace std::cout with our stringstream
+ * Hijack stdout
  */
 static inline void hijack_stdout() {
-    internal::stdout.str("");
-    std::cout.rdbuf(internal::stdout.rdbuf());
+    freopen(".stdout", "w", stdout);
 }
 
 /**
- * Replace std::cerr with our stringstream
+ * Restore stdout
+ */
+static inline void restore_stdout() {
+    freopen("/dev/tty", "w", stdout);
+}
+
+/**
+ * Hijack stderr
  */
 static inline void hijack_stderr() {
-    internal::stderr.str("");
-    std::cerr.rdbuf(internal::stderr.rdbuf());
+    freopen(".stderr", "w", stderr);
 }
 
 /**
- * Replace std::cin with our stringstream
+ * Restore stderr
+ */
+static inline void restore_stderr() {
+    freopen("/dev/tty", "w", stderr);
+}
+
+/**
+ * Hijack stdin
  */
 static inline void hijack_stdin(std::string value) {
-    internal::stdin.str(value);
-    std::cin.rdbuf(internal::stdin.rdbuf());
+    freopen(".stdin", "rw", stdin);
+    fprintf(stdin, value.c_str());
 }
 
 /**
- * Get std::cout
+ * Restore stdin
+ */
+static inline void restore_stdin() {
+    freopen("/dev/tty", "rw", stdin);
+}
+
+/**
+ * Get stdout
  * @param trim Trim return value? True by default
  */
 static inline std::string stdout(bool trim = true) {
-    return trim ? util::trim(internal::stdout.str()) : internal::stdout.str();
+    auto content = util::readFile(".stdout");
+    return trim ? util::trim(content) : content;
 }
 
 /**
- * Get std::cerr
+ * Get stderr
  * @param trim Trim return value? True by default
  */
 static inline std::string stderr(bool trim = true) {
-    return trim ? util::trim(internal::stderr.str()) : internal::stderr.str();
+    auto content = util::readFile(".stderr");
+    return trim ? util::trim(content) : content;
 }
 
 /**
- * Get std::cin
+ * Get stdin
  * @param trim Trim return value? True by default
  */
 static inline std::string stdin(bool trim = true) {
-    return trim ? util::trim(internal::stdin.str()) : internal::stdin.str();
+    auto content = util::readFile(".stdin");
+    return trim ? util::trim(content) : content;
 }
 
 /**
- * Set std::cin
+ * Set stdin
  */
 static inline std::string stdin(std::string value) {
     hijack_stdin(value);
@@ -109,9 +144,14 @@ static inline std::string stdin(std::string value) {
 
 /**
  * Call hijacked main
+ * Automaticly hijacks and restores stdout and stderr
  */
 static inline int call_main(int argc, char** argv) {
+    nitori::hijack_stdout();
+    nitori::hijack_stderr();
     __NITORI_HIJACK_MAIN__(argc, argv);
+    nitori::restore_stdout();
+    nitori::restore_stderr();
 }
 
 }
