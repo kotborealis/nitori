@@ -31,13 +31,21 @@ export default () => {
     return (<>
         <Paper square>
             <Tabs value={tab} onChange={handleTabChange}>
-                <Tab label={"Тесты"} id={0}/>
-                <Tab label={"Попытки"} id={1}/>
+                <Tab label={"Попытки"} id={0}/>
+                <Tab label={"Тесты"} id={1}/>
                 <Tab label={"Добавить тест"} id={2}/>
             </Tabs>
         </Paper>
         <Paper square>
             <TabPanel value={tab} index={0}>
+                {testTargets.loading && <Loading/>}
+                {testTargets.error && <Error error={testTargets.error}/>}
+                {!testTargets.loading && !testTargets.error &&
+                 <TestTargetsList
+                     data={testTargets.data}
+                 />}
+            </TabPanel>
+            <TabPanel value={tab} index={1}>
                 {testSpecs.loading && <Loading/>}
                 {testSpecs.error && <Error error={testSpecs.error}/>}
                 {!testSpecs.loading && !testSpecs.error && <TestSpecsList
@@ -45,14 +53,6 @@ export default () => {
                     onEdit={id => history.push(`/widgets/${widgetId}/test-specs-submit/${id}`)}
                     onDelete={id => testSpecDelete.fetch({testSpecId: id})}
                 />}
-            </TabPanel>
-            <TabPanel value={tab} index={1}>
-                {testTargets.loading && <Loading/>}
-                {testTargets.error && <Error error={testTargets.error}/>}
-                {!testTargets.loading && !testTargets.error &&
-                 <TestTargetsList
-                     data={testTargets.data}
-                 />}
             </TabPanel>
             <TabPanel value={tab} index={2}>
                 <TestSpecSubmit/>
