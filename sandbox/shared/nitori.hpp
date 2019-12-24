@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <vector>
 #include <functional>
 #include <cctype>
 #include <locale>
@@ -147,6 +148,23 @@ static inline std::string stdin(std::string value) {
  * Automaticly hijacks and restores stdout and stderr
  */
 static inline int call_main(int argc, char** argv) {
+    nitori::hijack_stdout();
+    nitori::hijack_stderr();
+    __NITORI_HIJACK_MAIN__(argc, argv);
+    nitori::restore_stdout();
+    nitori::restore_stderr();
+}
+
+/**
+ * Call hijacked main
+ * Automaticly hijacks and restores stdout and stderr
+ */
+static inline int call_main(std::vector<char*> args) {
+    args.insert(args.begin(), "hijacked_main_call");
+
+    int argc = args.size();
+    char **argv = &args[0];
+
     nitori::hijack_stdout();
     nitori::hijack_stderr();
     __NITORI_HIJACK_MAIN__(argc, argv);
