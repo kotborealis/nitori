@@ -40,7 +40,7 @@ module.exports = async (config, cache, files) => {
         return {compilerResult, linkerResult};
     }
 
-    const runnerResult = await sandbox.exec(["./" + output, "-r", "compact"], {
+    const runnerResult = await sandbox.exec(["./" + output], {
         timeout: config.timeout.run
     });
 
