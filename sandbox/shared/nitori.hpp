@@ -21,6 +21,8 @@ namespace util {
 
 /**
  * Trim string from start
+ *
+ * @param s String
  */
 static inline std::string ltrim(std::string s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(),
@@ -30,6 +32,8 @@ static inline std::string ltrim(std::string s) {
 
 /**
  * Trim string from end
+ *
+ * @param s String
  */
 static inline std::string rtrim(std::string s) {
     s.erase(std::find_if(s.rbegin(), s.rend(),
@@ -39,6 +43,8 @@ static inline std::string rtrim(std::string s) {
 
 /**
  * Trim string from both ends
+ *
+ * @param s String
  */
 static inline std::string trim(std::string s) {
     return ltrim(rtrim(s));
@@ -46,6 +52,7 @@ static inline std::string trim(std::string s) {
 
 /**
  * Read file into string
+ * @param filename Path to file
  */
 static inline std::string readFile(std::string filename) {
     std::ifstream file(filename);
@@ -57,6 +64,9 @@ static inline std::string readFile(std::string filename) {
 
 /**
  * Write string into file
+ *
+ * @param filename Path to file
+ * @param content Data to write
  */
 static inline void writeFile(std::string filename, std::string content) {
     std::ofstream file(filename);
@@ -96,8 +106,10 @@ static inline void restore_stderr() {
 
 /**
  * Hijack stdin
+ *
+ * @param value stdin value
  */
-static inline void hijack_stdin(std::string value) {
+static inline void hijack_stdin(std::string value = "") {
     freopen(".stdin", "rw", stdin);
     fprintf(stdin, value.c_str());
 }
@@ -137,17 +149,22 @@ static inline std::string stdin(bool trim = true) {
 }
 
 /**
- * Set stdin
+ * Hijack stdin alias
+ *
+ * @param value stdin value
  */
-static inline std::string stdin(std::string value) {
+static inline std::string stdin(std::string value = "") {
     hijack_stdin(value);
 }
 
 /**
- * Call hijacked main
+ * Call hijacked main with classic argc & argv
  * Automaticly hijacks and restores stdout and stderr
+ *
+ * @param argc
+ * @param argv
  */
-static inline int call_main(int argc, char** argv) {
+static inline int main(int argc, char** argv) {
     nitori::hijack_stdout();
     nitori::hijack_stderr();
     __NITORI_HIJACK_MAIN__(argc, argv);
@@ -156,20 +173,26 @@ static inline int call_main(int argc, char** argv) {
 }
 
 /**
- * Call hijacked main
+ * Call hijacked main with vector args and default program name
  * Automaticly hijacks and restores stdout and stderr
+ *
+ * @param args Vector with arguments, except argv[0] (program name)
  */
-static inline int call_main(std::vector<char*> args) {
+static inline int main(std::vector<char*> args) {
     args.insert(args.begin(), "hijacked_main_call");
 
     int argc = args.size();
     char **argv = &args[0];
 
-    nitori::hijack_stdout();
-    nitori::hijack_stderr();
-    __NITORI_HIJACK_MAIN__(argc, argv);
-    nitori::restore_stdout();
-    nitori::restore_stderr();
+    ::nitori::main(argc, argv);
+}
+
+/**
+ * Call hijacked main without args
+ * Automaticly hijacks and restores stdout and stderr
+ */
+static inline int main() {
+    ::nitori::main({});
 }
 
 }
