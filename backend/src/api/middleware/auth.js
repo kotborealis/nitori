@@ -14,6 +14,12 @@ const authMiddleware = (url) => async (req, res, next) => {
         if(req.userData && req.userData.login === "prep"){
             req.userData.isAdmin = true;
         }
+        if(req.userData && req.userData.login === "kotbarealis"){
+            req.userData.isAdmin = true;
+        }
+        if(req.userData && req.userData.login === "vel"){
+            req.userData.isAdmin = true;
+        }
     }
 
     if(!req.userData){
