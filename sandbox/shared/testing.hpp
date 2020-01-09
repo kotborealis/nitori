@@ -115,15 +115,16 @@ static inline void restore_stderr() {
  * @param value stdin value
  */
 static inline void hijack_stdin(std::string value = "") {
-    freopen(".stdin", "rw", stdin);
+    freopen(".stdin", "w", stdin);
     fprintf(stdin, value.c_str());
+    freopen(".stdin", "r", stdin);
 }
 
 /**
  * Restore stdin
  */
 static inline void restore_stdin() {
-    freopen("/dev/tty", "rw", stdin);
+    freopen("/dev/tty", "r", stdin);
 }
 
 /**
@@ -171,10 +172,11 @@ static inline std::string stdin(std::string value = "") {
  */
 static inline int main(int argc, char** argv) {
     nitori::hijack_stdout();
-    nitori::hijack_stderr();
+    //nitori::hijack_stderr();
     __NITORI_HIJACK_MAIN__(argc, argv);
     nitori::restore_stdout();
-    nitori::restore_stderr();
+    //nitori::restore_stderr();
+    nitori::restore_stdin();
 }
 
 /**
