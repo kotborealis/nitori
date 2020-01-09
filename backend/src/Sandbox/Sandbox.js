@@ -30,28 +30,47 @@ class Sandbox {
     }
 
     /**
-     * Create & start container
+     * Destroy all containers, created by this instance
+     * @param docker
      * @returns {Promise<void>}
      */
-    async start() {
-        debug("Start sandbox");
+    static async destroy_all(docker) {
+        debug("Destroying all created containers");
 
-        if(this._running) return;
-
-        const {docker, config, id} = this;
-
-        this.container = await docker.container.create({
-            ...config.container,
-            name: `${config.sandbox.container_prefix}_${id}`,
-            Labels: {
-                "nitori-sandbox-id": id,
-                "nitori-sandbox-instance-id": instanceId
-            }
+        const containers = await docker.container.list({
+            all: true,
+            filters: JSON.stringify({
+                label: [`nitori.parent=${instanceId}`]
+            })
         });
-        await this.container.start();
 
-        this._running = true;
-    };
+        debug(`Removing ${containers.length} containers`);
+
+        for await (let container of containers){
+            await container.pause();
+
+            const {data: {Name, Image, State: {Status}}} = await container.status();
+            debug("Processing container", Name, Image, Status);
+
+            debug("Killing & deleting container");
+
+            try{
+                await container.kill();
+            }
+            catch(e){
+                debug(e);
+            }
+
+            try{
+                await container.delete();
+            }
+            catch(e){
+                debug(e);
+            }
+        }
+
+        debug("Done");
+    }
 
     /**
      * Stop & remove container
@@ -135,47 +154,28 @@ class Sandbox {
     }
 
     /**
-     * Destroy all containers, created by this instance
-     * @param docker
+     * Create & start container
      * @returns {Promise<void>}
      */
-    static async destroy_all(docker) {
-        debug("Destroying all created containers");
+    async start() {
+        debug("Start sandbox");
 
-        const containers = await docker.container.list({
-            all: true,
-            filters: JSON.stringify({
-                label: [`nitori-sandbox-instance-id=${instanceId}`]
-            })
+        if(this._running) return;
+
+        const {docker, config, id} = this;
+
+        this.container = await docker.container.create({
+            ...config.container,
+            name: `${config.sandbox.container_prefix}_${id}`,
+            Labels: {
+                "nitori.sandbox": id,
+                "nitori.parent": instanceId
+            }
         });
+        await this.container.start();
 
-        debug(`Removing ${containers.length} containers`);
-
-        for await (let container of containers) {
-            await container.pause();
-
-            const {data: {Name, Image, State: {Status}}} = await container.status();
-            debug("Processing container", Name, Image, Status);
-
-            debug("Killing & deleting container");
-
-            try{
-                await container.kill();
-            }
-            catch(e){
-                debug(e);
-            }
-
-            try{
-                await container.delete();
-            }
-            catch(e){
-                debug(e);
-            }
-        }
-
-        debug("Done");
-    }
+        this._running = true;
+    };
 }
 
 module.exports = {Sandbox};
