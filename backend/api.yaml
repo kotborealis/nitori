@@ -111,6 +111,7 @@ paths:
             type: string
             enum:
               - timestamp
+              - name
             default: timestamp
         - $ref: '#/components/parameters/orderBy'
       responses:
