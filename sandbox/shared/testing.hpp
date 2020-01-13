@@ -171,10 +171,8 @@ static inline std::string stdin(std::string value = "") {
  */
 static inline int main(int argc, char** argv) {
     nitori::hijack_stdout();
-    nitori::hijack_stderr();
     __NITORI_HIJACK_MAIN__(argc, argv);
     nitori::restore_stdout();
-    nitori::restore_stderr();
 }
 
 /**
