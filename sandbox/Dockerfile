@@ -19,3 +19,6 @@ RUN chown -R sandbox:sandbox /sandbox
 RUN mkdir /opt/nitori/
 COPY ./shared/catch.hpp /opt/nitori/catch.hpp
 COPY ./shared/testing.hpp /opt/nitori/testing.hpp
+
+RUN g++ -std=c++11 -c /opt/nitori/testing.hpp -o /opt/nitori/testing.hpp.gch \
+    && rm /opt/nitori/testing.hpp

@@ -59,6 +59,7 @@ class Compiler {
             ...(std ? [`--std=${std}`] : []),
             ...I.map(_ => `-I${_}`),
             "-c",
+            "-Winvalid-pch",
             ...(cpp_file_names.length === 1 ? ["-o", obj_file_names[0]] : []),
             ...cpp_file_names
         ], {working_dir, timeout: this.timeout});
@@ -87,6 +88,7 @@ class Compiler {
         const res = await sandbox.exec([
             this.compiler_name,
             ...(L ? [`-L${L}`] : []),
+            "-Winvalid-pch",
             "-o", output,
             ...object_file_names
         ], {working_dir});
