@@ -1,4 +1,4 @@
-FROM bitnami/minideb:buster
+FROM bitnami/minideb:unstable
 
 RUN apt-get update && apt-get install -y --no-install-recommends locales \
  && rm -rf /var/lib/apt/lists/* \
@@ -7,21 +7,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends locales \
 ENV LANG en_US.UTF-8
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc gcc-multilib g++ \
+    g++ \
  && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /sandbox
+RUN mkdir -p /sandbox
 RUN useradd -M -d /sandbox sandbox
 RUN chown -R sandbox:sandbox /sandbox
+WORKDIR /sandbox
 
-RUN mkdir /opt/nitori/
+RUN mkdir -p /opt/nitori/
 COPY ./shared/catch.hpp /opt/nitori/catch.hpp
 COPY ./shared/util.hpp /opt/nitori/util.hpp
 COPY shared/processTest.hpp /opt/nitori/processTest.hpp
 COPY ./shared/testing.hpp /opt/nitori/testing.hpp
 
 RUN g++ \
-    -I/opt/nitori/ \
     -std=c++2a \
     -c \
     /opt/nitori/testing.hpp \
