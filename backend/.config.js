@@ -22,7 +22,7 @@ module.exports = {
     },
     sandbox: {
         container_prefix: "nitori-sandbox-",
-        std_version: "c++11",
+        std_version: "c++2a",
         working_dir: "/sandbox/"
     },
     testing: {

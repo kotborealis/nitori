@@ -1,4 +1,4 @@
-FROM bitnami/minideb:stretch
+FROM bitnami/minideb:buster
 
 RUN apt-get update && apt-get install -y --no-install-recommends locales \
  && rm -rf /var/lib/apt/lists/* \
@@ -6,10 +6,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends locales \
 
 ENV LANG en_US.UTF-8
 
-ENV GCC_VERSION 6.3.0-4
-
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc=4:${GCC_VERSION} gcc-multilib=4:${GCC_VERSION} g++=4:${GCC_VERSION} \
+    gcc gcc-multilib g++ \
  && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /sandbox
@@ -18,7 +16,14 @@ RUN chown -R sandbox:sandbox /sandbox
 
 RUN mkdir /opt/nitori/
 COPY ./shared/catch.hpp /opt/nitori/catch.hpp
+COPY ./shared/util.hpp /opt/nitori/util.hpp
+COPY shared/processTest.hpp /opt/nitori/processTest.hpp
 COPY ./shared/testing.hpp /opt/nitori/testing.hpp
 
-RUN g++ -std=c++11 -c /opt/nitori/testing.hpp -o /opt/nitori/testing.hpp.gch \
-    && rm /opt/nitori/testing.hpp
+RUN g++ \
+    -I/opt/nitori/ \
+    -std=c++2a \
+    -c \
+    /opt/nitori/testing.hpp \
+    -o /opt/nitori/testing.hpp.gch \
+    && rm /opt/nitori/*.hpp

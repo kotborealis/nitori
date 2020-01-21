@@ -28,7 +28,7 @@ class Compiler {
      */
     async compile(source_files, {
         working_dir = "/sandbox/",
-        std = "c++11",
+        std = "c++2a",
         I = [],
     } = {}) {
         const {sandbox} = this;
