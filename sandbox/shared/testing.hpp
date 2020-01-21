@@ -149,14 +149,25 @@ int main(::nitori::processTest::ProcessTestCase test) {
 
     auto exitCode = ::nitori::main(test.args);
 
-    if(test.exitCode.has_value())
-        REQUIRE(exitCode == *test.exitCode);
+    if(test.exitCode.has_value()) {
+        auto expectedExitCode = *test.exitCode;
+        REQUIRE(exitCode == expectedExitCode);
+    }
 
-    if(test.stdout.has_value())
-        REQUIRE(nitori::stdout() == *test.stdout);
+    if(test.stdout.has_value()) {
+        auto stdout = nitori::stdout();
+        auto expectedStdout = util::trim(*test.stdout);
 
-    for(auto const& [filename, content] : test.fsout)
-        REQUIRE(::nitori::util::readFile(filename) == content);
+        REQUIRE(stdout == expectedStdout);
+    }
+
+    for(auto const& [filename, expectedContent] : test.fsout) {
+        auto content = util::trim(
+            util::readFile(filename)
+        );
+
+        REQUIRE(content == expectedContent);
+    }
 
     return exitCode;
 }
