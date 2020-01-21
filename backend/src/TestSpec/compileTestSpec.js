@@ -28,7 +28,8 @@ const compileTestSpec = async (config, files) => {
     const working_dir = config.sandbox.working_dir;
     const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(files, {
         working_dir,
-        I: ["/opt/nitori/"]
+        I: ["/opt/nitori/"],
+        include: ["/opt/nitori/testing.hpp"],
     });
 
     if(compilerResult.exitCode){

@@ -30,6 +30,7 @@ class Compiler {
         working_dir = "/sandbox/",
         std = "c++2a",
         I = [],
+        include = [],
     } = {}) {
         const {sandbox} = this;
 
@@ -58,6 +59,7 @@ class Compiler {
             this.compiler_name,
             ...(std ? [`--std=${std}`] : []),
             ...I.map(_ => `-I${_}`),
+            ...include.map(_ => [`-include`, _]).flat(),
             "-c",
             "-Winvalid-pch",
             ...(cpp_file_names.length === 1 ? ["-o", obj_file_names[0]] : []),
