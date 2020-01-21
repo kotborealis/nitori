@@ -9,21 +9,15 @@
 
 namespace nitori::processTest {
 
-struct ProcessTestInput {
-    std::map<std::string, std::string> fs = {}; //!< Filesystem (filename => content)
-    std::string stdin = ""; //!< Standard input
-    std::vector<char*> args = {}; //!< CLI args
-};
-
-struct ProcessTestOutput {
-    std::map<std::string, std::string> fs = {}; //!< Expected filesystem (filename => content)
-    std::optional<std::string> stdout = {}; //!< Expected standard output
-    std::optional<int> exitCode = {}; //!< Expected exit code
-};
-
 struct ProcessTestCase {
-    ProcessTestInput input;
-    ProcessTestOutput output;
+    std::vector<char*> args = {}; //!< CLI args
+    std::optional<int> exitCode = {}; //!< Expected exit code
+
+    std::map<std::string, std::string> fsin = {}; //!< Input filesystem (filename => content)
+    std::map<std::string, std::string> fsout = {}; //!< Expected output filesystem (filename => content)
+
+    std::string stdin = ""; //!< Standard input
+    std::optional<std::string> stdout = {}; //!< Expected standard output
 };
 
 using ProcessTestSuite = std::vector<ProcessTestCase>;
