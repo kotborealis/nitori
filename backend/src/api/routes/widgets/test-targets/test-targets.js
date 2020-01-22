@@ -34,8 +34,6 @@ module.exports = (config) => {
                 userDataGroupName
             } = req.query;
 
-            console.log(userDataName);
-
             const selector = {
                 type: "TestTarget",
                 widgetId,
