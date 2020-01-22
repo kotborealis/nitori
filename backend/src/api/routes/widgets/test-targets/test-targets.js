@@ -105,7 +105,6 @@ module.exports = (config) => {
 
     router.route('/total-count')
         .get(async (req, res) => {
-            const {testTargetId: _id} = req.params;
             const {widgetId} = req;
 
             const {rows: [{value}]} = await db.view("TestTarget", "totalCount", {key: widgetId});

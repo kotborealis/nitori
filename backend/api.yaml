@@ -170,6 +170,26 @@ paths:
         403:
           $ref: "#/components/responses/Unauthorized"
 
+  /widgets/{widgetId}/test-specs/total-count:
+    get:
+      summary: Get total count of TestSpecs
+      tags:
+        - TestSpecs
+      parameters:
+        - $ref: '#/components/parameters/widgetId'
+      responses:
+        200:
+          description: Total count of TestSpecs
+          content:
+            application/json:
+              schema:
+                type: number
+                minimum: 0
+        404:
+          $ref: "#/components/responses/NotFound"
+        403:
+          $ref: "#/components/responses/Unauthorized"
+
   /widgets/{widgetId}/test-specs/{testSpecId}:
     get:
       summary: Get TestSpecs by id
@@ -279,6 +299,10 @@ paths:
               schema:
                 type: number
                 minimum: 0
+        404:
+          $ref: "#/components/responses/NotFound"
+        403:
+          $ref: "#/components/responses/Unauthorized"
 
   /widgets/{widgetId}/test-targets:
     get:
