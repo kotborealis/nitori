@@ -39,7 +39,7 @@ export const Widget = () => {
                 <Route path={`${path}/test-specs-submit/:testSpecId?`}>
                     <TestSpecSubmit/>
                 </Route>
-                <Route path={`${path}/admin`}>
+                <Route path={`${path}/admin/:adminTab?`}>
                     <Admin/>
                 </Route>
             </Switch>

@@ -7,7 +7,7 @@ import {TestTargetsList} from '../../../components/TestTarget/TestTargetsList';
 import {useApiStore, useStore} from '../../../store/store';
 import {Loading} from '../../../components/InvalidState/Loading';
 import {Error} from '../../../components/InvalidState/Error';
-import {useHistory} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import {TabPanel} from '../../../components/TabPanel/TabPanel';
 import {TestSpecSubmit} from '../TestSpecSubmit/TestSpecSubmit';
 
@@ -24,25 +24,21 @@ export default () => {
     const [tab, setTab] = useState(0);
     const handleTabChange = (event, value) => setTab(value);
 
+    const {adminTab} = useParams();
+
     return (<>
         <Paper square>
             <Tabs value={tab} onChange={handleTabChange}>
-                <Tab label={"Попытки"} id={0}/>
-                <Tab label={"Тесты"} id={1}/>
-                <Tab label={"Добавить тест"} id={2}/>
+                <Tab label={"Попытки"} id={"test-targets"}/>
+                <Tab label={"Тесты"} id={"test-specs"}/>
+                <Tab label={"Добавить тест"} id={"test-specs-submit"}/>
             </Tabs>
         </Paper>
         <Paper square>
-            <TabPanel value={tab} index={0}>
-                {/*{testTargets.loading && <Loading/>}*/}
-                {/*{testTargets.error && <Error error={testTargets.error}/>}*/}
-                {/*{!testTargets.loading && !testTargets.error &&*/}
-                {/* <TestTargetsList*/}
-                {/*     //data={testTargets.data}*/}
-                {/* />}*/}
+            <TabPanel value={tab} index={"test-targets"}>
                 <TestTargetsList/>
             </TabPanel>
-            <TabPanel value={tab} index={1}>
+            <TabPanel value={tab} index={"test-specs"}>
                 {testSpecs.loading && <Loading/>}
                 {testSpecs.error && <Error error={testSpecs.error}/>}
                 {!testSpecs.loading && !testSpecs.error && <TestSpecsList
@@ -51,7 +47,7 @@ export default () => {
                     onDelete={id => testSpecDelete.fetch({testSpecId: id})}
                 />}
             </TabPanel>
-            <TabPanel value={tab} index={2}>
+            <TabPanel value={tab} index={"test-specs-submit"}>
                 <TestSpecSubmit/>
             </TabPanel>
         </Paper>
