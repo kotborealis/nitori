@@ -11,7 +11,6 @@ export const TestTargetView = () => {
     const widgetId = useStore(state => state.widgetId);
 
     const testTarget = useApiStore("testTarget@testTargetView");
-    console.log("testTarget", testTarget);
 
     useEffect(() => void testTarget.fetch({testTargetId}), [testTargetId, widgetId]);
 

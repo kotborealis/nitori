@@ -15,22 +15,31 @@ export const TestTargetsList = () => {
 
     return (
         <MaterialTable
+            options={{
+                showTitle: false,
+                search: false
+            }}
+
             onRowClick={(event, rowData) => {
                 history.push(`/widgets/${widgetId}/test-targets/${rowData._id}`);
             }}
+
             columns={[
                 {
                     title: 'Тест',
-                    render: ({testSpec: {name}}) => name
+                    render: ({testSpec: {name}}) => name,
+                    sorting: false,
                 },
                 {
                     title: 'Пользователь',
-                    render: ({userData: {name, login}}) => name ? `${name} (${login})` : login
+                    render: ({userData: {name, login}}) => name ? `${name} (${login})` : login,
+                    sorting: false,
                 },
                 {
                     title: 'Отправлено',
-                    field: 'timestamp',
-                    render: ({timestamp}) => <TimeUpdated>{timestamp}</TimeUpdated>
+                    render: ({timestamp}) => <TimeUpdated>{timestamp}</TimeUpdated>,
+                    sorting: true,
+                    sortingField: 'timestamp',
                 },
                 {
                     title: 'Проверки',
@@ -50,9 +59,11 @@ export const TestTargetsList = () => {
                                 <Chip icon={<RunnerIcon/>} color={runnerColor} label="Тесты"/>
                             </>
                         );
-                    }
+                    },
+                    sorting: false
                 }
             ]}
+
             data={async ({
                              page,
                              pageSize,
@@ -60,7 +71,6 @@ export const TestTargetsList = () => {
                              orderBy,
                              orderDirection
                          }) => {
-
                 const totalCount = await api(`/widgets/${widgetId}/test-targets/total-count`);
 
                 let data;
@@ -70,13 +80,17 @@ export const TestTargetsList = () => {
                             limit: pageSize,
                             skip: page * pageSize,
                             ...(search ? {userDataName: search} : {}),
-                            ...(orderBy ? {sortBy: orderBy} : {}),
+                            ...(orderBy ? {sortBy: orderBy.sortingField} : {}),
                             ...(orderDirection ? {orderBy: orderDirection} : {}),
                         }
                     });
                 }
                 catch(e){
-                    data = [{}];
+                    return {
+                        data: [],
+                        page: 0,
+                        totalCount: 0
+                    };
                 }
 
                 return {
