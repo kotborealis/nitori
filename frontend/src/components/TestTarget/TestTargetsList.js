@@ -7,8 +7,9 @@ import {useStore} from '../../store/store';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 import MaterialTable from 'material-table';
 import {useHistory} from 'react-router-dom';
+import {api} from '../../api';
 
-export const TestTargetsList = ({data}) => {
+export const TestTargetsList = () => {
     const history = useHistory();
     const widgetId = useStore(state => state.widgetId);
 
@@ -52,6 +53,37 @@ export const TestTargetsList = ({data}) => {
                     }
                 }
             ]}
-            data={data}/>
+            data={async ({
+                             page,
+                             pageSize,
+                             search,
+                             orderBy,
+                             orderDirection
+                         }) => {
+
+                const totalCount = await api(`/widgets/${widgetId}/test-targets/total-count`);
+
+                let data;
+                try{
+                    data = await api(`/widgets/${widgetId}/test-targets`, {
+                        query: {
+                            limit: pageSize,
+                            skip: page * pageSize,
+                            ...(search ? {userDataName: search} : {}),
+                            ...(orderBy ? {sortBy: orderBy} : {}),
+                            ...(orderDirection ? {orderBy: orderDirection} : {}),
+                        }
+                    });
+                }
+                catch(e){
+                    data = [{}];
+                }
+
+                return {
+                    data,
+                    page,
+                    totalCount
+                };
+            }}/>
     );
 };

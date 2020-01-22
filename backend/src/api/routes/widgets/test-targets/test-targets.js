@@ -61,7 +61,6 @@ module.exports = (config) => {
             });
 
             for await (let doc of docs){
-                debug("plain doc", doc);
                 await plainedDoc(doc);
             }
 
@@ -103,6 +102,16 @@ module.exports = (config) => {
                 }));
                 res.json(await plainedDoc(data));
             });
+
+    router.route('/total-count')
+        .get(async (req, res) => {
+            const {testTargetId: _id} = req.params;
+            const {widgetId} = req;
+
+            const {rows: [{value}]} = await db.view("TestTarget", "totalCount", {key: widgetId});
+
+            res.json(value);
+        });
 
     router.route('/:testTargetId')
         .get(async (req, res) => {

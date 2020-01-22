@@ -15,10 +15,6 @@ export default () => {
     const history = useHistory();
     const widgetId = useStore(state => state.widgetId);
 
-    // Fetch test targets
-    const testTargets = useApiStore("testTargets");
-    useEffect(() => void testTargets.fetch(), [widgetId]);
-
     const testSpecDelete = useApiStore("testSpecDelete@admin");
 
     const testSpecs = useApiStore("testSpecs");
@@ -38,12 +34,13 @@ export default () => {
         </Paper>
         <Paper square>
             <TabPanel value={tab} index={0}>
-                {testTargets.loading && <Loading/>}
-                {testTargets.error && <Error error={testTargets.error}/>}
-                {!testTargets.loading && !testTargets.error &&
-                 <TestTargetsList
-                     data={testTargets.data}
-                 />}
+                {/*{testTargets.loading && <Loading/>}*/}
+                {/*{testTargets.error && <Error error={testTargets.error}/>}*/}
+                {/*{!testTargets.loading && !testTargets.error &&*/}
+                {/* <TestTargetsList*/}
+                {/*     //data={testTargets.data}*/}
+                {/* />}*/}
+                <TestTargetsList/>
             </TabPanel>
             <TabPanel value={tab} index={1}>
                 {testSpecs.loading && <Loading/>}

@@ -264,6 +264,22 @@ paths:
         403:
           $ref: "#/components/responses/Unauthorized"
 
+  /widgets/{widgetId}/test-targets/total-count:
+    get:
+      summary: Get total count of TestTargets
+      tags:
+        - TestTargets
+      parameters:
+        - $ref: '#/components/parameters/widgetId'
+      responses:
+        200:
+          description: Total count of TestTargets
+          content:
+            application/json:
+              schema:
+                type: number
+                minimum: 0
+
   /widgets/{widgetId}/test-targets:
     get:
       summary: Get list of TestTargets
