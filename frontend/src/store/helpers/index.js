@@ -132,7 +132,6 @@ export const createUseApiStore =
                 const [baseName] = name.split('@');
 
                 if(state.hasOwnProperty(baseName)){
-                    console.log("CREATE", name);
                     const props = fetchStoreHelperGeneric(name, state[baseName].set, state[baseName].fetcher);
 
                     state[baseName].set({
