@@ -34,6 +34,8 @@ module.exports = (config) => {
                 userDataGroupName
             } = req.query;
 
+            console.log(userDataName);
+
             const selector = {
                 type: "TestTarget",
                 widgetId,
@@ -42,12 +44,20 @@ module.exports = (config) => {
                     "$gte": timestampStart ? timestampStart : undefined,
                     "$lte": timestampEnd ? timestampEnd : undefined,
                 } : undefined,
-                userDataId: userDataId ? {"$eq": userDataId} : undefined,
-                userDataLogin: userDataLogin ? {"$eq": userDataLogin} : undefined,
-                userDataName: userDataName ? {"$eq": userDataName} : undefined,
-                userDataGroupId: userDataGroupId ? {"$eq": userDataGroupId} : undefined,
-                userDataGroupName: userDataGroupName ? {"$eq": userDataGroupName} : undefined,
+                userData: {
+                    id: userDataId ? {"$eq": userDataId} : undefined,
+                    login: userDataLogin ? {"$eq": userDataLogin} : undefined,
+                    name: userDataName ? {"$regex": userDataName} : undefined,
+                    groupId: userDataGroupId ? {"$eq": userDataGroupId} : undefined,
+                    groupName: userDataGroupName ? {"$eq": userDataGroupName} : undefined,
+                }
             };
+
+            if(Object.keys(selector.userData)
+                .map(key => selector.userData[key])
+                .every(value => value === undefined)
+            )
+                delete selector.userData;
 
             const sort = [
                 ...[(req.query.sortBy && {[req.query.sortBy]: req.query.orderBy})]

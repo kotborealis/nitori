@@ -17,7 +17,7 @@ export const TestTargetsList = () => {
         <MaterialTable
             options={{
                 showTitle: false,
-                search: false
+                search: true
             }}
 
             onRowClick={(event, rowData) => {
