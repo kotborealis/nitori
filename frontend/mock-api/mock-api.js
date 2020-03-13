@@ -1,8 +1,8 @@
 module.exports = [
     {
         context: ['/api/v1'],
-        target: 'http://127.0.0.1:3000',
-        pathRewrite: {'^/api/v1' : ''},
+        target: `http://127.0.0.1:${require('../../backend/.config.dev.js').api.port}`,
+        pathRewrite: {'^/api/v1': ''},
         headers: {
             Cookie: 'PHPSESSID=qwerty'
         }
