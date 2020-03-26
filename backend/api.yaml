@@ -451,6 +451,28 @@ paths:
         404:
           $ref: "#/components/responses/NotFound"
 
+  /specRunner:
+    post:
+      summary: Test spec and example runner
+      tags:
+        - SpecRunner
+      requestBody:
+        description: SpecRunner request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecRunnerRequest'
+      responses:
+        200:
+          description: SpecRunner output
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpecRunnerResult'
+        500:
+          $ref: "#/components/responses/ServerError"
+
 components:
 
   parameters:
@@ -479,6 +501,8 @@ components:
       description: The specified resource was not found
     Unauthorized:
       description: Unauthorized
+    ServerError:
+      description: Server-side error
 
   schemas:
 
@@ -578,6 +602,26 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/TestTarget'
+
+    SpecRunnerRequest:
+      type: object
+      properties:
+        spec:
+          type: string
+        example:
+          type: string
+
+    SpecRunnerResult:
+      type: object
+      properties:
+        specCompilerResult:
+          $ref: '#/components/schemas/ExecOutput'
+        exampleCompilerResult:
+          $ref: '#/components/schemas/ExecOutput'
+        linkerResult:
+          $ref: '#/components/schemas/ExecOutput'
+        runnerResult:
+          $ref: '#/components/schemas/ExecOutput'
 
   securitySchemes:
     cookieAuth:

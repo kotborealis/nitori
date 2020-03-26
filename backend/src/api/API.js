@@ -35,6 +35,7 @@ module.exports = (config) => {
 
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: true}));
+    app.use(bodyParser.json());
 
     app.use(cookieParser());
 
@@ -56,6 +57,7 @@ module.exports = (config) => {
     }).install(app);
 
     app.use('/widgets/', require('./routes/widgets/widgets')(config));
+    app.use('/specRunner/', require('./routes/specRunner/specRunner')(config));
 
     //noinspection JSUnusedLocalSymbols
     app.use(function(err, req, res, next) {
