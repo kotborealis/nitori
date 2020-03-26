@@ -7,7 +7,7 @@ import {TestTargetsList} from '../../../components/TestTarget/TestTargetsList';
 import {useApiStore, useStore} from '../../../store/store';
 import {Loading} from '../../../components/InvalidState/Loading';
 import {Error} from '../../../components/InvalidState/Error';
-import {useHistory, useParams} from "react-router-dom";
+import {useHistory} from "react-router-dom";
 import {TabPanel} from '../../../components/TabPanel/TabPanel';
 import {TestSpecSubmit} from '../TestSpecSubmit/TestSpecSubmit';
 
@@ -21,17 +21,15 @@ export default () => {
 
     useEffect(() => void testSpecs.fetch(), [testSpecDelete.data]);
 
-    const [tab, setTab] = useState(0);
+    const [tab, setTab] = useState("test-targets");
     const handleTabChange = (event, value) => setTab(value);
-
-    const {adminTab} = useParams();
 
     return (<>
         <Paper square>
             <Tabs value={tab} onChange={handleTabChange}>
-                <Tab label={"Попытки"} id={"test-targets"}/>
-                <Tab label={"Тесты"} id={"test-specs"}/>
-                <Tab label={"Добавить тест"} id={"test-specs-submit"}/>
+                <Tab label={"Попытки"} value={"test-targets"}/>
+                <Tab label={"Тесты"} value={"test-specs"}/>
+                <Tab label={"Добавить тест"} value={"test-specs-submit"}/>
             </Tabs>
         </Paper>
         <Paper square>
