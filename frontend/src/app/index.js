@@ -4,7 +4,6 @@ import {BrowserRouter, matchPath, Route, Switch, withRouter} from 'react-router-
 import {Widget} from '../views/Widget/Widget';
 import {WidgetList} from '../views/WidgetList/WidgetList';
 import Container from '@material-ui/core/Container';
-import {storeApi} from '../store/store';
 
 const RouterRoot = ({children}) => {
     return (
@@ -24,12 +23,6 @@ const Routes = () => {
 };
 
 const RouteWidget = withRouter(({location: {pathname}}) => {
-    const {params: {widgetId}} = matchPath(pathname, {
-        path: "/widgets/:widgetId"
-    });
-
-    storeApi.setState({widgetId});
-
     return <Widget/>;
 });
 

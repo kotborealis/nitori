@@ -1,28 +1,30 @@
 import React, {useEffect} from 'react';
 import {TestTargetInputForm} from '../../../components/TestTarget/TestTargetInputForm';
-import {useApiStore, useStore} from '../../../store/store';
 import {TestTarget} from '../../../components/TestTarget/TestTarget';
 import {Loading} from '../../../components/InvalidState/Loading';
 import {Error} from '../../../components/InvalidState/Error';
 import Grid from '@material-ui/core/Grid';
+import {apiActions} from '../../../api/apiActions';
+import {useApi} from '../../../api/useApi';
+import {useParams} from 'react-router-dom';
 
 export const TestTargetSubmit = () => {
-    const widgetId = useStore(state => state.widgetId);
+    const {widgetId} = useParams();
 
-    const testSpecs = useApiStore("testSpecs");
-    useEffect(() => void testSpecs.fetch(), [widgetId]);
+    const testSpecs = useApi(apiActions.testSpecs);
+    testSpecs.useFetch({widgetId})([widgetId]);
 
-    const testTargetSubmit = useApiStore("testTargetSubmit");
+    const testTargetSubmit = useApi(apiActions.testTargetSubmit);
 
     const testSpecId = testTargetSubmit.data && testTargetSubmit.testSpecId;
-    const testSpec = useApiStore("testSpec@testTargetSubmit");
-    useEffect(() => void (testSpecId && testSpec.fetch({testSpecId})), [testSpecId]);
+    const testSpec = useApi(apiActions.testSpec);
+    useEffect(() => void (testSpecId && testSpec.fetch({widgetId, testSpecId})), [widgetId, testSpecId]);
 
     const onSubmit = event => {
         event.preventDefault();
 
         const formData = new FormData(event.target);
-        testTargetSubmit.fetch({formData});
+        testTargetSubmit.fetch({widgetId, formData});
     };
 
     let result = null;
@@ -32,7 +34,7 @@ export const TestTargetSubmit = () => {
     else if(testTargetSubmit.loading)
         result = <Loading/>;
     else if(testTargetSubmit.error)
-        result = <Error error={error}/>;
+        result = <Error error={testTargetSubmit.error}/>;
     else if(!testTargetSubmit.init)
         result = <TestTarget output={testTargetSubmit.data} testSpec={testSpec.data}/>;
 

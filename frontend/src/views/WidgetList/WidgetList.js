@@ -1,13 +1,14 @@
-import React, {useEffect} from 'react';
-import {useApiStore} from '../../store/store';
+import React from 'react';
 import {Loading} from '../../components/InvalidState/Loading';
 import {Error} from '../../components/InvalidState/Error';
 import {WidgetsList} from '../../components/Widgets/WidgetsList';
 import {BlockContainer} from '../../components/BlockContainer/BlockContainer';
+import {useApi} from '../../api/useApi';
+import {apiActions} from '../../api/apiActions';
 
 export const WidgetList = () => {
-    const widgets = useApiStore("widgets");
-    useEffect(() => void widgets.fetch(), []);
+    const widgets = useApi(apiActions.widgets);
+    widgets.useFetch()([]);
 
     let child = null;
 

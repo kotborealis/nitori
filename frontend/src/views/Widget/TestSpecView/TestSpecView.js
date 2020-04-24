@@ -1,18 +1,18 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {TestSpec} from '../../../components/TestSpec/TestSpec';
 import {useParams} from 'react-router-dom';
 import {Loading} from '../../../components/InvalidState/Loading';
 import {Error} from '../../../components/InvalidState/Error';
-import {useApiStore, useStore} from '../../../store/store';
+import {apiActions} from '../../../api/apiActions';
+import {useApi} from '../../../api/useApi';
 
 export default () => {
-    const widgetId = useStore(state => state.widgetId);
+    const {widgetId} = useParams();
     const {testSpecId} = useParams();
 
-    const testSpec = useApiStore("testSpec@testSpecView");
+    const testSpec = useApi(apiActions.testSpec);
 
-    useEffect(() => void testSpec.fetch({testSpecId}),
-        [testSpecId, widgetId]);
+    testSpec.useFetch({widgetId, testSpecId})([testSpecId, widgetId]);
 
     let child;
 

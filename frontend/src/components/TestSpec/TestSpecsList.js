@@ -1,13 +1,12 @@
 import React from 'react';
-import {useHistory} from 'react-router-dom';
-import {useStore} from '../../store/store';
+import {useHistory, useParams} from 'react-router-dom';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 import MaterialTable from 'material-table';
-import {api} from '../../api';
+import {apiActions} from '../../api/apiActions';
 
 export const TestSpecsList = () => {
     const history = useHistory();
-    const widgetId = useStore(state => state.widgetId);
+    const {widgetId} = useParams();
 
     return (
         <MaterialTable
@@ -47,21 +46,23 @@ export const TestSpecsList = () => {
                              orderDirection
                          }) => {
 
-                const totalCount = await api(`/widgets/${widgetId}/test-specs/total-count`);
+                const totalCount = await apiActions.testSpecsTotalCount({widgetId});
 
                 let data;
                 try{
-                    data = await api(`/widgets/${widgetId}/test-specs`, {
-                        query: {
-                            limit: pageSize,
-                            skip: page * pageSize,
-                            ...(search ? {userDataName: search} : {}),
-                            ...(orderBy ? {sortBy: orderBy.sortingField} : {}),
-                            ...(orderDirection ? {orderBy: orderDirection} : {}),
-                        }
+                    console.log("TRY DATA FETCH");
+                    data = await apiActions.testSpecs({
+                        widgetId,
+                        limit: pageSize,
+                        skip: page * pageSize,
+                        name: search,
+                        sortBy: orderBy ? orderBy.sortingField : undefined,
+                        orderBy: orderDirection,
                     });
+                    console.log(data);
                 }
                 catch(e){
+                    console.error(e);
                     return {
                         data: [],
                         page: 0,

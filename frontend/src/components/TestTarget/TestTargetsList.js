@@ -3,15 +3,14 @@ import React from 'react';
 import {exitCodeToIcon} from '../../helpers/exitCodeToIcon';
 import Chip from '@material-ui/core/Chip';
 import {exitCodeToColor} from '../../helpers/exitCodeToColor';
-import {useStore} from '../../store/store';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 import MaterialTable from 'material-table';
-import {useHistory} from 'react-router-dom';
-import {api} from '../../api';
+import {useHistory, useParams} from 'react-router-dom';
+import {apiActions} from '../../api/apiActions';
 
 export const TestTargetsList = () => {
     const history = useHistory();
-    const widgetId = useStore(state => state.widgetId);
+    const {widgetId} = useParams();
 
     return (
         <MaterialTable
@@ -71,18 +70,17 @@ export const TestTargetsList = () => {
                              orderBy,
                              orderDirection
                          }) => {
-                const totalCount = await api(`/widgets/${widgetId}/test-targets/total-count`);
+                const totalCount = await apiActions.testTargetsTotalCount({widgetId});
 
                 let data;
                 try{
-                    data = await api(`/widgets/${widgetId}/test-targets`, {
-                        query: {
-                            limit: pageSize,
-                            skip: page * pageSize,
-                            ...(search ? {userDataName: search} : {}),
-                            ...(orderBy ? {sortBy: orderBy.sortingField} : {}),
-                            ...(orderDirection ? {orderBy: orderDirection} : {}),
-                        }
+                    data = await apiActions.testTargets({
+                        widgetId,
+                        limit: pageSize,
+                        skip: page * pageSize,
+                        userDataName: search,
+                        sortBy: orderBy.sortingField,
+                        orderBy: orderDirection,
                     });
                 }
                 catch(e){

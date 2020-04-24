@@ -1,8 +1,8 @@
 .title {
-    margin-bottom: 0!important;
-    border-bottom: 0!important;
-    border-bottom-left-radius: 0!important;
-    border-bottom-right-radius: 0!important;
+    margin-bottom: 0 !important;
+    border-bottom: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
 }
 
 :global .output-renderer {

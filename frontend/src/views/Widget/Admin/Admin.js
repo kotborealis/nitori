@@ -1,25 +1,25 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import {TestSpecsList} from '../../../components/TestSpec/TestSpecsList';
 import {TestTargetsList} from '../../../components/TestTarget/TestTargetsList';
-import {useApiStore, useStore} from '../../../store/store';
 import {Loading} from '../../../components/InvalidState/Loading';
 import {Error} from '../../../components/InvalidState/Error';
-import {useHistory} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import {TabPanel} from '../../../components/TabPanel/TabPanel';
 import {TestSpecSubmit} from '../TestSpecSubmit/TestSpecSubmit';
+import {apiActions} from '../../../api/apiActions';
+import {useApi} from '../../../api/useApi';
 
 export default () => {
     const history = useHistory();
-    const widgetId = useStore(state => state.widgetId);
+    const {widgetId} = useParams();
 
-    const testSpecDelete = useApiStore("testSpecDelete@admin");
+    const testSpecDelete = useApi(apiActions.testSpecDelete);
+    const testSpecs = useApi(apiActions.testSpecs);
 
-    const testSpecs = useApiStore("testSpecs");
-
-    useEffect(() => void testSpecs.fetch(), [testSpecDelete.data]);
+    testSpecs.useFetch({widgetId})([testSpecDelete.data]);
 
     const [tab, setTab] = useState("test-targets");
     const handleTabChange = (event, value) => setTab(value);

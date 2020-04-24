@@ -1,51 +1,25 @@
-import React, {useRef, useState} from 'react';
+import React from 'react';
 import {TestSpecInputForm} from './TestSpecInputForm';
-import {api} from '../../api';
 import {Error} from '../InvalidState/Error';
 import {Tty} from '../Tty/Tty';
 import Grid from '@material-ui/core/Grid';
-import {useStore} from '../../store/store';
+import {useParams} from 'react-router-dom';
+import {apiActions} from '../../api/apiActions';
+import {useApi} from '../../api/useApi';
 
 export const TestSpecCreate = ({}) => {
-    const widgetId = useStore(state => state.widgetId);
+    const {widgetId} = useParams();
 
-    const [outputState, setOutputState] = useState({});
-    const [outputLoading, setOutputLoading] = useState(false);
-    const [isError, setIsError] = useState(false);
-
-    const outputError = useRef({});
+    const testSpecSubmit = useApi(apiActions.testSpecSubmit);
 
     const testSpecFormSubmit = async (event) => {
         event.preventDefault();
-
-        setIsError(false);
-
-        setOutputState({});
         const formData = new FormData(event.target);
-        setOutputLoading(true);
 
-        try{
-            const {compilerResult} = await api(`widgets/${widgetId}/test-specs/`,
-                {
-                    query: {
-                        name: formData.get('name'),
-                        description: formData.get('description')
-                    },
-                    options: {
-                        method: "POST",
-                        body: formData
-                    }
-                }
-            );
-
-            setOutputState(compilerResult);
-        }
-        catch(error){
-            outputError.current = error;
-            setIsError(true);
-        }finally{
-            setOutputLoading(false);
-        }
+        testSpecSubmit.fetch({
+            widgetId,
+            formData,
+        });
     };
 
     return (
@@ -54,15 +28,15 @@ export const TestSpecCreate = ({}) => {
                 <TestSpecInputForm onSubmit={testSpecFormSubmit}/>
             </Grid>
             <Grid item xs={12}>
-                {isError
-                    ? <Error error={outputError.current}/>
+                {testSpecSubmit.error
+                    ? <Error error={testSpecSubmit.error}/>
                     : <Tty
                         title={
-                            outputState.exitCode === undefined
+                            testSpecSubmit.data.compilerResult.exitCode === undefined
                                 ? `Не выполнено`
-                                : `Код возврата: ${outputState.exitCode}`
+                                : `Код возврата: ${testSpecSubmit.data.compilerResult.exitCode}`
                         }
-                        {...outputState}
+                        {...testSpecSubmit.data.compilerResult}
                     />
                 }
             </Grid>

@@ -1,27 +1,28 @@
-import React, {useEffect} from 'react';
-import {Route, Switch, useRouteMatch} from 'react-router-dom';
+import React from 'react';
+import {Route, Switch, useParams, useRouteMatch} from 'react-router-dom';
 import {BlockContainer} from '../../components/BlockContainer/BlockContainer';
 import {TestTargetSubmit} from './TestTargetSubmit/TestTargetSubmit';
 import Admin from './Admin/Admin';
 import TestSpecView from './TestSpecView/TestSpecView';
-import {useApiStore, useStore} from '../../store/store';
 import {TestTargetView} from './TestTargetView/TestTargetView';
 import {AuthBanner} from '../../components/AuthBanner/AuthBanner';
 import {TestSpecSubmit} from './TestSpecSubmit/TestSpecSubmit';
+import {apiActions} from '../../api/apiActions';
+import {useApi} from '../../api/useApi';
 
 export const Widget = () => {
     const {path} = useRouteMatch();
-    const widgetId = useStore(state => state.widgetId);
+    const {widgetId} = useParams();
 
     // Fetch data into store:
 
     // Fetch test specs
-    const testSpecs = useApiStore("testSpecs");
-    useEffect(() => void testSpecs.fetch(), [widgetId]);
+    const testSpecs = useApi(apiActions.testSpec);
+    testSpecs.useFetch({widgetId})([widgetId]);
 
     // Fetch user data
-    const userData = useApiStore("userData");
-    useEffect(() => void userData.fetch(), []);
+    const userData = useApi(apiActions.userData);
+    userData.useFetch()([]);
 
     return (
         <BlockContainer>

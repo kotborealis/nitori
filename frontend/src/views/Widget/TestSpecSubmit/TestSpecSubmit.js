@@ -1,21 +1,22 @@
 import React, {useEffect} from 'react';
 import {TestSpecInputForm} from '../../../components/TestSpec/TestSpecInputForm';
-import {useApiStore} from '../../../store/store';
 import Grid from '@material-ui/core/Grid';
 import {Loading} from '../../../components/InvalidState/Loading';
 import {Error} from '../../../components/InvalidState/Error';
 import {TestSpec} from '../../../components/TestSpec/TestSpec';
 import {ExecOutput} from '../../../components/ExecOutput/ExecOutput';
 import {useParams} from 'react-router-dom';
+import {apiActions} from '../../../api/apiActions';
+import {useApi} from '../../../api/useApi';
 
 export const TestSpecSubmit = () => {
-    const {testSpecId} = useParams();
-    const testSpecSubmit = useApiStore("testSpecSubmit");
-    const testSpec = useApiStore("testSpec@testSpecSubmit");
+    const {widgetId, testSpecId} = useParams();
+    const testSpecSubmit = useApi(apiActions.testSpecSubmit);
+    const testSpec = useApi(apiActions.testSpec);
 
     useEffect(() => {
         if(testSpecId){
-            testSpec.fetch({testSpecId});
+            testSpec.fetch({widgetId, testSpecId});
         }
     }, [testSpecId]);
 
@@ -23,7 +24,7 @@ export const TestSpecSubmit = () => {
         event.preventDefault();
 
         const formData = new FormData(event.target);
-        testSpecSubmit.fetch({formData, testSpecId});
+        testSpecSubmit.fetch({widgetId, formData, testSpecId});
     };
 
     let result;
