@@ -1,6 +1,6 @@
 const dev_config = (() => {
     try{
-        return require('../../backend/.config.dev.js');
+        return require('../../backend/.config.js');
     }
     catch(e){
         return {api: {port: 3000}};

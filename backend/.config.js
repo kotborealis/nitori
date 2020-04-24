@@ -1,11 +1,11 @@
 module.exports = {
     api: {
-        port: 3000,
+        port: process.env.API_PORT || 3000,
         limits: {
-            fileSize: 1024 * 10
+            fileSize: process.env.API_LIMITS_FILESIZE || (1024 * 10)
         }
     },
-    docker: {
+    docker: process.env.DOCKER ? JSON.parse(process.env.DOCKER) : {
         socketPath: '/var/run/docker.sock'
     },
     container: {
@@ -39,8 +39,8 @@ module.exports = {
         run: 1000 * 10
     },
     database: {
-        url: 'http://admin:123qwe@database:5984',
-        name: 'nitori'
+        url: process.env.DATABASE_URL || 'http://admin:123qwe@127.0.0.1:5984',
+        name: process.env.DATABASE_NAME || 'nitori'
     },
     auth: {
         url: process.env.AUTH_API || 'http://127.0.0.1:8080/auth/user_data.php'

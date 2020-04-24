@@ -5,11 +5,8 @@ services:
     build:
       context: ./backend/
       dockerfile: Dockerfile
-      args:
-        AUTH_API: "${BACKEND_AUTH_API}"
-        PROD_API: "${BACKEND_AUTH_API}"
     env_file:
-      - .env
+      - backend/.env
     entrypoint:
       - node
       - src/index
@@ -38,6 +35,7 @@ services:
       - backend
     depends_on:
       - backend
+
   database:
     image: couchdb:latest
     environment:

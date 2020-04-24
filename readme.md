@@ -35,10 +35,10 @@ Run `database` via docker-compose, using `docker-compose.dev.yml`:
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d database
 ```
 
-Run `backend` with dev config (`./backend/.config.dev.js`):
+Run `backend`:
 ```shell script
 cd backend
-node src/index --config .config.dev.js
+npm start
 ```
 
 Run `frontend` via webpack-dev-server:

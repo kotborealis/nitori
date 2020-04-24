@@ -1,13 +1,6 @@
 version: "3"
 
 services:
-  backend:
-    entrypoint:
-      - node
-      - src/index
-      - --api
-      - --config=./.config.dev.js
-
   database:
     ports:
       - "5984:5984"
