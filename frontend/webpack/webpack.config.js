@@ -27,7 +27,7 @@ module.exports = (env = {prod: false}) => {
             publicPath: PUBLIC_PATH
         },
 
-        devtool: ifDebug('cheap-module-eval-source-map'),
+        devtool: ifDebug('source-map'),
         resolve: {
             alias: {
                 "components": path.resolve(__dirname, '../src/components'),
