@@ -20,6 +20,8 @@ module.exports = [
         bypass: (req, res) => {
             if(req.url.indexOf('/auth/user_data.php') < 0) return '/index.html';
 
+            //res.status(400).end();
+
             res.json({
                 "userId": 5,
                 "isAdmin": true,
