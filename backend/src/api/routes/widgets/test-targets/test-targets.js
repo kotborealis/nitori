@@ -76,7 +76,8 @@ module.exports = (config) => {
         })
         .post(filesMiddleware(config.api.limits, 1, 10),
             async (req, res) => {
-                const userData = await auth(req.cookies.PHPSESSID);
+                req.auth();
+                const {userData} = req;
 
                 const {widgetId} = req;
                 const {testSpecId} = req.query;

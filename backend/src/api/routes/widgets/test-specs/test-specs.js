@@ -87,9 +87,12 @@ module.exports = (config) => {
         .get(async (req, res) => {
             const {widgetId} = req;
 
-            const {rows: [{value}]} = await db.view("TestSpec", "totalCount", {key: widgetId});
+            const data = await db.view("TestSpec", "totalCount", {key: widgetId});
 
-            res.json(value);
+            if(data.rows.length)
+                res.json(data.rows[0].value);
+            else
+                res.json(0);
         });
 
     router.route('/:testSpecId')

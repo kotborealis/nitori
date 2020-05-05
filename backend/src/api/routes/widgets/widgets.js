@@ -47,6 +47,8 @@ module.exports = (config) => {
     });
 
     router.get('/:widgetId/', async (req, res) => {
+        req.auth([({isAdmin}) => isAdmin === true]);
+
         const {rows} = await db.view("Widget", "list", {
             include_docs: true,
             key: req.widgetId

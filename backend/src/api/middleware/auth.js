@@ -22,14 +22,8 @@ const authMiddleware = (url) => async (req, res, next) => {
         }
     }
 
-    if(!req.userData){
-        const err = new Error("Not authorized");
-        err.status = 403;
-        throw err;
-    }
-
-    req.auth = (when = []) => {
-        if(!when.map(w => w(req.userData)).every(_ => _)){
+    req.auth = (...when) => {
+        if(!req.userData || !when.flat().every(w => w(req.userData))){
             const err = new Error("Not authorized by access control policy");
             err.status = 403;
             throw err;
