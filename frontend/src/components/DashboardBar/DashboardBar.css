@@ -1,0 +1,13 @@
+.bar {
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+}
+
+.link {
+    color: white;
+}
+
+.breadcrumbs {
+    color: white !important;
+}

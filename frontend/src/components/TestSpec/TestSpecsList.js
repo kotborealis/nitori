@@ -1,22 +1,30 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 import MaterialTable from 'material-table';
 import {apiActions} from '../../api/apiActions';
+import {useApi} from '../../api/useApi';
 
 export const TestSpecsList = () => {
     const history = useHistory();
     const {widgetId} = useParams();
+    const tableRef = useRef(null);
+
+    const testSpecDelete = useApi(apiActions.testSpecDelete);
+
+    useEffect(() => tableRef.current && tableRef.current.onQueryChange(), [widgetId]);
 
     return (
         <MaterialTable
+            title={"Тесты"}
+            tableRef={tableRef}
             options={{
-                showTitle: false,
+                showTitle: true,
                 search: false
             }}
 
             onRowClick={(event, rowData) => {
-                history.push(`/widgets/${widgetId}/test-specs/${rowData._id}`);
+                history.push(`/dashboard/${widgetId}/test-specs/${rowData._id}`);
             }}
 
             columns={[
@@ -50,16 +58,14 @@ export const TestSpecsList = () => {
 
                 let data;
                 try{
-                    console.log("TRY DATA FETCH");
                     data = await apiActions.testSpecs({
                         widgetId,
                         limit: pageSize,
                         skip: page * pageSize,
                         name: search,
                         sortBy: orderBy ? orderBy.sortingField : undefined,
-                        orderBy: orderDirection,
+                        orderBy: orderDirection
                     });
-                    console.log(data);
                 }
                 catch(e){
                     console.error(e);

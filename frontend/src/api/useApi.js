@@ -11,6 +11,8 @@ export const useApi = (fetcher, deps = []) => {
         error: null,
     });
 
+    const [watchdog, setWatchdog] = useState(0);
+
     const fetch = (...args) => {
         fetchCancelManager.cancel();
         const id = fetchCancelManager.pend();
@@ -36,6 +38,7 @@ export const useApi = (fetcher, deps = []) => {
                 })
             )
             .finally(() => {
+                setWatchdog(watchdog + 1);
                 if(!fetchCancelManager.cancelled(id)){
                     fetchCancelManager.clear(id);
                 }
@@ -49,6 +52,7 @@ export const useApi = (fetcher, deps = []) => {
     return {
         ...state,
         fetch,
-        useFetch
+        useFetch,
+        watchdog
     };
 };

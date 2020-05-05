@@ -2,6 +2,15 @@ import {api, fetchJSON} from './index';
 
 export const apiActions = {
     widgets: () => api(`/widgets/`),
+    widget: ({widgetId}) => api(`/widgets/${widgetId}`),
+
+    widgetCreate: ({name}) =>
+        api(`/widgets/`, {
+            query: {name},
+            options: {
+                method: 'POST',
+            }
+        }),
 
     testSpecs:
         ({
@@ -28,7 +37,7 @@ export const apiActions = {
                       widgetId,
                       limit = 100,
                       skip = 0,
-                      sortBy = 'name',
+                      sortBy,
                       orderBy = 'asc',
                       userDataName,
                   } = {}) => api(`/widgets/${widgetId}/test-targets`, {
@@ -36,8 +45,8 @@ export const apiActions = {
             limit,
             skip,
             ...(userDataName ? {userDataName} : {}),
-            sortBy,
-            orderBy,
+            ...(sortBy ? {sortBy} : {}),
+            ...(orderBy ? {orderBy} : {}),
         }
     }),
 

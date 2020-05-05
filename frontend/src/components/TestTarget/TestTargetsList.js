@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 
 import {exitCodeToIcon} from '../../helpers/exitCodeToIcon';
 import Chip from '@material-ui/core/Chip';
@@ -11,16 +11,21 @@ import {apiActions} from '../../api/apiActions';
 export const TestTargetsList = () => {
     const history = useHistory();
     const {widgetId} = useParams();
+    const tableRef = useRef(null);
+
+    useEffect(() => tableRef.current && tableRef.current.onQueryChange(), [widgetId]);
 
     return (
         <MaterialTable
+            title={"Попытки"}
+            tableRef={tableRef}
             options={{
-                showTitle: false,
+                showTitle: true,
                 search: true
             }}
 
             onRowClick={(event, rowData) => {
-                history.push(`/widgets/${widgetId}/test-targets/${rowData._id}`);
+                history.push(`/dashboard/${widgetId}/test-targets/${rowData._id}`);
             }}
 
             columns={[
@@ -79,11 +84,12 @@ export const TestTargetsList = () => {
                         limit: pageSize,
                         skip: page * pageSize,
                         userDataName: search,
-                        sortBy: orderBy.sortingField,
+                        sortBy: orderBy ? orderBy.sortingField : undefined,
                         orderBy: orderDirection,
                     });
                 }
                 catch(e){
+                    console.error(e);
                     return {
                         data: [],
                         page: 0,
