@@ -20,7 +20,6 @@
     "express-openapi-validator": "^2.15.1",
     "glob": "^7.1.4",
     "md5": "^2.2.1",
-    "nano": "^8.1.0",
     "node-docker-api": "^1.1.22",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
