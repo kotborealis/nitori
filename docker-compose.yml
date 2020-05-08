@@ -37,13 +37,11 @@ services:
       - backend
 
   database:
-    image: couchdb:latest
-    environment:
-        COUCHDB_USER: admin
-        COUCHDB_PASSWORD: 123qwe
+    image: "mongo"
     volumes:
-      - database:/opt/couchdb/data
+      - database_mongo:/data/db
+    restart: unless-stopped
 
 volumes:
-    database:
+  database_mongo:
     object_cache:

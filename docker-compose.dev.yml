@@ -3,4 +3,4 @@ version: "3"
 services:
   database:
     ports:
-      - "5984:5984"
+      - "27017:27017"
