@@ -1,177 +1,130 @@
 const {Router} = require('express');
-const {filesMiddleware} = require('../../../middleware/files');
-const shortid = require('shortid');
-const Database = require('../../../../database');
-const {authMiddleware} = require('../../../middleware/auth');
+const {TestSpecModel} = require('../../../../database');
 const {compileTestSpec} = require('../../../../TestSpec/compileTestSpec');
 const debug = require('debug')('nitori:api:widget:test-spec');
 
 module.exports = (config) => {
 
     const router = Router();
-    const db = new Database(require('nano')(config.database), config.database.name);
 
     router.route('/')
         .get(async (req, res) => {
             const {
                 limit,
                 skip,
-                name
+                name,
+                sortBy,
+                orderBy
             } = req.query;
 
             const {widgetId} = req;
 
-            const selector = {
-                type: "TestSpec",
-                removed: false,
-                name,
-                widgetId
-            };
+            const testSpecs = await TestSpecModel
+                .find({
+                    name,
+                    removed: false,
+                    widget: widgetId,
+                }, null, {limit, skip, lean: true})
+                .sort({
+                    [sortBy]: orderBy
+                });
 
-            const sort = [
-                ...[(req.query.sortBy && {[req.query.sortBy]: req.query.orderBy})]
-            ].filter(id => id);
-
-            const {docs} = await db.find({
-                limit,
-                skip,
-                selector,
-                sort
-            });
-
-            res.json(docs);
+            res.mongo(testSpecs);
         })
-        .post(
-            filesMiddleware(config.api.limits, 1, 10),
-            async (req, res) => {
+        .post(async (req, res) => {
                 req.auth([({isAdmin}) => isAdmin === true]);
 
-                const files = req.files;
                 const {widgetId} = req;
                 const {name, description} = req.query;
+                const {spec, example} = req.body;
 
-                const {compilerResult, cache} = await compileTestSpec(config, files);
+                const specSources = [{
+                    name: 'spec.cpp',
+                    content: spec,
+                    type: 'text/cpp'
+                }];
+
+                const {compilerResult, cache} = await compileTestSpec(config, specSources);
 
                 debug("Cache key is", cache);
 
-                if(compilerResult.exitCode === 0){
-                    const id = shortid.generate();
-                    await db.multipart.insert({
-                            type: "TestSpec",
-                            name,
-                            widgetId,
-                            description,
-                            cache,
-                            timestamp: Date.now(),
-                            removed: false
-                        },
-                        files.map(({name, content: data, content_type}) => ({name, data, content_type})),
-                        id
-                    );
+                if(compilerResult.exitCode !== 0)
+                    return res.json({compilerResult});
 
-                    res.json({
-                        compilerResult,
-                        testSpec: {
-                            ...await db.get(id),
-                            sourceFiles: await db.getAllAttachments(id)
-                        }
-                    });
-                }
-                else{
-                    res.json({compilerResult});
-                }
+                const testSpec = new TestSpecModel({
+                    name,
+                    widget: widgetId,
+                    description,
+                    cache,
+                    sourceFiles: specSources,
+                    exampleTargetFile: {
+                        name: 'example.cpp',
+                        content: example,
+                        type: 'text/cpp'
+                    }
+                });
+
+                await testSpec.save();
+
+                res.mongo({compilerResult, testSpec});
             }
         );
 
     router.route('/total-count')
-        .get(async (req, res) => {
-            const {widgetId} = req;
-
-            const data = await db.view("TestSpec", "totalCount", {key: widgetId});
-
-            if(data.rows.length)
-                res.json(data.rows[0].value);
-            else
-                res.json(0);
-        });
+        .get(async (req, res) =>
+            res.mongo(await TestSpecModel.countDocuments({widget: req.widgetId}))
+        );
 
     router.route('/:testSpecId')
         .get(
             async function(req, res) {
                 req.auth([({isAdmin}) => isAdmin === true]);
+                const {testSpecId} = req.params;
+                const testSpec = await TestSpecModel.findById(testSpecId);
 
-                const {testSpecId: _id} = req.params;
-                const {includeSources = false, rev = undefined} = req.query;
-
-                const doc = await db.get(_id, rev ? {rev} : {});
-
-                if(doc.type !== "TestSpec"){
+                if(!testSpec){
                     const err = new Error("Not found");
                     err.status = 404;
                     throw err;
                 }
 
-                if(includeSources)
-                    doc.sourceFiles = await db.getAllAttachments(_id, rev ? {rev} : {});
-
-                res.json(doc);
+                res.mongo(testSpec);
             })
-        .put(
-            filesMiddleware(config.api.limits, 0, 10),
-            async (req, res) => {
+        .put(async (req, res) => {
                 req.auth([({isAdmin}) => isAdmin === true]);
 
-                const files = req.files;
                 const {testSpecId} = req.params;
+                const {widgetId} = req;
                 const {name, description} = req.query;
+                const {spec, example} = req.body;
 
-                const testSpec = await db.get(testSpecId);
+                const specSources = [{
+                    name: 'spec.cpp',
+                    content: spec,
+                    type: 'text/cpp'
+                }];
 
-                if(testSpec.type !== "TestSpec"){
-                    const err = new Error("Not found");
-                    err.status = 404;
-                    throw err;
-                }
+                const {compilerResult, cache} = await compileTestSpec(config, specSources);
 
-                if(name)
-                    testSpec.name = name;
-                if(description)
-                    testSpec.description = description;
+                debug("Cache key is", cache);
 
-                testSpec.timestamp = Date.now();
+                if(compilerResult.exitCode !== 0)
+                    return res.json({compilerResult});
 
-                if(files.length){
-                    const {compilerResult, cache} = await compileTestSpec(config, files);
-
-                    if(compilerResult.exitCode === 0){
-                        const attachments = files.map(({name, content: data, content_type}) => ({
-                            name,
-                            data,
-                            content_type
-                        }));
-                        testSpec.cache = cache;
-                        await db.multipart.update(testSpec, attachments, testSpecId, testSpec._rev);
+                const testSpec = await TestSpecModel.findByIdAndUpdate(testSpecId, {
+                    name,
+                    widget: widgetId,
+                    description,
+                    cache,
+                    sourceFiles: specSources,
+                    exampleTargetFile: {
+                        name: 'example.cpp',
+                        content: example,
+                        type: 'text/cpp'
                     }
+                }, {new: true, upsert: true});
 
-                    res.json({
-                        compilerResult,
-                        testSpec: {
-                            ...await db.get(testSpecId),
-                            sourceFiles: await db.getAllAttachments(testSpecId)
-                        }
-                    });
-                }
-                else{
-                    await db.update(testSpec, testSpecId, testSpec._rev);
-
-                    res.json({
-                        compilerResult: {exitCode: 0, stdout: "Loaded from cache", stderr: ""},
-                        testSpec: {
-                            ...await db.get(testSpecId),
-                            sourceFiles: await db.getAllAttachments(testSpecId)
-                        }
-                    });
-                }
+                res.mongo({compilerResult, testSpec});
             }
         )
         .delete(
@@ -179,11 +132,9 @@ module.exports = (config) => {
                 req.auth([({isAdmin}) => isAdmin === true]);
 
                 const {testSpecId} = req.params;
-                const testSpec = await db.get(testSpecId);
-                await db.update({
-                    ...testSpec,
-                    removed: true
-                }, testSpecId, testSpec._rev);
+
+                await TestSpecModel.findByIdAndUpdate(testSpecId, {removed: true});
+
                 res.json(testSpecId);
             }
         );

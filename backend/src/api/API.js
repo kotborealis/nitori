@@ -2,7 +2,7 @@ const YAML = require('yamljs');
 const swaggerDocument = YAML.load('./api.yaml');
 
 if(process.env.PROD_API){
-    swaggerDocument.servers.push({
+    swaggerDocument.servers.unshift({
         url: process.env.PROD_API,
         description: 'Current production server'
     });
@@ -13,9 +13,6 @@ const {OpenApiValidator} = require('express-openapi-validator');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-
-const shortid = require('shortid');
-shortid.characters("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-.");
 
 const debug = require('debug')('nitori:api');
 const express = require('express');
@@ -31,15 +28,20 @@ module.exports = (config) => {
 
     const app = express();
 
+    app.use((req, res, next) => {
+        res.mongo = obj => res.json(JSON.parse(JSON.stringify(obj)));
+        next();
+    });
+
     app.use(cors());
+
+    app.use('/swagger/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(bodyParser.json());
 
     app.use(cookieParser());
-
-    app.use('/swagger/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.use(authMiddleware(config.auth.url));
 

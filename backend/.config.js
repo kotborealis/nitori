@@ -39,7 +39,7 @@ module.exports = {
         run: 1000 * 10
     },
     database: {
-        url: process.env.DATABASE_URL || 'http://admin:123qwe@127.0.0.1:5984',
+        url: process.env.DATABASE_URL || '127.0.0.1:27017',
         name: process.env.DATABASE_NAME || 'nitori'
     },
     auth: {

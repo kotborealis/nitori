@@ -44,4 +44,4 @@ services:
 
 volumes:
   database_mongo:
-    object_cache:
+  object_cache:

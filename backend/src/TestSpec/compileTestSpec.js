@@ -1,6 +1,7 @@
 const debug = require('debug')('nitori:testSpecCompile');
 const md5 = require('md5');
 const Database = require('../database');
+const {TestSpecModel} = require('../database');
 const {ObjectCache} = require('../ObjectCache');
 const {Compiler, Ar} = require('../SandboxedGnuUtils');
 const {Sandbox} = require('../Sandbox');
@@ -11,7 +12,7 @@ const compileTestSpec = async (config, files) => {
     const docker = new Docker(config.docker);
     const sandbox = new Sandbox(docker, config);
 
-    const cache = md5(files.map(({content}) => content.toString()).join("\n"));
+    const cache = md5(files.map(({name, content}) => name + content.toString()).join("\n"));
     debug("cache key", cache);
 
     if(objectCache.has(cache)){
@@ -53,21 +54,10 @@ const compileTestSpec = async (config, files) => {
 const precompileTestSpecs = async (config) => {
     debug("Start TestSpecs precompilation");
 
-    const nano = require('nano')(config.database);
-    const db = new Database(nano, config.database.name);
+    const testSpecs = await TestSpecModel.find({removed: false});
 
-    const {docs: rows} = await db.find({
-        selector: {type: "TestSpec", removed: false}
-    });
-
-    const spec_ids = rows.map(({_id}) => _id);
-
-    for await (const test of spec_ids){
-        const files =
-            (await db.getAllAttachments(test)).map(({name, data}) => ({name, content: data}));
-
-        await compileTestSpec(config, files);
-    }
+    for await (const testSpec of testSpecs)
+        await compileTestSpec(config, testSpec.sourceFiles);
 
     debug("Precompiled all TestSpecs");
 };

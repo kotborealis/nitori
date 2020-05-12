@@ -1,18 +1,12 @@
 const {Router} = require('express');
-const Database = require('../../../database');
 const shortid = require('shortid');
+const {WidgetModel} = require('../../../database');
 
 module.exports = (config) => {
     const router = Router();
-    const db = new Database(require('nano')(config.database), config.database.name);
 
     router.param('widgetId', async (req, res, next, value) => {
-        const {rows: {length}} = await db.view("Widget", "list", {
-            include_docs: true,
-            key: value
-        });
-
-        if(length === 0){
+        if(!await WidgetModel.findById({_id: value})){
             const err = new Error("Specified Widget was not found");
             err.status = 404;
             throw err;
@@ -24,37 +18,29 @@ module.exports = (config) => {
 
     router.get('/', async (req, res) => {
         req.auth([({isAdmin}) => isAdmin === true]);
-
-        const {rows} = await db.view("Widget", "list", {
-            include_docs: true
-        });
-
-        res.json(rows.map(({doc}) => doc));
+        const widgets = await WidgetModel.find();
+        res.mongo(widgets);
     });
 
     router.post('/', async (req, res) => {
         req.auth([({isAdmin}) => isAdmin === true]);
 
         const {name} = req.query;
-        const _id = req.query.id || shortid.generate();
 
-        await db.insert({
-            type: "Widget",
-            name
-        }, _id);
+        const widget = new WidgetModel({name});
+        await widget.save();
 
-        res.status(201).json({name, _id});
+        res.status(201).mongo(widget);
     });
 
     router.get('/:widgetId/', async (req, res) => {
         req.auth([({isAdmin}) => isAdmin === true]);
 
-        const {rows} = await db.view("Widget", "list", {
-            include_docs: true,
-            key: req.widgetId
-        });
+        const {widgetId} = req;
 
-        res.json(rows[0].doc);
+        const widget = await WidgetModel.findById(widgetId);
+
+        res.mongo(widget);
     });
 
     router.use('/:widgetId/test-specs', require('./test-specs/test-specs')(config));

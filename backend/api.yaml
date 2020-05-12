@@ -39,11 +39,6 @@ paths:
           required: true
           schema:
             type: string
-        - name: id
-          description: Widget's desired id. If not set, generated randomly.
-          in: query
-          schema:
-            type: string
       responses:
         201:
           description: Created new widget
@@ -144,15 +139,16 @@ paths:
             default: ""
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               properties:
-                file:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
+                spec:
+                  description: Spec source file content
+                  type: string
+                example:
+                  description: Spec example source file content
+                  type: string
       responses:
         200:
           description: Added TestSpec
@@ -191,17 +187,18 @@ paths:
           $ref: "#/components/responses/Unauthorized"
 
   /widgets/{widgetId}/test-specs/{testSpecId}:
+    parameters:
+      - $ref: '#/components/parameters/widgetId'
+      - name: testSpecId
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       summary: Get TestSpecs by id
       tags:
         - TestSpecs
       parameters:
-        - $ref: '#/components/parameters/widgetId'
-        - name: testSpecId
-          in: path
-          required: true
-          schema:
-            type: string
         - name: includeSources
           in: query
           required: false
@@ -222,7 +219,6 @@ paths:
       tags:
         - TestSpecs
       parameters:
-        - $ref: '#/components/parameters/widgetId'
         - name: name
           in: query
           required: true
@@ -236,15 +232,16 @@ paths:
             default: ""
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               properties:
-                file:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
+                spec:
+                  description: Spec source file content
+                  type: string
+                example:
+                  description: Spec example source file content
+                  type: string
       responses:
         200:
           description: Added TestSpec
@@ -278,7 +275,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/widgetId'
+                type: string
         404:
           $ref: "#/components/responses/NotFound"
         403:
@@ -332,18 +329,6 @@ paths:
           required: false
           schema:
             type: string
-        - name: timestampStart
-          description: Filter by TestSpec timestamp range (end)
-          in: query
-          required: false
-          schema:
-            type: number
-        - name: timestampEnd
-          description: Filter by TestSpec timestamp range (end)
-          in: query
-          required: false
-          schema:
-            type: number
         - name: userDataId
           description: Filter by UserData userId
           in: query
@@ -408,15 +393,9 @@ paths:
             type: string
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              type: object
-              properties:
-                file:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
+              $ref: '#/components/schemas/SourceFileList'
       responses:
         200:
           description: TestTarget completed
@@ -483,7 +462,7 @@ components:
       in: path
       required: true
       schema:
-        $ref: '#/components/schemas/widgetId'
+        type: string
 
     orderBy:
       name: orderBy
@@ -506,24 +485,28 @@ components:
 
   schemas:
 
-    widgetId:
-      type: string
-
     Widget:
       type: object
       properties:
         _id:
-          $ref: '#/components/schemas/widgetId'
+          type: string
         name:
           type: string
 
     SourceFile:
       type: object
       properties:
-        data:
-          type: string
         name:
           type: string
+        content:
+          type: string
+        type:
+          type: string
+
+    SourceFileList:
+      type: array
+      items:
+        $ref: '#/components/schemas/SourceFile'
 
     TestSpec:
       type: object
@@ -542,6 +525,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SourceFile'
+        exampleTargetFile:
+          $ref: '#/components/schemas/SourceFile'
 
     TestSpecList:
       type: array
@@ -594,9 +579,7 @@ components:
         runnerResult:
           $ref: '#/components/schemas/ExecOutput'
         sourceFiles:
-          type: array
-          items:
-            $ref: '#/components/schemas/SourceFile'
+          $ref: '#/components/schemas/SourceFileList'
 
     TestTargetList:
       type: array
