@@ -21,7 +21,7 @@ module.exports = (config) => {
 
             const testSpecs = await TestSpecModel
                 .find({
-                    name,
+                    ...(name ? {name} : {}),
                     removed: false,
                     widget: widgetId,
                 }, null, {limit, skip, lean: true})
@@ -38,13 +38,13 @@ module.exports = (config) => {
                 const {name, description} = req.query;
                 const {spec, example} = req.body;
 
-                const specSources = [{
+                const specFile = {
                     name: 'spec.cpp',
                     content: spec,
                     type: 'text/cpp'
-                }];
+                };
 
-                const {compilerResult, cache} = await compileTestSpec(config, specSources);
+                const {compilerResult, cache} = await compileTestSpec(config, [specFile]);
 
                 debug("Cache key is", cache);
 
@@ -56,7 +56,7 @@ module.exports = (config) => {
                     widget: widgetId,
                     description,
                     cache,
-                    sourceFiles: specSources,
+                    specFile,
                     exampleTargetFile: {
                         name: 'example.cpp',
                         content: example,

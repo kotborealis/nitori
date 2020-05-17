@@ -20,9 +20,9 @@ export const FileViewer = ({files = []}) => {
             </Tabs>
         </Paper>
 
-        {files.map(({data}, index) =>
+        {files.map(({content}, index) =>
             <TabPanel value={sourceCodeTab} index={index}>
-                <CodeCpp>{data}</CodeCpp>
+                <CodeCpp>{content}</CodeCpp>
             </TabPanel>
         )}
     </>);

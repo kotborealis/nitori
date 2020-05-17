@@ -521,10 +521,8 @@ components:
           type: string
         timestamp:
           type: number
-        sourceFiles:
-          type: array
-          items:
-            $ref: '#/components/schemas/SourceFile'
+        specFile:
+          $ref: '#/components/schemas/SourceFile'
         exampleTargetFile:
           $ref: '#/components/schemas/SourceFile'
 

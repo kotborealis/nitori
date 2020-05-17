@@ -1,0 +1,19 @@
+.editorsLayout {
+    display: flex;
+    flex-direction: row;
+    flex-basis: 50%;
+    height: 100%;
+}
+
+.editorsLayout > div {
+    height: 100%;
+    width: 100%;
+}
+
+.formControl {
+    width: 100%;
+}
+
+.formControl > div {
+    margin: 10px;
+}

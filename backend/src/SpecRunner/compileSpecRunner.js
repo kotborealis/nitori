@@ -13,20 +13,6 @@ const compileSpecRunner = async (config, spec, example) => {
     const working_dir = config.sandbox.working_dir;
 
     const {
-        exec: exampleCompilerResult,
-        obj: exampleBinaries
-    } = await compiler.compile([{
-        name: "example.cpp",
-        content: example
-    }], {working_dir});
-
-    if(exampleCompilerResult.exitCode){
-        debug(`Failed to compile example`);
-        await sandbox.stop();
-        return {exampleCompilerResult};
-    }
-
-    const {
         exec: specCompilerResult,
         obj: specBinaries
     } = await compiler.compile([{
@@ -36,6 +22,20 @@ const compileSpecRunner = async (config, spec, example) => {
 
     if(specCompilerResult.exitCode){
         debug(`Failed to compile spec`);
+        await sandbox.stop();
+        return {specCompilerResult};
+    }
+
+    const {
+        exec: exampleCompilerResult,
+        obj: exampleBinaries
+    } = await compiler.compile([{
+        name: "example.cpp",
+        content: example
+    }], {working_dir});
+
+    if(exampleCompilerResult.exitCode){
+        debug(`Failed to compile example`);
         await sandbox.stop();
         return {specCompilerResult, exampleCompilerResult};
     }

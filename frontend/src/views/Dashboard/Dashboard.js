@@ -13,6 +13,7 @@ import {TabPanel} from '../../components/TabPanel/TabPanel';
 import {DashboardBar} from '../../components/DashboardBar/DashboardBar';
 import TestSpecView from '../../components/TestSpec/TestSpecView';
 import {TestTargetView} from '../../components/TestTarget/TestTargetView';
+import {TestSpecSubmit} from '../../components/TestSpecSubmit/TestSpecSubmit';
 
 const DashboardBasic = () => {
     const {widgetId, dashboardTab = 'test-specs', itemId} = useParams();
@@ -45,6 +46,7 @@ const DashboardBasic = () => {
             <Tabs value={tab} onChange={handleTabChange}>
                 <Tab label={"Тесты"} value={"test-specs"}/>
                 <Tab label={"Попытки"} value={"test-targets"}/>
+                <Tab label={"Новый тест"} value={"test-spec-submit"}/>
             </Tabs>
         </Paper>
         <Paper square>
@@ -53,6 +55,9 @@ const DashboardBasic = () => {
             </TabPanel>
             <TabPanel value={tab} index={"test-targets"}>
                 <TestTargetsList/>
+            </TabPanel>
+            <TabPanel value={tab} index={"test-spec-submit"}>
+                <TestSpecSubmit widgetId={widgetId}/>
             </TabPanel>
         </Paper>
     </>;

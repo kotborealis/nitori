@@ -1,27 +1,29 @@
 import {FetchCancelManager} from './FetchCancelManager';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
+
+const initialState = {
+    data: null,
+    init: true,
+    loading: true,
+    error: null,
+};
 
 export const useApi = (fetcher, deps = []) => {
-    const fetchCancelManager = new FetchCancelManager();
+    const fetchCancelManager = useRef(new FetchCancelManager());
 
-    const [state, setState] = useState({
-        data: null,
-        init: true,
-        loading: true,
-        error: null,
-    });
+    const [state, setState] = useState(initialState);
 
     const [watchdog, setWatchdog] = useState(0);
 
     const fetch = (...args) => {
-        fetchCancelManager.cancel();
-        const id = fetchCancelManager.pend();
+        fetchCancelManager.current.cancel();
+        const id = fetchCancelManager.current.pend();
 
         setState({...state, init: false, loading: true, error: null});
 
         fetcher(...args)
             .then(data => {
-                if(!fetchCancelManager.cancelled(id))
+                if(!fetchCancelManager.current.cancelled(id))
                     setState({
                         data,
                         error: null,
@@ -39,8 +41,8 @@ export const useApi = (fetcher, deps = []) => {
             )
             .finally(() => {
                 setWatchdog(watchdog + 1);
-                if(!fetchCancelManager.cancelled(id)){
-                    fetchCancelManager.clear(id);
+                if(!fetchCancelManager.current.cancelled(id)){
+                    fetchCancelManager.current.clear(id);
                 }
             });
     };
@@ -49,10 +51,16 @@ export const useApi = (fetcher, deps = []) => {
         useEffect(() => fetch(...args), deps);
     };
 
+    const reset = () => {
+        fetchCancelManager.current.cancel();
+        setState(initialState);
+    }
+
     return {
         ...state,
         fetch,
         useFetch,
-        watchdog
+        watchdog,
+        reset
     };
 };

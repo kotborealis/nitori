@@ -1,8 +1,20 @@
 import React from 'react';
-import {PrismAsyncLight as SyntaxHighlighter} from 'react-syntax-highlighter';
-import {tomorrow} from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import AceEditor from 'react-ace';
 
-export const CodeCpp = ({name, children}) =>
-    <SyntaxHighlighter language="cpp" style={tomorrow} showLineNumbers={true}>
-        {children}
-    </SyntaxHighlighter>;
+import 'ace-builds/src-min-noconflict/mode-c_cpp';
+import 'ace-builds/src-min-noconflict/theme-github';
+
+export const CodeCpp = ({
+                            value = ``,
+                            onValueChange = () => 0,
+                            children = undefined,
+                            editor = false
+                        }) =>
+    <AceEditor
+        readOnly={!editor}
+        mode="c_cpp"
+        theme="github"
+        value={children === undefined ? value : children}
+        onChange={onValueChange}
+        editorProps={{$blockScrolling: true}}
+    />;

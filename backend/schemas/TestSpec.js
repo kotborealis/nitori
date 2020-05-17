@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
 
+const {SourceFileSchema} = require('./SourceFile');
+
 const TestSpecSchema = Schema({
     name: {
         type: String,
@@ -21,16 +23,8 @@ const TestSpecSchema = Schema({
         required: true,
         default: Date.now
     },
-    sourceFiles: [{
-        type: Schema.Types.ObjectID,
-        ref: 'SourceFile',
-        required: true
-    }],
-    exampleTargetFile: {
-        type: Schema.Types.ObjectID,
-        ref: 'SourceFile',
-        required: false
-    },
+    specFile: SourceFileSchema,
+    exampleTargetFile: SourceFileSchema,
     cache: {
         type: String,
         required: true

@@ -7,7 +7,7 @@ import {FileViewer} from '../FileViewer/FileViewer';
 import Typography from '@material-ui/core/Typography';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 
-export const TestSpec = ({_id, name, description, timestamp, sourceFiles}) =>
+export const TestSpec = ({_id, name, description, timestamp, specFile, exampleTargetFile}) =>
     <Card>
         <CardHeader
             title={name}
@@ -18,6 +18,6 @@ export const TestSpec = ({_id, name, description, timestamp, sourceFiles}) =>
             <Typography variant="body1" style={{padding: "20px"}}>
                 {description}
             </Typography>
-            <FileViewer files={sourceFiles}/>
+            <FileViewer files={[specFile, exampleTargetFile]}/>
         </CardContent>
     </Card>;

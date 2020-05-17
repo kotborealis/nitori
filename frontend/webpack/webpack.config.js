@@ -111,6 +111,10 @@ module.exports = (env = {prod: false}) => {
                             }
                         }
                     ]
+                },
+                {
+                    test: /\.cpp$/i,
+                    use: 'raw-loader'
                 }
             ],
         },

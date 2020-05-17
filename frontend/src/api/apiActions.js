@@ -63,15 +63,13 @@ export const apiActions = {
             }
         }),
 
-    testSpecSubmit: ({widgetId, formData, testSpecId = false} = {}) =>
+    testSpecSubmit: ({widgetId, name, description, spec, example, testSpecId = false} = {}) =>
         api(`/widgets/${widgetId}/test-specs/${testSpecId || ""}`, {
-            query: {
-                name: formData.get('name'),
-                description: formData.get('description')
-            },
+            query: {name, description},
             options: {
                 method: testSpecId === false ? 'POST' : 'PUT',
-                body: formData
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({spec, example})
             }
         }),
 
@@ -85,5 +83,14 @@ export const apiActions = {
     testSpecsTotalCount: ({widgetId} = {}) => api(`/widgets/${widgetId}/test-specs/total-count`),
     testTargetsTotalCount: ({widgetId} = {}) => api(`/widgets/${widgetId}/test-targets/total-count`),
 
-    userData: () => fetchJSON(`/auth/user_data.php`)
+    userData: () => fetchJSON(`/auth/user_data.php`),
+
+    specRunner: ({spec, example} = {}) =>
+        api(`/specRunner/`, {
+            options: {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({spec, example})
+            }
+        })
 };

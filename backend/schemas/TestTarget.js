@@ -1,5 +1,8 @@
 const {Schema} = require('mongoose');
 
+const {ExecOutputSchema} = require('./ExecOutput');
+const {SourceFileSchema} = require('./SourceFile');
+
 const TestTargetSchema = Schema({
     name: {
         type: String,
@@ -17,17 +20,10 @@ const TestTargetSchema = Schema({
         ref: 'TestSpec',
         required: true
     },
-    compilerResult:
-    require('./ExecOutput').ExecOutputSchema,
-    linkerResult:
-    require('./ExecOutput').ExecOutputSchema,
-    runnerResult:
-    require('./ExecOutput').ExecOutputSchema,
-    sourceFiles: [{
-        type: Schema.Types.ObjectID,
-        ref: 'SourceFile',
-        required: true
-    }],
+    compilerResult: ExecOutputSchema,
+    linkerResult: ExecOutputSchema,
+    runnerResult: ExecOutputSchema,
+    sourceFiles: [SourceFileSchema],
 });
 
 module.exports.TestTargetSchema = TestTargetSchema;

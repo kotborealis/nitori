@@ -1,6 +1,6 @@
 export const testOutputsToFailedIndex = (testOutputs = []) => {
     const index = testOutputs
-        .map(({exitCode}) => exitCode === 0)
+        .map(result => result ? result.exitCode === 0 : true)
         .indexOf(false);
 
     if(index === -1)

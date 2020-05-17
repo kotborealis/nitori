@@ -21,7 +21,10 @@ export const Error = ({error: {errors = [], message = ""}}) => {
                 Runtime error
             </Typography>
             <Typography component="p">
-                {errors.map(error => <>{JSON.stringify(error)}</>)}
+                {Array.isArray(errors)
+                    ? errors.map(error => <>{JSON.stringify(error)}</>)
+                    : Object.keys(errors).map(key => <>{key}: {JSON.stringify(errors[key])}</>)
+                }
             </Typography>
         </Paper>
     );
