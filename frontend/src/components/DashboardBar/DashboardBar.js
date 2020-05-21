@@ -27,7 +27,7 @@ export const DashboardBar = () => {
         <div className={styles.bar}>
             <Breadcrumbs className={styles.breadcrumbs}>
                 <BLink to='/'>Виджеты</BLink>
-                {widgetId && <BLink to={`/dashboard/${widget.data?._id}`}>{widget.data?.name}</BLink>}
+                {widgetId && <BLink to={`/dashboard/${widget.data?._id}`}>{widget.data?.name || widgetId}</BLink>}
                 {dashboardTab && <BLink to={`/dashboard/${widget.data?._id}/${dashboardTab}`}>
                     {dashboardTabToString(dashboardTab)}
                 </BLink>}
