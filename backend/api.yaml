@@ -157,7 +157,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  compilationResult:
+                  compilerResult:
                     $ref: '#/components/schemas/ExecOutput'
                   testSpec:
                     $ref: '#/components/schemas/TestSpec'
@@ -250,7 +250,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  compilationResult:
+                  compilerResult:
                     $ref: '#/components/schemas/ExecOutput'
                   testSpec:
                     $ref: '#/components/schemas/TestSpec'
