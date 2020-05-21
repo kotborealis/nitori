@@ -1,23 +1,22 @@
 import React from 'react';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardContent from '@material-ui/core/CardContent';
-import Card from '@material-ui/core/Card';
-import ReceiptIcon from '@material-ui/icons/Receipt';
-import {FileViewer} from '../FileViewer/FileViewer';
-import Typography from '@material-ui/core/Typography';
-import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
+import {Loading} from '../InvalidState/Loading';
+import {Error} from '../InvalidState/Error';
+import {apiActions} from '../../api/apiActions';
+import {useApi} from '../../api/useApi';
+import {TestSpecEdit} from './TestSpecEdit';
 
-export const TestSpec = ({_id, name, description, timestamp, specFile, exampleTargetFile}) =>
-    <Card>
-        <CardHeader
-            title={name}
-            avatar={<ReceiptIcon/>}
-            subheader={<>Обновлён <TimeUpdated>{timestamp}</TimeUpdated></>}
-        />
-        <CardContent>
-            <Typography variant="body1" style={{padding: "20px"}}>
-                {description}
-            </Typography>
-            <FileViewer files={[specFile, exampleTargetFile]}/>
-        </CardContent>
-    </Card>;
+export default ({testSpecId = false, widgetId}) => {
+    if(!testSpecId)
+        return <TestSpecEdit widgetId={widgetId}/>;
+
+    const testSpec = useApi(apiActions.testSpec);
+    testSpec.useFetch({widgetId, testSpecId})([testSpecId, widgetId]);
+
+    if(testSpec.loading)
+        return <Loading/>;
+
+    if(testSpec.error)
+        return <Error error={testSpec.error}/>;
+
+    return <TestSpecEdit widgetId={widgetId} {...testSpec.data}/>;
+};

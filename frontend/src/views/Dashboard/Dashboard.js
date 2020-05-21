@@ -11,9 +11,9 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import {TabPanel} from '../../components/TabPanel/TabPanel';
 import {DashboardBar} from '../../components/DashboardBar/DashboardBar';
-import TestSpecView from '../../components/TestSpec/TestSpecView';
 import {TestTargetView} from '../../components/TestTarget/TestTargetView';
-import {TestSpecSubmit} from '../../components/TestSpecSubmit/TestSpecSubmit';
+import {TestSpecEdit} from '../../components/TestSpec/TestSpecEdit';
+import TestSpec from '../../components/TestSpec/TestSpec';
 
 const DashboardBasic = () => {
     const {widgetId, dashboardTab = 'test-specs', itemId} = useParams();
@@ -36,7 +36,7 @@ const DashboardBasic = () => {
         return <NotFound/>;
 
     if(itemId && dashboardTab === 'test-specs')
-        return <TestSpecView widgetId={widgetId} testSpecId={itemId}/>;
+        return <TestSpec widgetId={widgetId} testSpecId={itemId}/>;
 
     if(itemId && dashboardTab === 'test-targets')
         return <TestTargetView widgetId={widgetId} testTargetId={itemId}/>;
@@ -57,7 +57,7 @@ const DashboardBasic = () => {
                 <TestTargetsList/>
             </TabPanel>
             <TabPanel value={tab} index={"test-spec-submit"}>
-                <TestSpecSubmit widgetId={widgetId}/>
+                <TestSpecEdit widgetId={widgetId}/>
             </TabPanel>
         </Paper>
     </>;

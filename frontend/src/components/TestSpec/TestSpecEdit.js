@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import styles from './testSpecSubmit.css';
+import styles from './testSpecEdit.css';
 import {CodeCpp} from '../CodeCpp/CodeCpp';
 import specSample from './specSample.cpp';
 import exampleSample from './exampleSample.cpp';
@@ -13,11 +13,20 @@ import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
 
-export const TestSpecSubmit = ({widgetId, testSpecId = null}) => {
-    const [name, setName] = useState(``);
-    const [description, setDescription] = useState(``);
-    const [spec, setSpec] = useState(specSample);
-    const [example, setExample] = useState(exampleSample);
+export const TestSpecEdit = (
+    {
+        widgetId,
+        _id = false,
+        name = '',
+        description = '',
+        specFile: {content: specFileContent} = {content: null},
+        exampleTargetFile: {content: exampleFileContent} = {content: null}
+    }
+) => {
+    const [specName, setName] = useState(name);
+    const [specDescription, setDescription] = useState(description);
+    const [spec, setSpec] = useState(specFileContent || specSample);
+    const [example, setExample] = useState(exampleFileContent || exampleSample);
 
     const specRunner = useApi(apiActions.specRunner);
     const testSpecSubmit = useApi(apiActions.testSpecSubmit);
@@ -31,8 +40,9 @@ export const TestSpecSubmit = ({widgetId, testSpecId = null}) => {
         specRunner.reset();
         testSpecSubmit.fetch({
             widgetId,
-            name,
-            description,
+            testSpecId: _id,
+            name: specName,
+            description: specDescription,
             spec,
             example
         });
@@ -54,7 +64,7 @@ export const TestSpecSubmit = ({widgetId, testSpecId = null}) => {
     else if(testSpecSubmit.loading) specSubmitResult = <Loading/>;
     else if(testSpecSubmit.error) specSubmitResult = <Error error={testSpecSubmit.error}/>;
     else if(testSpecSubmit.data) specSubmitResult = <BuildResultTestSpec results={[
-        testSpecSubmit.data.compilationResult
+        testSpecSubmit.data.compilerResult
     ]}/>;
 
     return (
@@ -65,7 +75,7 @@ export const TestSpecSubmit = ({widgetId, testSpecId = null}) => {
                         label="Название теста"
                         variant="outlined"
                         fullWidth
-                        value={name}
+                        value={specName}
                         onChange={({target: {value}}) => setName(value)}
                     />
                     <TextField
@@ -75,7 +85,7 @@ export const TestSpecSubmit = ({widgetId, testSpecId = null}) => {
                         fullWidth
                         rows={4}
                         rowsMax={4}
-                        value={description}
+                        value={specDescription}
                         onChange={({target: {value}}) => setDescription(value)}
                     />
                 </FormControl>
