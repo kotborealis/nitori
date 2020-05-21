@@ -1,5 +1,5 @@
 import AppBar from '@material-ui/core/AppBar';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useApi} from '../../api/useApi';
 import {apiActions} from '../../api/apiActions';
 import {Link, useParams} from 'react-router-dom';
@@ -12,6 +12,17 @@ export const DashboardBar = () => {
     const widget = useApi(apiActions.widget);
     widget.useFetch({widgetId})([widgetId]);
 
+    const testSpec = useApi(apiActions.testSpec);
+
+    useEffect(() => {
+        if(dashboardTab === 'test-specs')
+            testSpec.fetch({widgetId, testSpecId: itemId});
+    }, [itemId, dashboardTab]);
+
+    let itemName = itemId;
+    if(dashboardTab === 'test-specs' && testSpec.data)
+        itemName = testSpec.data.name;
+
     return (<AppBar position="static">
         <div className={styles.bar}>
             <Breadcrumbs className={styles.breadcrumbs}>
@@ -20,7 +31,7 @@ export const DashboardBar = () => {
                 {dashboardTab && <BLink to={`/dashboard/${widget.data?._id}/${dashboardTab}`}>
                     {dashboardTabToString(dashboardTab)}
                 </BLink>}
-                {itemId && <BLink to={`/dashboard/${widget.data?._id}/${dashboardTab}/${itemId}`}>{itemId}</BLink>}
+                {itemId && <BLink to={`/dashboard/${widget.data?._id}/${dashboardTab}/${itemId}`}>{itemName}</BLink>}
             </Breadcrumbs>
         </div>
     </AppBar>);
