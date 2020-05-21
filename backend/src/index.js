@@ -1,5 +1,5 @@
 const debug = require('debug')('nitori');
-const config = require('chen.js').config('.config.js').resolve();
+const config = require('chen.js').config('.config.js');
 
 const {init: databaseInit} = require('./database/');
 const {precompileTestSpecs} = require('./TestSpec/compileTestSpec');
