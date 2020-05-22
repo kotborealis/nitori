@@ -69,15 +69,18 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tes
                                 disabled={disabled}
                             >
                                 {!formState.files && "Исходный код"}
-                                {formState.files && `Файлы: ${formState.files.length}`}
+                                {formState.files && `Прикреплены файлы: ${formState.files.length}`}
                                 <input
+                                    directory=""
+                                    webkitdirectory=""
                                     type="file"
                                     name={"sources"}
                                     multiple={true}
                                     style={{display: "none"}}
-                                    onChange={({target: {files}}) =>
-                                        setFormState(state => ({...state, files}))
-                                    }
+                                    onChange={({target: {files}}) => {
+                                        setFormState(state => ({...state, files}));
+                                        console.log(files);
+                                    }}
                                 />
                             </Button>
                         </FormControl>

@@ -99,7 +99,7 @@ class Sandbox {
     async exec(cmd = [], {root = false, tty = true, working_dir = '', timeout = 0} = {}) {
         const {container} = this;
 
-        debug("Exec:", cmd);
+        debug(`Exec in ${working_dir}:`, cmd.join(' '));
 
         const exec = await container.exec.create({
             WorkingDir: working_dir ? working_dir : undefined,

@@ -56,19 +56,12 @@ module.exports = (config) => {
 
                 const sourceFiles = req.body;
 
-                const testTargetRes = await compileTestTarget(config, cache, sourceFiles);
-
                 const testTarget = new TestTargetModel({
                     widget: widgetId,
                     userData,
                     testSpec: testSpecId,
                     sourceFiles,
-                    ...{
-                        compilerResult: {exitCode: undefined, stdout: ""},
-                        linkerResult: {exitCode: undefined, stdout: ""},
-                        runnerResult: {exitCode: undefined, stdout: ""},
-                        ...testTargetRes
-                    }
+                    ...await compileTestTarget(config, cache, sourceFiles)
                 });
 
                 await testTarget.save();

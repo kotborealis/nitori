@@ -9,6 +9,7 @@ import {useApi} from '../api/useApi';
 import {apiActions} from '../api/apiActions';
 import {AuthBanner} from '../components/AuthBanner/AuthBanner';
 import Container from '@material-ui/core/Container';
+import {Submit} from '../views/Submit/Submit';
 
 const RouterRoot = ({children}) => {
     // Fetch user data
@@ -23,6 +24,7 @@ const RouterRoot = ({children}) => {
                     <Switch>
                         <Route exact path="/"><WidgetSearch/></Route>
                         <Route path="/dashboard/:widgetId/:dashboardTab?/:itemId?"><Dashboard/></Route>
+                        <Route path="/submit/:widgetId"><Submit/></Route>
                         <Route path="/404"><NotFound/></Route>
                         <Redirect to="/404"/>
                     </Switch>

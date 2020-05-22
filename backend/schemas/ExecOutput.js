@@ -4,15 +4,18 @@ const {Schema} = mongoose;
 const ExecOutputSchema = Schema({
     exitCode: {
         type: Number,
-        required: true
+        required: false,
+        default: 0
     },
     stderr: {
         type: String,
-        required: true
+        required: false,
+        default: ''
     },
     stdout: {
         type: String,
-        required: true
+        required: false,
+        default: ''
     },
 });
 

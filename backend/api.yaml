@@ -568,8 +568,6 @@ components:
           $ref: '#/components/schemas/UserData'
         testSpecId:
           type: string
-        testSpec:
-          $ref: '#/components/schemas/TestSpec'
         compilerResult:
           $ref: '#/components/schemas/ExecOutput'
         linkerResult:

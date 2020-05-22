@@ -24,7 +24,8 @@ class Compiler {
      * @param working_dir
      * @param std Which standart to use
      * @param I Include path
-     * @returns {Promise<void>}
+     * @param include
+     * @returns {Promise<{obj: *, exec: *}>}
      */
     async compile(source_files, {
         working_dir = "/sandbox/",
@@ -44,9 +45,21 @@ class Compiler {
         debug("creating tarball");
 
         const tarball = tar.pack();
-        source_files.forEach(({name, content}) => {
-            tarball.entry({name: `${working_dir}/${name}`}, content);
-        });
+        source_files
+            .map(({name}) => name)
+            .map(name => require('path').dirname(name))
+            .filter((e, i, s) => s.indexOf(e) === i)
+            .forEach(dir => tarball.entry({
+                name: `${working_dir}/${dir}`,
+                type: 'directory',
+                mode: 0o777
+            }));
+        source_files
+            .forEach(({name, content}) => tarball.entry({
+                name: `${working_dir}/${name}`,
+                type: 'file',
+                mode: 0o644
+            }, content));
         tarball.finalize();
 
         debug("created tarball");

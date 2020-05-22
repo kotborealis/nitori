@@ -4,17 +4,12 @@ const {ExecOutputSchema} = require('./ExecOutput');
 const {SourceFileSchema} = require('./SourceFile');
 
 const TestTargetSchema = Schema({
-    name: {
-        type: String,
-        required: true
-    },
     timestamp: {
         type: Number,
         required: true,
         default: Date.now
     },
-    userData:
-    require('./UserData').UserDataSchema,
+    userData: require('./UserData').UserDataSchema,
     testSpec: {
         type: Schema.Types.ObjectID,
         ref: 'TestSpec',

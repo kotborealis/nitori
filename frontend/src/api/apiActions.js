@@ -52,14 +52,13 @@ export const apiActions = {
 
     testTarget: ({widgetId, testTargetId} = {}) => api(`/widgets/${widgetId}/test-targets/${testTargetId}`),
 
-    testTargetSubmit: ({widgetId, formData} = {}) =>
+    testTargetSubmit: ({widgetId, testSpecId, files} = {}) =>
         api(`/widgets/${widgetId}/test-targets/`, {
-            query: {
-                testSpecId: formData.get('testSpecId')
-            },
+            query: {testSpecId},
             options: {
                 method: 'POST',
-                body: formData
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(files)
             }
         }),
 
