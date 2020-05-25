@@ -9,6 +9,8 @@ module.exports = (config) => {
 
     router.route('/')
         .get(async (req, res) => {
+            req.auth([({isAdmin}) => isAdmin === true]);
+
             const {
                 limit,
                 skip,
@@ -79,6 +81,7 @@ module.exports = (config) => {
         .get(
             async function(req, res) {
                 req.auth([({isAdmin}) => isAdmin === true]);
+
                 const {testSpecId} = req.params;
                 const testSpec = await TestSpecModel.findById(testSpecId);
 
