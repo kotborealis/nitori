@@ -26,18 +26,26 @@ module.exports = (config) => {
 
             const {widgetId} = req;
 
+            const query = {
+                _id: testSpecId,
+                widget: widgetId,
+                userData: {
+                    userId: userDataId,
+                    login: userDataLogin,
+                    name: userDataName,
+                    groupId: userDataGroupId,
+                    userDataGroupName: userDataGroupName
+                }
+            };
+
+            Object.keys(query).forEach(key => query[key] === undefined && delete query[key]);
+            Object.keys(query.userData).forEach(key => query.userData[key] === undefined && delete query.userData[key]);
+            if(Object.keys(query.userData).length === 0) delete query.userData;
+
+            debug("query", query, limit, skip);
+
             const testTargets = await TestTargetModel
-                .find({
-                    _id: testSpecId,
-                    widget: widgetId,
-                    userData: {
-                        userId: userDataId,
-                        login: userDataLogin,
-                        name: userDataName,
-                        groupId: userDataGroupId,
-                        userDataGroupName: userDataGroupName
-                    }
-                }, null, {limit, skip, lean: true})
+                .find(query, null, {limit, skip, lean: true})
                 .sort({
                     [sortBy]: orderBy
                 });
@@ -77,7 +85,7 @@ module.exports = (config) => {
     router.route('/:testTargetId')
         .get(async (req, res) => {
             const {testTargetId} = req.params;
-            const testTarget = await TestSpecModel.findById(testTargetId);
+            const testTarget = await TestTargetModel.findById(testTargetId);
 
             if(!testTarget){
                 const err = new Error("Not found");
