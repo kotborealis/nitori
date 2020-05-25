@@ -47,8 +47,9 @@ export const TestTarget =
                 <Grid item xs={12}>
                     <Paper>
                         <Typography variant="body1" style={{padding: '20px'}}>
+                            Решение
                             {testSpec.data && <>
-                                Решение для теста <Link to={
+                                для задания <Link to={
                                 `/dashboard/${testSpec.widgetId}/test-specs/${testSpec._id}`
                             }>{testSpec.name}</Link>,
                             </>} {userData.name} ({userData.login}), {userData.groupName},

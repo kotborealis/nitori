@@ -72,14 +72,14 @@ export const TestSpecEdit = (
             <div className={``}>
                 <FormControl className={styles.formControl}>
                     <TextField
-                        label="Название теста"
+                        label="Название задания"
                         variant="outlined"
                         fullWidth
                         value={specName}
                         onChange={({target: {value}}) => setName(value)}
                     />
                     <TextField
-                        label="Описание теста"
+                        label="Описание задания"
                         variant="outlined"
                         multiline={true}
                         fullWidth

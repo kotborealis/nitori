@@ -44,9 +44,9 @@ const DashboardBasic = () => {
     return <>
         <Paper square>
             <Tabs value={tab} onChange={handleTabChange}>
-                <Tab label={"Тесты"} value={"test-specs"}/>
-                <Tab label={"Попытки"} value={"test-targets"}/>
-                <Tab label={"Новый тест"} value={"test-spec-submit"}/>
+                <Tab label={"Задания"} value={"test-specs"}/>
+                <Tab label={"Решения"} value={"test-targets"}/>
+                <Tab label={"Добавить задание"} value={"test-spec-submit"}/>
             </Tabs>
         </Paper>
         <Paper square>

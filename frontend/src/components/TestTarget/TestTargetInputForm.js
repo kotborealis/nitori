@@ -68,14 +68,17 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tes
                                 startIcon={<CloudUploadIcon/>}
                                 disabled={disabled}
                             >
-                                {!formState.files && "Исходный код"}
-                                {formState.files && `Прикреплены файлы: ${formState.files.length}`}
+                                {!formState.files && "Директория с исходным кодом"}
+                                {formState.files && `Прикреплены файлы (${formState.files.length})`}
                                 <input
+                                    /** allow selection of whole directory **/
                                     directory=""
                                     webkitdirectory=""
+                                    mozdirectory=""
+                                    /** fallback to multiple files **/
+                                    multiple={true}
                                     type="file"
                                     name={"sources"}
-                                    multiple={true}
                                     style={{display: "none"}}
                                     onChange={({target: {files}}) => {
                                         setFormState(state => ({...state, files}));

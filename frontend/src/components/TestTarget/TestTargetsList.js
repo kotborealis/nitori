@@ -17,7 +17,7 @@ export const TestTargetsList = () => {
 
     return (
         <MaterialTable
-            title={"Попытки"}
+            title={"Решения"}
             tableRef={tableRef}
             options={{
                 showTitle: true,

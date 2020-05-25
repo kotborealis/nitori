@@ -3,20 +3,17 @@ import {useHistory, useParams} from 'react-router-dom';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 import MaterialTable from 'material-table';
 import {apiActions} from '../../api/apiActions';
-import {useApi} from '../../api/useApi';
 
 export const TestSpecsList = () => {
     const history = useHistory();
     const {widgetId} = useParams();
     const tableRef = useRef(null);
 
-    const testSpecDelete = useApi(apiActions.testSpecDelete);
-
     useEffect(() => tableRef.current && tableRef.current.onQueryChange(), [widgetId]);
 
     return (
         <MaterialTable
-            title={"Тесты"}
+            title={"Задания"}
             tableRef={tableRef}
             options={{
                 showTitle: true,

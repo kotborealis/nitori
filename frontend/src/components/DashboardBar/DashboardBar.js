@@ -40,6 +40,6 @@ export const DashboardBar = () => {
 const BLink = (props) => <Link {...props} className={styles.link}>{props.children}</Link>;
 
 const dashboardTabToString = tab => {
-    if(tab === 'test-specs') return 'Тесты';
-    if(tab === 'test-targets') return 'Попытки';
+    if(tab === 'test-specs') return 'Задания';
+    if(tab === 'test-targets') return 'Решения ';
 };
