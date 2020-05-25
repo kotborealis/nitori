@@ -11,6 +11,8 @@ import {Link} from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 import {TabPanel} from '../TabPanel/TabPanel';
+import {apiActions} from '../../api/apiActions';
+import {useApi} from '../../api/useApi';
 
 export const TestTarget =
     ({
@@ -21,13 +23,17 @@ export const TestTarget =
              timestamp = 0,
              userData = {},
              sourceFiles = [],
-             testSpec = {}
+             testSpec: testSpecId = null,
+             widget: widgetId = null
          } = {}
      } = {}) => {
         const execOutputs = [compilerResult, linkerResult, runnerResult];
 
         const suggestedResultTab = testOutputsToFailedIndex(execOutputs);
         const [resultTab, setResultTab] = useState(suggestedResultTab);
+
+        const testSpec = useApi(apiActions.testSpec);
+        testSpec.useFetch({testSpecId})([testSpecId, widgetId]);
 
         useEffect(() => {
             if(resultTab !== suggestedResultTab)
@@ -41,9 +47,11 @@ export const TestTarget =
                 <Grid item xs={12}>
                     <Paper>
                         <Typography variant="body1" style={{padding: '20px'}}>
-                            Решение для теста <Link to={
-                            `/dashboard/${testSpec.widgetId}/test-specs/${testSpec._id}`
-                        }>{testSpec.name}</Link>, {userData.name} ({userData.login}), {userData.groupName},
+                            {testSpec.data && <>
+                                Решение для теста <Link to={
+                                `/dashboard/${testSpec.widgetId}/test-specs/${testSpec._id}`
+                            }>{testSpec.name}</Link>,
+                            </>} {userData.name} ({userData.login}), {userData.groupName},
                             отправлено <TimeUpdated>{timestamp}</TimeUpdated>
                         </Typography>
 
