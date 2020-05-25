@@ -11,6 +11,7 @@ export const CodeCpp = ({
                             editor = false
                         }) =>
     <AceEditor
+        style={{width: 'inherit'}}
         readOnly={!editor}
         mode="c_cpp"
         theme="github"
