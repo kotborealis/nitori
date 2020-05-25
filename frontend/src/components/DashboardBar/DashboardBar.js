@@ -15,7 +15,7 @@ export const DashboardBar = () => {
     const testSpec = useApi(apiActions.testSpec);
 
     useEffect(() => {
-        if(dashboardTab === 'test-specs')
+        if(dashboardTab === 'test-specs' && itemId)
             testSpec.fetch({widgetId, testSpecId: itemId});
     }, [itemId, dashboardTab]);
 
