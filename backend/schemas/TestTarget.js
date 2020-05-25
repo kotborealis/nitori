@@ -15,6 +15,11 @@ const TestTargetSchema = Schema({
         ref: 'TestSpec',
         required: true
     },
+    widget: {
+        type: Schema.Types.ObjectID,
+        ref: 'Widget',
+        required: true
+    },
     compilerResult: ExecOutputSchema,
     linkerResult: ExecOutputSchema,
     runnerResult: ExecOutputSchema,
