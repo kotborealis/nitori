@@ -51,7 +51,7 @@ export const Submit = ({}) => {
     else if(testTargetSubmit.error)
         result = <Error error={testTargetSubmit.error}/>;
     else if(!testTargetSubmit.init)
-        result = <TestTarget output={testTargetSubmit.data} testSpec={testSpec.data}/>;
+        result = <TestTarget output={testTargetSubmit.data}/>;
 
     return (<Container max="lg">
         {testSpecs.loading && <Loading/>}
