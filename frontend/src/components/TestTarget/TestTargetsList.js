@@ -48,13 +48,13 @@ export const TestTargetsList = () => {
                 {
                     title: 'Проверки',
                     render: ({compilerResult, linkerResult, runnerResult}) => {
-                        const CompilerIcon = exitCodeToIcon(compilerResult.exitCode);
-                        const LinkerIcon = exitCodeToIcon(linkerResult.exitCode);
-                        const RunnerIcon = exitCodeToIcon(runnerResult.exitCode);
+                        const CompilerIcon = exitCodeToIcon(compilerResult?.exitCode);
+                        const LinkerIcon = exitCodeToIcon(linkerResult?.exitCode);
+                        const RunnerIcon = exitCodeToIcon(runnerResult?.exitCode);
 
-                        const compilerColor = exitCodeToColor(compilerResult.exitCode);
-                        const linkerColor = exitCodeToColor(linkerResult.exitCode);
-                        const runnerColor = exitCodeToColor(runnerResult.exitCode);
+                        const compilerColor = exitCodeToColor(compilerResult?.exitCode);
+                        const linkerColor = exitCodeToColor(linkerResult?.exitCode);
+                        const runnerColor = exitCodeToColor(runnerResult?.exitCode);
 
                         return (
                             <>
