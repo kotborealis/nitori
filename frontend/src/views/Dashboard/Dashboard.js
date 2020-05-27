@@ -14,6 +14,8 @@ import {DashboardBar} from '../../components/DashboardBar/DashboardBar';
 import {TestTargetView} from '../../components/TestTarget/TestTargetView';
 import {TestSpecEdit} from '../../components/TestSpec/TestSpecEdit';
 import TestSpec from '../../components/TestSpec/TestSpec';
+import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
 
 const DashboardBasic = () => {
     const {widgetId, dashboardTab = 'test-specs', itemId} = useParams();
@@ -42,6 +44,11 @@ const DashboardBasic = () => {
         return <TestTargetView widgetId={widgetId} testTargetId={itemId}/>;
 
     return <>
+        <Paper elevation={3} style={{padding: 10}}>
+            <Typography>
+                <Link href={`/submit/${widgetId}`}>Отправка решений</Link>
+            </Typography>
+        </Paper>
         <Paper square>
             <Tabs value={tab} onChange={handleTabChange}>
                 <Tab label={"Задания"} value={"test-specs"}/>
