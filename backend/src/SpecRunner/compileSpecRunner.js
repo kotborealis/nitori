@@ -56,7 +56,7 @@ const compileSpecRunner = async (config, spec, example) => {
         timeout: config.timeout.run
     });
 
-    await sandbox.stop();
+    sandbox.stop().catch((...args) => debug(...args));
 
     return {specCompilerResult, exampleCompilerResult, linkerResult, runnerResult};
 };
