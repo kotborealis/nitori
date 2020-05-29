@@ -55,8 +55,11 @@ const precompileTestSpecs = async (config) => {
 
     const testSpecs = await TestSpecModel.find({removed: false});
 
-    for await (const testSpec of testSpecs)
-        await compileTestSpec(config, [testSpec.specFile]);
+    for await (const testSpec of testSpecs){
+        const {cache} = await compileTestSpec(config, [testSpec.specFile]);
+        testSpec.cache = cache;
+        await testSpec.save();
+    }
 
     debug("Precompiled all TestSpecs");
 };
