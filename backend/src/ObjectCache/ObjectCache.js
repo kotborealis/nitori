@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const md5 = require('md5');
 
 class ObjectCache {
     dir;
@@ -39,6 +40,11 @@ class ObjectCache {
                 )
             )
         );
+    }
+
+    generateKey(files = {}, imageId = "unknown") {
+        const contentHash = md5(files.map(({name, content}) => name + content.toString()).join("\n"));
+        return `${contentHash}-via-${imageId}`;
     }
 }
 
