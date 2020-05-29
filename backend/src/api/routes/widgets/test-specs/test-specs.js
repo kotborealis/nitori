@@ -14,7 +14,7 @@ module.exports = (config) => {
             const {
                 limit,
                 skip,
-                name,
+                name = ".*",
                 sortBy,
                 orderBy
             } = req.query;
@@ -23,7 +23,7 @@ module.exports = (config) => {
 
             const testSpecs = await TestSpecModel
                 .find({
-                    ...(name ? {name} : {}),
+                    name,
                     removed: false,
                     widget: widgetId,
                 }, null, {limit, skip, lean: true})
