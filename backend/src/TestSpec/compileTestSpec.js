@@ -1,6 +1,4 @@
 const debug = require('debug')('nitori:testSpecCompile');
-const md5 = require('md5');
-const Database = require('../database');
 const {TestSpecModel} = require('../database');
 const {ObjectCache} = require('../ObjectCache');
 const {Compiler, Ar} = require('../SandboxedGnuUtils');
@@ -12,7 +10,9 @@ const compileTestSpec = async (config, files) => {
     const docker = new Docker(config.docker);
     const sandbox = new Sandbox(docker, config);
 
-    const cache = md5(files.map(({name, content}) => name + content.toString()).join("\n"));
+    await sandbox.start();
+
+    const cache = objectCache.generateKey(files, sandbox.imageID);
     debug("cache key", cache);
 
     if(objectCache.has(cache)){
@@ -24,7 +24,6 @@ const compileTestSpec = async (config, files) => {
     }
 
     // compile code
-    await sandbox.start();
     const compiler = new Compiler(sandbox, config.timeout.compilation);
     const working_dir = config.sandbox.working_dir;
     const {exec: compilerResult, obj: targetBinaries} = await compiler.compile(files, {
