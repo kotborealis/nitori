@@ -14,12 +14,12 @@ module.exports = (config) => {
             const {
                 limit,
                 skip,
-                testSpecId,
-                userDataId,
-                userDataLogin,
-                userDataName,
-                userDataGroupId,
-                userDataGroupName,
+                testSpecId = "",
+                userDataId = "",
+                userDataLogin = ".*",
+                userDataName = ".*",
+                userDataGroupId = "",
+                userDataGroupName = ".*",
                 sortBy,
                 orderBy
             } = req.query;
@@ -27,20 +27,11 @@ module.exports = (config) => {
             const {widgetId} = req;
 
             const query = {
-                _id: testSpecId,
                 widget: widgetId,
-                userData: {
-                    userId: userDataId,
-                    login: userDataLogin,
-                    name: userDataName,
-                    groupId: userDataGroupId,
-                    userDataGroupName: userDataGroupName
-                }
+                'userData.login': {$regex: userDataLogin, $options: 'i'},
+                'userData.name': {$regex: userDataName, $options: 'i'},
+                'userData.groupName': {$regex: userDataGroupName, $options: 'i'}
             };
-
-            Object.keys(query).forEach(key => query[key] === undefined && delete query[key]);
-            Object.keys(query.userData).forEach(key => query.userData[key] === undefined && delete query.userData[key]);
-            if(Object.keys(query.userData).length === 0) delete query.userData;
 
             debug("query", query, limit, skip);
 

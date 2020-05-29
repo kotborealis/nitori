@@ -9,6 +9,6 @@ process.on('unhandledRejection', (reason) => debug('unhandledRejection', reason)
 
 (async () => {
     databaseInit(config);
-    await precompileTestSpecs(config);
+    //await precompileTestSpecs(config);
     API(config);
 })();
