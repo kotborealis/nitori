@@ -11,10 +11,30 @@ const instanceId = shortid.generate();
  * Docker Sandbox class
  */
 class Sandbox {
+    /**
+     * Docker instance
+     */
     docker;
+
+    /**
+     * Sandbox configuration
+     */
     config;
+
+    /**
+     * Sandbox container
+     */
     container;
+
+    /**
+     * Sandbox ID
+     */
     id;
+
+    /**
+     * Sandbox image ID
+     */
+    imageID;
 
     _running = false;
 
