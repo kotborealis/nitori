@@ -192,6 +192,10 @@ class Sandbox {
                 "nitori.parent": instanceId
             }
         });
+
+        const {data: {Image: imageID}} = await this.container.status();
+        this.imageID = imageID.split(':')[1];
+
         await this.container.start();
 
         this._running = true;
