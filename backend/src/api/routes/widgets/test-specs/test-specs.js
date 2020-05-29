@@ -21,7 +21,7 @@ module.exports = (config) => {
 
             const testSpecs = await TestSpecModel
                 .find({
-                    name,
+                    name: {$regex: name, $options: 'i'},
                     removed: false,
                     widget: widgetId,
                 }, null, {limit, skip, lean: true})
