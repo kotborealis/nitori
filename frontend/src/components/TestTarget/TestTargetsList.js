@@ -7,6 +7,7 @@ import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 import MaterialTable from 'material-table';
 import {useHistory, useParams} from 'react-router-dom';
 import {apiActions} from '../../api/apiActions';
+import {useApi} from '../../api/useApi';
 
 export const TestTargetsList = () => {
     const history = useHistory();
@@ -31,7 +32,7 @@ export const TestTargetsList = () => {
             columns={[
                 {
                     title: 'Тест',
-                    render: ({testSpec: {name}}) => name,
+                    render: ({testSpec}) => <TestSpecName testSpecId={testSpec} widgetId={widgetId}/>,
                     sorting: false,
                 },
                 {
@@ -104,4 +105,13 @@ export const TestTargetsList = () => {
                 };
             }}/>
     );
+};
+
+const TestSpecName = ({testSpecId, widgetId}) => {
+    const testSpec = useApi(apiActions.testSpec);
+    testSpec.useFetch({testSpecId, widgetId})({testSpecId, widgetId});
+
+    if(testSpec.data)
+        return testSpec.data.name;
+    return '...';
 };
