@@ -9,8 +9,6 @@ module.exports = (config) => {
 
     router.route('/')
         .get(async (req, res) => {
-            req.auth([({isAdmin}) => isAdmin === true]);
-
             const {
                 limit,
                 skip,
@@ -30,6 +28,9 @@ module.exports = (config) => {
                 .sort({
                     [sortBy]: orderBy
                 });
+
+            delete testSpecs.specFile;
+            delete testSpecs.exampleTargetFile;
 
             res.mongo(testSpecs);
         })
