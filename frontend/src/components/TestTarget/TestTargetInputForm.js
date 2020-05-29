@@ -35,6 +35,10 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tes
             task: event.target.value
         }));
 
+    const selectedTask = formState.task
+        ? testSpecs.find(({_id}) => _id === formState.task)
+        : null;
+
     return (
         <Paper className={classes.root}>
             <form onSubmit={onSubmit}>
@@ -58,6 +62,16 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tes
                             </Select>
                         </FormControl>
                     </Grid>
+                    {selectedTask &&
+                     <Grid item xs={12}>
+                         <Typography variant="h5">
+                             {selectedTask.name}
+                         </Typography>
+                         <Typography variant="p">
+                             {selectedTask.description}
+                         </Typography>
+                     </Grid>
+                    }
                     <Grid item xs={12}>
                         <Typography>Выберите исходный код для проверки:</Typography>
                         <FormControl className={classes.formControl}>
