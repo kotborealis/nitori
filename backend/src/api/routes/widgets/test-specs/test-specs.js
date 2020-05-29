@@ -29,10 +29,11 @@ module.exports = (config) => {
                     [sortBy]: orderBy
                 });
 
-            delete testSpecs.specFile;
-            delete testSpecs.exampleTargetFile;
-
-            res.mongo(testSpecs);
+            res.mongo(testSpecs.map(testSpec => {
+                delete testSpec.specFile;
+                delete testSpec.exampleTargetFile;
+                return testSpec;
+            }));
         })
         .post(async (req, res) => {
                 req.auth([({isAdmin}) => isAdmin === true]);
