@@ -11,7 +11,15 @@
 #include <cstdio>
 
 extern "C" {
-    int __NITORI_HIJACK_MAIN__(int argc, char** argv);
+    int __NITORI_HIJACK_MAIN__(int argc, char** argv) __attribute__((weak));
+
+    int __NITORI_HIJACK_MAIN__(int argc, char** argv) {
+        printf("Function `int main(int, char**)` was not found in target,\n");
+        printf("using *this* stub for linking.\n\n");
+
+        printf("exitCode=0xBADF00D\n");
+        return 0xBADF00D;
+    }
 }
 
 #include "util.hpp"
