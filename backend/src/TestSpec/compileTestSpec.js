@@ -47,7 +47,7 @@ const compileTestSpec = async (config, files) => {
     objectCache.put(cache, testObjStream);
     debug(`Compiled test with cache key ${cache}`);
 
-    await sandbox.stop();
+    sandbox.stop().catch((...args) => debug(...args));
     return {compilerResult, cache};
 };
 

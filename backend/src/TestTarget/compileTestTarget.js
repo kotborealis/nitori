@@ -44,7 +44,7 @@ module.exports = async (config, cache, files) => {
         timeout: config.timeout.run
     });
 
-    await sandbox.stop();
+    sandbox.stop().catch((...args) => debug(...args));
 
     return {compilerResult, linkerResult, runnerResult};
 };
