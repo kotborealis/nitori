@@ -20,7 +20,8 @@ const TestTargetSchema = Schema({
         ref: 'Widget',
         required: true
     },
-    compilerResult: ExecOutputSchema,
+    targetCompilerResult: ExecOutputSchema,
+    specCompilerResult: ExecOutputSchema,
     linkerResult: ExecOutputSchema,
     runnerResult: ExecOutputSchema,
     sourceFiles: [SourceFileSchema],

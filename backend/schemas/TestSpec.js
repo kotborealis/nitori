@@ -25,10 +25,6 @@ const TestSpecSchema = Schema({
     },
     specFile: SourceFileSchema,
     exampleTargetFile: SourceFileSchema,
-    cache: {
-        type: String,
-        required: true
-    },
     removed: {
         type: Boolean,
         required: true,

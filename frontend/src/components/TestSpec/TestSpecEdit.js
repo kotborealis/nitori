@@ -3,7 +3,7 @@ import styles from './testSpecEdit.css';
 import {CodeCpp} from '../CodeCpp/CodeCpp';
 import specSample from './specSample.cpp';
 import exampleSample from './exampleSample.cpp';
-import {BuildResultSpecRunner, BuildResultTestSpec} from '../BuildResult/BuildResult';
+import {BuildResultSpecRunner} from '../BuildResult/BuildResult';
 import Button from '@material-ui/core/Button';
 import {useApi} from '../../api/useApi';
 import {apiActions} from '../../api/apiActions';
@@ -12,6 +12,7 @@ import {Error} from '../InvalidState/Error';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
 
 export const TestSpecEdit = (
     {
@@ -63,9 +64,10 @@ export const TestSpecEdit = (
     if(testSpecSubmit.init) specSubmitResult = null;
     else if(testSpecSubmit.loading) specSubmitResult = <Loading/>;
     else if(testSpecSubmit.error) specSubmitResult = <Error error={testSpecSubmit.error}/>;
-    else if(testSpecSubmit.data) specSubmitResult = <BuildResultTestSpec results={[
-        testSpecSubmit.data.compilerResult
-    ]}/>;
+    else if(testSpecSubmit.data) specSubmitResult =
+        <Link to={`/dashboard/${widgetId}/${testSpecSubmit.data._id}`}>
+            Сохранено
+        </Link>;
 
     return (
         <>

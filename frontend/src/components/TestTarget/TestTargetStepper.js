@@ -6,13 +6,14 @@ import {testOutputsToFailedIndex} from '../../helpers/testOutputsToFailedIndex';
 
 export const TestTargetStepper =
     ({
-         compilerResult,
+         targetCompilerResult,
+         specCompilerResult,
          linkerResult,
          runnerResult
      }) => {
 
         const index = testOutputsToFailedIndex([
-            compilerResult, linkerResult, runnerResult
+            targetCompilerResult, targetCompilerResult, linkerResult, runnerResult
         ]);
 
         return (
@@ -21,19 +22,26 @@ export const TestTargetStepper =
             >
                 <Step key={0}>
                     <StepLabel
-                        error={compilerResult.exitCode !== 0 && 0 <= index}
+                        error={targetCompilerResult.exitCode !== 0 && 0 <= index}
                     >
                         Компиляция
                     </StepLabel>
                 </Step>
                 <Step key={1}>
                     <StepLabel
+                        error={specCompilerResult.exitCode !== 0 && 0 <= index}
+                    >
+                        Компиляция теста
+                    </StepLabel>
+                </Step>
+                <Step key={2}>
+                    <StepLabel
                         error={linkerResult.exitCode !== 0 && 1 <= index}
                     >
                         Линковка
                     </StepLabel>
                 </Step>
-                <Step key={2}>
+                <Step key={3}>
                     <StepLabel
                         error={runnerResult.exitCode !== 0 && 2 <= index}
                     >

@@ -17,7 +17,8 @@ import {useApi} from '../../api/useApi';
 export const TestTarget =
     ({
          output: {
-             compilerResult = {},
+             targetCompilerResult = {},
+             specCompilerResult = {},
              linkerResult = {},
              runnerResult = {},
              timestamp = 0,
@@ -27,7 +28,7 @@ export const TestTarget =
              widget: widgetId = null
          } = {}
      } = {}) => {
-        const execOutputs = [compilerResult, linkerResult, runnerResult];
+        const execOutputs = [targetCompilerResult, specCompilerResult, linkerResult, runnerResult];
 
         const suggestedResultTab = testOutputsToFailedIndex(execOutputs);
         const [resultTab, setResultTab] = useState(suggestedResultTab);
@@ -57,7 +58,8 @@ export const TestTarget =
                         </Typography>
 
                         <TestTargetStepper
-                            compilerResult={compilerResult}
+                            targetCompilerResult={targetCompilerResult}
+                            specCompilerResult={specCompilerResult}
                             linkerResult={linkerResult}
                             runnerResult={runnerResult}
                         />
@@ -68,6 +70,7 @@ export const TestTarget =
                     <Paper square>
                         <Tabs value={resultTab} onChange={handleResultTabChange}>
                             <Tab label={"Компиляция"} id={0}/>
+                            <Tab label={"Компиляция теста"} id={0}/>
                             <Tab label={"Линковка"} id={1}/>
                             <Tab label={"Тестирование"} id={2}/>
                         </Tabs>
@@ -75,12 +78,15 @@ export const TestTarget =
 
                     <Paper square>
                         <TabPanel value={resultTab} index={0}>
-                            <ExecOutput {...compilerResult}/>
+                            <ExecOutput {...targetCompilerResult}/>
                         </TabPanel>
                         <TabPanel value={resultTab} index={1}>
-                            <ExecOutput {...linkerResult}/>
+                            <ExecOutput {...specCompilerResult}/>
                         </TabPanel>
                         <TabPanel value={resultTab} index={2}>
+                            <ExecOutput {...linkerResult}/>
+                        </TabPanel>
+                        <TabPanel value={resultTab} index={3}>
                             <ExecOutput {...runnerResult}/>
                         </TabPanel>
                     </Paper>

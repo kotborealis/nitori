@@ -1,6 +1,5 @@
 const {Router} = require('express');
 const {TestSpecModel} = require('../../../../database');
-const {compileTestSpec} = require('../../../../TestSpec/compileTestSpec');
 const debug = require('debug')('nitori:api:widget:test-spec');
 
 module.exports = (config) => {
@@ -46,18 +45,10 @@ module.exports = (config) => {
                     type: 'text/cpp'
                 };
 
-                const {compilerResult, cache} = await compileTestSpec(config, [specFile]);
-
-                debug("Cache key is", cache);
-
-                if(compilerResult.exitCode !== 0)
-                    return res.json({compilerResult});
-
                 const testSpec = new TestSpecModel({
                     name,
                     widget: widgetId,
                     description,
-                    cache,
                     specFile,
                     exampleTargetFile: {
                         name: 'example.cpp',
@@ -68,7 +59,7 @@ module.exports = (config) => {
 
                 await testSpec.save();
 
-                res.mongo({compilerResult, testSpec});
+                res.mongo(testSpec);
             }
         );
 
@@ -107,13 +98,6 @@ module.exports = (config) => {
                     type: 'text/cpp'
                 }];
 
-                const {compilerResult, cache} = await compileTestSpec(config, specSources);
-
-                debug("Cache key is", cache);
-
-                if(compilerResult.exitCode !== 0)
-                    return res.json({compilerResult});
-
                 const testSpec = await TestSpecModel.findByIdAndUpdate(testSpecId, {
                     name,
                     widget: widgetId,
@@ -127,7 +111,7 @@ module.exports = (config) => {
                     }
                 }, {new: true, upsert: true});
 
-                res.mongo({compilerResult, testSpec});
+            res.mongo(testSpec);
             }
         )
         .delete(
