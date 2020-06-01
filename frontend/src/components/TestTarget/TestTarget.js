@@ -50,7 +50,7 @@ export const TestTarget =
                         <Typography variant="body1" style={{padding: '20px'}}>
                             Решение
                             {testSpec.data && <>
-                                для задания <Link to={
+                                &nbsp;для задания <Link to={
                                 `/dashboard/${testSpec.data.widget}/test-specs/${testSpec.data._id}`
                             }>{testSpec.data.name}</Link>,
                             </>} {userData.name} ({userData.login}), {userData.groupName},
