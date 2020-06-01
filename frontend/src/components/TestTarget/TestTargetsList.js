@@ -112,9 +112,9 @@ export const TestTargetsList = () => {
 
 const TestSpecName = ({testSpecId, widgetId}) => {
     const testSpec = useApi(apiActions.testSpec);
-    testSpec.useFetch({testSpecId, widgetId})({testSpecId, widgetId});
+    testSpec.useFetch({testSpecId, widgetId})([testSpecId, widgetId]);
 
+    if(testSpec.loading || testSpec.init) return '...';
     if(testSpec.data)
         return testSpec.data.name;
-    return '...';
 };
