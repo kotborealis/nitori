@@ -12,7 +12,7 @@ import {Error} from '../InvalidState/Error';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
+import {useHistory} from 'react-router-dom';
 
 export const TestSpecEdit = (
     {
@@ -24,6 +24,8 @@ export const TestSpecEdit = (
         exampleTargetFile: {content: exampleFileContent} = {content: null}
     }
 ) => {
+    const history = useHistory();
+
     const [specName, setName] = useState(name);
     const [specDescription, setDescription] = useState(description);
     const [spec, setSpec] = useState(specFileContent || specSample);
@@ -64,10 +66,10 @@ export const TestSpecEdit = (
     if(testSpecSubmit.init) specSubmitResult = null;
     else if(testSpecSubmit.loading) specSubmitResult = <Loading/>;
     else if(testSpecSubmit.error) specSubmitResult = <Error error={testSpecSubmit.error}/>;
-    else if(testSpecSubmit.data) specSubmitResult =
-        <Link to={`/dashboard/${widgetId}/${testSpecSubmit.data._id}`}>
-            Сохранено
-        </Link>;
+    else if(testSpecSubmit.data){
+        testSpecSubmit.reset();
+        history.push(`/dashboard/${widgetId}/test-specs/${testSpecSubmit.data._id}`);
+    }
 
     return (
         <>
