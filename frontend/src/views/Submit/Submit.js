@@ -25,7 +25,7 @@ export const Submit = ({}) => {
 
         const files = await Promise.all(formData.getAll("sources")
             .map(file => new Promise(resolve => {
-                const {name, webkitRelativePath = null, type} = file;
+                const {name = 'unknown', webkitRelativePath = null, type = 'text/plain'} = file;
 
                 const reader = new FileReader;
 
