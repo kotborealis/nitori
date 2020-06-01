@@ -67,7 +67,7 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tes
                          <Typography variant="h5">
                              {selectedTask.name}
                          </Typography>
-                         <Typography variant="p">
+                         <Typography variant="body1">
                              {selectedTask.description}
                          </Typography>
                      </Grid>
