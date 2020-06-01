@@ -94,17 +94,17 @@ module.exports = (config) => {
                 const {name, description} = req.query;
                 const {spec, example} = req.body;
 
-                const specSources = [{
+                const specFile = {
                     name: 'spec.cpp',
                     content: spec,
                     type: 'text/cpp'
-                }];
+                };
 
                 const testSpec = await TestSpecModel.findByIdAndUpdate(testSpecId, {
                     name,
                     widget: widgetId,
                     description,
-                    sourceFiles: specSources,
+                    specFile,
                     exampleTargetFile: {
                         name: 'example.cpp',
                         content: example,
