@@ -12,7 +12,7 @@ const SourceFileSchema = Schema({
     },
     type: {
         type: String,
-        required: true
+        required: false
     },
 });
 
