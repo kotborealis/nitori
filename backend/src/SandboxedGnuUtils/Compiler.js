@@ -74,24 +74,23 @@ class Compiler {
         debug("uploaded tarball");
 
 
-        let res;
-        if(cpp_file_names.length){
-            res = await sandbox.exec([
+        const res = (await Promise.all(cpp_file_names.map((name, i) =>
+            sandbox.exec([
                 this.compiler_name,
                 ...(std ? [`--std=${std}`] : []),
                 ...I.map(_ => `-I${_}`),
                 ...include.map(_ => [`-include`, _]).flat(),
                 "-c",
                 "-Winvalid-pch",
-                ...cpp_file_names
-            ], {working_dir, timeout: this.timeout});
-        }
-        else{
-            res = await sandbox.exec([
-                `echo`,
-                `No c++ source files found, skipping compilation...`
-            ]);
-        }
+                name,
+                "-o",
+                obj_file_names[i]
+            ], {working_dir, timeout: this.timeout})
+        ))).reduce((res, total) => ({
+            stdout: total.stdout + '\n\n' + res.stdout,
+            stderr: total.stderr + '\n\n' + res.stderr,
+            exitCode: res.exitCode || total.exitCode,
+        }), {stdout: "", stderr: "", exitCode: 0});
 
         return {
             exec: res,
