@@ -3,7 +3,7 @@ import styles from './dashboard.css';
 import {TestTargetsList} from '../../components/TestTarget/TestTargetsList';
 import {TestSpecsList} from '../../components/TestSpec/TestSpecsList';
 import {apiActions} from '../../api/apiActions';
-import {useHistory, useParams} from 'react-router-dom';
+import {Link, useHistory, useParams} from 'react-router-dom';
 import {useApi} from '../../api/useApi';
 import {NotFound} from '../../components/InvalidState/NotFound';
 import Paper from '@material-ui/core/Paper';
@@ -15,7 +15,6 @@ import {TestTargetView} from '../../components/TestTarget/TestTargetView';
 import {TestSpecEdit} from '../../components/TestSpec/TestSpecEdit';
 import TestSpec from '../../components/TestSpec/TestSpec';
 import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
 
 const DashboardBasic = () => {
     const {widgetId, dashboardTab = 'test-specs', itemId} = useParams();
@@ -46,7 +45,7 @@ const DashboardBasic = () => {
     return <>
         <Paper elevation={3} style={{padding: 10}}>
             <Typography>
-                <Link href={`/submit/${widgetId}`}>Отправка решений</Link>
+                <Link to={`/submit/${widgetId}`}>Отправка решений</Link>
             </Typography>
         </Paper>
         <Paper square>
