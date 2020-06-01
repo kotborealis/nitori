@@ -28,10 +28,14 @@ module.exports = async (config, testSpec, testTarget) => {
     const objcopy = new Objcopy(sandbox);
     await objcopy.redefine_sym(targetBinaries, "main", config.testing.hijack_main, {working_dir});
 
+    const includePaths = testTarget.sourceFiles
+        .map(({name}) => require('path').dirname(name))
+        .filter((element, index, self) => self.indexOf(element) === index);
+
     const specCompiler = new Compiler(sandbox, config.timeout.compilation);
     const {exec: specCompilerResult, obj: specBinaries} =
         await specCompiler.compile([testSpec.specFile],
-            {working_dir, I: ["/opt/nitori/"], include: ["/opt/nitori/testing.hpp"]});
+            {working_dir, I: ["/opt/nitori/", ...includePaths], include: ["/opt/nitori/testing.hpp"]});
 
     if(specCompilerResult.exitCode !== 0){
         await sandbox.stop();
