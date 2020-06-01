@@ -490,8 +490,10 @@ components:
           type: string
         content:
           type: string
+          default: ""
         type:
           type: string
+          default: "text/plain"
 
     SourceFileList:
       type: array
