@@ -48,18 +48,21 @@ export const TestTargetsList = () => {
                 },
                 {
                     title: 'Проверки',
-                    render: ({compilerResult, linkerResult, runnerResult}) => {
-                        const CompilerIcon = exitCodeToIcon(compilerResult?.exitCode);
+                    render: ({targetCompilerResult, specCompilerResult, linkerResult, runnerResult}) => {
+                        const TargetIcon = exitCodeToIcon(targetCompilerResult?.exitCode);
+                        const SpecIcon = exitCodeToIcon(specCompilerResult?.exitCode);
                         const LinkerIcon = exitCodeToIcon(linkerResult?.exitCode);
                         const RunnerIcon = exitCodeToIcon(runnerResult?.exitCode);
 
-                        const compilerColor = exitCodeToColor(compilerResult?.exitCode);
+                        const targetColor = exitCodeToColor(targetCompilerResult?.exitCode);
+                        const specColor = exitCodeToColor(specCompilerResult?.exitCode);
                         const linkerColor = exitCodeToColor(linkerResult?.exitCode);
                         const runnerColor = exitCodeToColor(runnerResult?.exitCode);
 
                         return (
                             <>
-                                <Chip icon={<CompilerIcon/>} color={compilerColor} label="Компиляция"/>
+                                <Chip icon={<TargetIcon/>} color={targetColor} label="Компиляция"/>
+                                <Chip icon={<SpecIcon/>} color={specColor} label="Компиляция теста"/>
                                 <Chip icon={<LinkerIcon/>} color={linkerColor} label="Линковка"/>
                                 <Chip icon={<RunnerIcon/>} color={runnerColor} label="Тесты"/>
                             </>
