@@ -10,11 +10,9 @@ services:
     entrypoint:
       - node
       - src/index
-      - --api
       - --config=./.config.js
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - object_cache:/app/data/cache
     links:
       - database
     depends_on:
@@ -44,4 +42,3 @@ services:
 
 volumes:
   database_mongo:
-  object_cache:

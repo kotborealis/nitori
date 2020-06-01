@@ -51,7 +51,7 @@ module.exports = (config) => {
                 const {widgetId} = req;
                 const {testSpecId} = req.query;
 
-                const {cache} = await TestSpecModel.findById(testSpecId);
+                const testSpec = await TestSpecModel.findById(testSpecId);
 
                 const sourceFiles = req.body;
 
@@ -59,9 +59,24 @@ module.exports = (config) => {
                     widget: widgetId,
                     userData,
                     testSpec: testSpecId,
-                    sourceFiles,
-                    ...await compileTestTarget(config, cache, sourceFiles)
+                    sourceFiles
                 });
+
+                await testTarget.save();
+
+                const result = await compileTestTarget(config, testSpec, testTarget);
+
+                const {
+                    targetCompilerResult,
+                    specCompilerResult,
+                    linkerResult,
+                    runnerResult
+                } = result;
+
+                testTarget.targetCompilerResult = targetCompilerResult;
+                testTarget.specCompilerResult = specCompilerResult;
+                testTarget.linkerResult = linkerResult;
+                testTarget.runnerResult = runnerResult;
 
                 await testTarget.save();
 

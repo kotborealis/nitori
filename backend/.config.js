@@ -30,9 +30,6 @@ module.exports = {
         hijack_main: "__NITORI_HIJACK_MAIN__",
         test_archive_name: "__nitori_test.a"
     },
-    cache: {
-        dir: "./data/cache/"
-    },
     timeout: {
         compilation: 1000 * 60,
         precompilation: 0,
