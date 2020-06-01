@@ -102,7 +102,6 @@ module.exports = (config) => {
                     name,
                     widget: widgetId,
                     description,
-                    cache,
                     sourceFiles: specSources,
                     exampleTargetFile: {
                         name: 'example.cpp',
