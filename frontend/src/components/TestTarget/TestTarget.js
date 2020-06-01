@@ -34,7 +34,7 @@ export const TestTarget =
         const [resultTab, setResultTab] = useState(suggestedResultTab);
 
         const testSpec = useApi(apiActions.testSpec);
-        testSpec.useFetch({testSpecId})([testSpecId, widgetId]);
+        testSpec.useFetch({widgetId, testSpecId})([testSpecId, widgetId]);
 
         useEffect(() => {
             if(resultTab !== suggestedResultTab)
@@ -51,8 +51,8 @@ export const TestTarget =
                             Решение
                             {testSpec.data && <>
                                 для задания <Link to={
-                                `/dashboard/${testSpec.widgetId}/test-specs/${testSpec._id}`
-                            }>{testSpec.name}</Link>,
+                                `/dashboard/${testSpec.data.widget}/test-specs/${testSpec.data._id}`
+                            }>{testSpec.data.name}</Link>,
                             </>} {userData.name} ({userData.login}), {userData.groupName},
                             отправлено <TimeUpdated>{timestamp}</TimeUpdated>
                         </Typography>
