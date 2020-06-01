@@ -12,9 +12,9 @@ module.exports = [
         context: ['/api/v1'],
         target: `http://127.0.0.1:${dev_config.api.port}`,
         pathRewrite: {'^/api/v1': ''},
-        //headers: {
-        //    Cookie: 'PHPSESSID=qwerty'
-        //}
+        headers: {
+            Cookie: 'PHPSESSID=qwerty'
+        }
     },
     {
         bypass: (req, res) => {
