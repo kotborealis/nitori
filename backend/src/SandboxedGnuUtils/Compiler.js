@@ -45,6 +45,8 @@ class Compiler {
         debug("creating tarball");
 
         const tarball = tar.pack();
+
+        // Setup dirs
         source_files
             .map(({name}) => name)
             .map(name => require('path').dirname(name))
@@ -54,12 +56,15 @@ class Compiler {
                 type: 'directory',
                 mode: 0o777
             }));
+
+        // Setup files
         source_files
             .forEach(({name, content}) => tarball.entry({
                 name: `${working_dir}/${name}`,
                 type: 'file',
                 mode: 0o644
             }, content));
+
         tarball.finalize();
 
         debug("created tarball");
@@ -68,16 +73,25 @@ class Compiler {
 
         debug("uploaded tarball");
 
-        const res = await sandbox.exec([
-            this.compiler_name,
-            ...(std ? [`--std=${std}`] : []),
-            ...I.map(_ => `-I${_}`),
-            ...include.map(_ => [`-include`, _]).flat(),
-            "-c",
-            "-Winvalid-pch",
-            ...(cpp_file_names.length === 1 ? ["-o", obj_file_names[0]] : []),
-            ...cpp_file_names
-        ], {working_dir, timeout: this.timeout});
+
+        let res;
+        if(cpp_file_names.length){
+            res = await sandbox.exec([
+                this.compiler_name,
+                ...(std ? [`--std=${std}`] : []),
+                ...I.map(_ => `-I${_}`),
+                ...include.map(_ => [`-include`, _]).flat(),
+                "-c",
+                "-Winvalid-pch",
+                ...cpp_file_names
+            ], {working_dir, timeout: this.timeout});
+        }
+        else{
+            res = await sandbox.exec([
+                `echo`,
+                `No c++ source files found, skipping compilation...`
+            ]);
+        }
 
         return {
             exec: res,
