@@ -47,5 +47,5 @@ cd frontend
 npm start
 ```
 
-`frontend` proxies calls to `backend` on `/api/v1/` endpoint and mocks auth api on `/auth/user_data.php` ([frontend/mock-api/mock-api.js](frontend/mock-api/mock-api.js)).
+`frontend` proxies calls to `backend` on `/api/v1/` endpoint and mocks auth api on `/auth/user_data.php` ([frontend/mock-api/mock-api.js](backend/test/mock/auth/mock-auth-handler.js)).
 

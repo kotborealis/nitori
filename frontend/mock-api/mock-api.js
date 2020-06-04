@@ -1,35 +1,16 @@
-const dev_config = (() => {
-    try{
-        return require('../../backend/.config.js');
-    }
-    catch(e){
-        return {api: {port: 3000}};
-    }
-})();
+const {createProxyMiddleware} = require('http-proxy-middleware');
+const authMock = require('../../backend/test/mock/auth/mock-auth-handler');
 
-module.exports = [
-    {
+module.exports = (app) => {
+    // backend API proxy
+    app.use('/api/v1', createProxyMiddleware({
+        target: 'http://127.0.0.1:3000',
         context: ['/api/v1'],
-        target: `http://127.0.0.1:${dev_config.api.port}`,
         pathRewrite: {'^/api/v1': ''},
         headers: {
-            Cookie: 'PHPSESSID=qwerty'
+            Cookie: 'PHPSESSID=examplePhpSessidCookie'
         }
-    },
-    {
-        bypass: (req, res) => {
-            if(req.url.indexOf('/auth/user_data.php') < 0) return '/index.html';
+    }));
 
-            //res.status(400).end();
-
-            res.json({
-                "userId": 5,
-                "isAdmin": true,
-                "login": "test-user",
-                "name": "Иван Иванович Иванов",
-                "groupId": 0,
-                "groupName": "ЯКУБОВИЧ-05-20"
-            });
-        }
-    }
-];
+    authMock(app);
+};

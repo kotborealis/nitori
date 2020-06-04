@@ -160,8 +160,8 @@ module.exports = (env = {prod: false}) => {
             open: true,
             openPage: '',
             overlay: true,
-            proxy: mockApi,
-            historyApiFallback: true
+            historyApiFallback: true,
+            before: mockApi
         }
     };
 
