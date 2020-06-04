@@ -2,6 +2,7 @@ const {PromiseTimeout} = require('../utils/PromiseTimeout');
 const debug = require('debug')('nitori:sandbox');
 
 const shortid = require('shortid');
+const {PromiseTimeoutError} = require('../utils/PromiseTimeout');
 
 const {promisifyDockerStream} = require('../utils/promisifyDockerStream');
 
@@ -32,9 +33,9 @@ class Sandbox {
     id;
 
     /**
-     * Sandbox image ID
+     * debug instance associated with this Sandbox
      */
-    imageID;
+    debug;
 
     _running = false;
 
@@ -47,49 +48,55 @@ class Sandbox {
         this.docker = docker;
         this.config = config;
         this.id = shortid.generate();
+        this.debug = debug.extend(this.id);
     }
 
     /**
-     * Destroy all containers, created by this instance
+     * Get all containers created by this instance
      * @param docker
      * @returns {Promise<void>}
      */
-    static async destroy_all(docker) {
-        debug("Destroying all created containers");
-
-        const containers = await docker.container.list({
+    static get_children_containers(docker) {
+        return docker.container.list({
             all: true,
             filters: JSON.stringify({
                 label: [`nitori.parent=${instanceId}`]
             })
         });
+    }
 
-        debug(`Removing ${containers.length} containers`);
+    /**
+     * Destroy all containers created by this instance
+     * @param docker
+     * @returns {Promise<void>}
+     */
+    static async destroy_all(docker) {
+        debug("Destroying all created Sandbox containers");
+
+        const containers = await Sandbox.get_children_containers(docker);
+
+        debug(`Destroying ${containers.length} containers`);
 
         for await (let container of containers){
             await container.pause();
 
             const {data: {Name, Image, State: {Status}}} = await container.status();
-            debug("Processing container", Name, Image, Status);
-
-            debug("Killing & deleting container");
+            debug("Killing container", Name, Image, Status);
 
             try{
                 await container.kill();
             }
             catch(e){
-                debug(e);
+                debug("Error during container.kill()", e);
             }
 
             try{
                 await container.delete();
             }
             catch(e){
-                debug(e);
+                debug("Error during container.delete()", e);
             }
         }
-
-        debug("Done");
     }
 
     /**
@@ -97,12 +104,20 @@ class Sandbox {
      * @returns {Promise<void>}
      */
     async stop() {
-        debug("Stop sandbox");
+        this.debug("Stop sandbox & delete container");
 
-        if(!this._running) return;
+        if(!this._running){
+            this.debug("Already not running");
+            return;
+        }
 
         const {container} = this;
-        await container.delete({force: true});
+        try{
+            await container.delete({force: true});
+        }
+        catch(e){
+            this.debug("Error during container.delete()", e);
+        }
 
         this._running = false;
     };
@@ -119,37 +134,48 @@ class Sandbox {
     async exec(cmd = [], {root = false, tty = true, working_dir = '', timeout = 0} = {}) {
         const {container} = this;
 
-        debug(`Exec in ${working_dir}:`, cmd.join(' '));
-
-        const exec = await container.exec.create({
-            WorkingDir: working_dir ? working_dir : undefined,
-            Cmd: cmd,
-            AttachStdin: true,
-            AttachStdout: true,
-            AttachStderr: true,
-            Tty: tty,
-            User: root ? "root" : "sandbox"
-        });
-
+        this.debug(`Execute \`${cmd.join(' ')}\` in \`${working_dir}\` with timeout \`${timeout}\``);
 
         try{
+            const exec = await container.exec.create({
+                WorkingDir: working_dir ? working_dir : undefined,
+                Cmd: cmd,
+                AttachStdin: true,
+                AttachStdout: true,
+                AttachStderr: true,
+                Tty: tty,
+                User: root ? "root" : "sandbox"
+            });
+
             const dockerStream = await exec.start();
-            debug("Exec with timeout", timeout);
             const {stdout, stderr} = await PromiseTimeout(promisifyDockerStream(dockerStream), timeout);
             const {data: {ExitCode: exitCode}} = await exec.status();
 
-            debug("Exec exitCode:", exitCode);
-            debug("Exec stdout:", stdout);
-            debug("Exec stderr:", stderr);
+            this.debug(`Exec exitCode=\`${exitCode}\``);
+            this.debug("Exec stdout:", stdout);
+            this.debug("Exec stderr:", stderr);
+
+            // handle SIGSEGV via exitCode
+            if(exitCode === '139'){
+                return {
+                    exitCode,
+                    stdout: stdout + `\nAbort (segmentation fault)\n`,
+                    stderr
+                };
+            }
 
             return {exitCode, stdout, stderr};
         }
-        catch({message, stack}){
-            debug(stack);
-            debug("Timed out sandbox will be terminated.");
-            await this.stop();
-            // 124 is exit code for timeout command
-            return {exitCode: 124, stdout: message, stderr: ""};
+        catch(e){
+            if(e instanceof PromiseTimeoutError){
+                this.debug(`Exec timed out in ${timeout}ms.`);
+                await this.stop();
+                // 124 is exit code for timeout command
+                return {exitCode: 124, stdout: e.message, stderr: ""};
+            }
+            else{
+                this.debug("Error while executing", e);
+            }
         }
     };
 
@@ -160,7 +186,7 @@ class Sandbox {
      * @returns {Promise<Object>}
      */
     async fs_put(tarball, path = '/') {
-        debug("fs put", path);
+        this.debug("Fs put into", path);
         return this.container.fs.put(tarball, {path});
     }
 
@@ -170,6 +196,7 @@ class Sandbox {
      * @returns {Promise<Object>}
      */
     async fs_get(path) {
+        this.debug("Fs get from", path);
         return this.container.fs.get({path});
     }
 
@@ -178,25 +205,30 @@ class Sandbox {
      * @returns {Promise<void>}
      */
     async start() {
-        debug("Start sandbox");
+        this.debug("Start");
 
-        if(this._running) return;
+        if(this._running){
+            this.debug("Already running");
+            return;
+        }
 
         const {docker, config, id} = this;
 
-        this.container = await docker.container.create({
-            ...config.container,
-            name: `${config.sandbox.container_prefix}_${id}`,
-            Labels: {
-                "nitori.sandbox": id,
-                "nitori.parent": instanceId
-            }
-        });
+        try{
+            this.container = await docker.container.create({
+                ...config.container,
+                name: `${config.sandbox.container_prefix}${id}`,
+                Labels: {
+                    "nitori.sandbox": id,
+                    "nitori.parent": instanceId
+                }
+            });
 
-        const {data: {Image: imageID}} = await this.container.status();
-        this.imageID = imageID.split(':')[1];
-
-        await this.container.start();
+            await this.container.start();
+        }
+        catch(e){
+            this.debug("Error while creating/starting container", e);
+        }
 
         this._running = true;
     };
