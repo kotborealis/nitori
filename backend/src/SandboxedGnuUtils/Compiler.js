@@ -104,7 +104,7 @@ class Compiler {
      * @param working_dir
      * @param output Executable name
      * @param L Library path
-     * @returns {Promise<{name: string, exec: *}>}
+     * @returns {Promise<{output: string, exec: *}>}
      */
     async link(object_file_names, {
         working_dir = "/sandbox/",
