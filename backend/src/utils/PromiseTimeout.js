@@ -3,9 +3,15 @@ const PromiseTimeout = (promise, timeout) => Promise.race([
     timeout > 0 ? new Promise((resolve, reject) => {
         const id = setTimeout(() => {
             clearTimeout(id);
-            reject(new Error(`Timed out in ${timeout}ms.`));
+            reject(new PromiseTimeoutError(`Promise timed out in ${timeout}ms.`));
         }, timeout);
     }) : new Promise(() => 0)
 ]);
 
-module.exports = {PromiseTimeout};
+class PromiseTimeoutError extends Error {
+    constructor(message) {
+        super(message);
+    }
+}
+
+module.exports = {PromiseTimeout, PromiseTimeoutError};
