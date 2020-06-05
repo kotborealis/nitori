@@ -32,4 +32,6 @@ module.exports = (app) => {
         authState.isAdmin = !authState.isAdmin;
         res.json(authState);
     });
+
+    return authState;
 };
