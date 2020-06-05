@@ -1,5 +1,5 @@
 const debug = require('debug')('nitori:auth');
-const {auth} = require('../../auth');
+const {auth} = require('../../auth/auth');
 
 /**
  * Middleware for auth with access control

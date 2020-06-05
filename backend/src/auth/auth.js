@@ -7,6 +7,7 @@ const request = require('request-promise-native');
  * @returns {Function}
  */
 const auth = (url) => async (phpsessid) => {
+    console.log("Auth by url with phpsessid", url, phpsessid);
     if(!phpsessid)
         return null;
 
