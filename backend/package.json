@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index --config=./.config.js",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "author": "",
   "license": "ISC",
