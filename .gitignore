@@ -7,5 +7,7 @@ backend/data/cache/*
 frontend/node_modules
 frontend/build
 backend/node_modules
+backend/coverage
+frontend/coverage
 
 .env
