@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="backend/test" type="JavaScriptTestRunnerJest">
+        <node-interpreter value="project"/>
+        <node-options value=""/>
+        <jest-package value="$PROJECT_DIR$/backend/node_modules/jest"/>
+        <working-dir value="$PROJECT_DIR$/backend"/>
+        <jest-options value="--runInBand --collectCoverageFrom=./src/"/>
+        <envs>
+            <env name="DEBUG" value="nitori:*"/>
+        </envs>
+        <scope-kind value="ALL"/>
+        <method v="2"/>
+    </configuration>
+</component>
