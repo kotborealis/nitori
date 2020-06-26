@@ -4,6 +4,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import AttachmentIcon from '@material-ui/icons/Attachment';
 import {CodeCpp} from '../CodeCpp/CodeCpp';
+import styles from './FileViewer.css';
 
 const TabPanel = ({children, value, index}) => value === index && <div>{children}</div>;
 
@@ -15,7 +16,7 @@ export const FileViewer = ({files = []}) => {
         <Paper square>
             <Tabs value={sourceCodeTab} onChange={handleSourceCodeTabChange}>
                 {files.map(({name}, index) =>
-                    <Tab label={name} id={index} icon={<AttachmentIcon/>}/>
+                    <Tab label={name} id={index} icon={<AttachmentIcon/>} className={styles.tabHeader}/>
                 )}
             </Tabs>
         </Paper>

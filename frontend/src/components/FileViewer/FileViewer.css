@@ -1,0 +1,13 @@
+.tabHeader > :global(.MuiTab-wrapper) {
+    display: flex;
+    flex-direction: row;
+}
+
+.tabHeader > :global(.MuiTab-wrapper) > :global(.MuiSvgIcon-root) {
+    margin-right: 6px !important;
+}
+
+.tabHeader {
+    text-transform: none !important;
+    min-height: unset !important;
+}
