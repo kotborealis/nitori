@@ -1,32 +1,36 @@
 const YAML = require('yamljs');
-const swaggerDocument = YAML.load('./api.yaml');
 
-if(process.env.PROD_API){
-    swaggerDocument.servers.unshift({
-        url: process.env.PROD_API,
-        description: 'Current production server'
-    });
-}
-
+const express = require('express');
+require('express-async-errors');
 const swaggerUi = require('swagger-ui-express');
 const {OpenApiValidator} = require('express-openapi-validator');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-
-const debug = require('debug')('nitori:api');
-const express = require('express');
-require('express-async-errors');
+const {correlationMiddleware} = require('./middleware/correlation');
 
 const {authMiddleware} = require('./middleware/auth');
+
+const debug = require('debug')('nitori:api');
 
 const {Sandbox} = require('../Sandbox');
 const {Docker} = require('node-docker-api');
 
 module.exports = (config) => {
+    const swaggerDocument = YAML.load('./api.yaml');
+
+    if(process.env.PROD_API){
+        swaggerDocument.servers.unshift({
+            url: process.env.PROD_API,
+            description: 'Current production server'
+        });
+    }
+
     const port = config.api.port;
 
     const app = express();
+
+    app.use(correlationMiddleware());
 
     app.use((req, res, next) => {
         res.mongo = obj => res.json(JSON.parse(JSON.stringify(obj)));
@@ -71,7 +75,7 @@ module.exports = (config) => {
         });
     });
 
-    const server = app.listen(port, () => debug(`Server running on 0.0.0.0:${port}`));
+    const server = app.listen(port, () => console.log(`Server running on 0.0.0.0:${port}`));
 
     process.on('SIGINT', async () => {
         server.close();

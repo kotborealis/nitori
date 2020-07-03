@@ -26,6 +26,7 @@
     "node-docker-api": "^1.1.22",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
+    "short-unique-id": "^3.0.3",
     "shortid": "^2.2.15",
     "supports-color": "^7.1.0",
     "swagger-ui-express": "^4.1.2",
