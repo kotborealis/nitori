@@ -9,16 +9,28 @@ const asyncLocalStorage = new AsyncLocalStorage();
  * @param fn Function to run
  * @param id Correlation ID. Random UUID by default
  */
-module.exports.runWithCorrelation =
+const runWithCorrelation =
     (fn, id = uid.randomUUID()) =>
         asyncLocalStorage.run(id, fn);
+
+/**
+ * missing correlation id constant
+ * @type {string}
+ */
+const NO_CORRELATION_ID = `no-correlation-id`;
 
 /**
  * Get current correlation id
  * Returns `no-correlation-id` if not set
  * @returns {any}
  */
-module.exports.getCorrelationId =
+const getCorrelationId =
     () =>
         asyncLocalStorage.getStore()
-        || 'no-correlation-id';
+        || NO_CORRELATION_ID;
+
+module.exports = {
+    NO_CORRELATION_ID,
+    runWithCorrelation,
+    getCorrelationId
+};
