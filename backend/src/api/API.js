@@ -7,7 +7,7 @@ const {OpenApiValidator} = require('express-openapi-validator');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const {correlationMiddleware} = require('./middleware/correlation');
+const {correlationMiddleware} = require('./middleware/correlationMiddleware');
 
 const {authMiddleware} = require('./middleware/auth');
 
