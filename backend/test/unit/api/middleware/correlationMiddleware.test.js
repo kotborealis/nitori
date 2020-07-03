@@ -2,12 +2,12 @@ const {
     getCorrelationId,
     runWithCorrelation,
     NO_CORRELATION_ID
-} = require('../../correlation/correlation');
+} = require('../../../../src/correlation/correlation');
 
 const {
     correlationMiddleware,
     X_CORRELATION_ID
-} = require('./correlationMiddleware');
+} = require('../../../../src/api/middleware/correlationMiddleware');
 
 describe('correlation middleware', () => {
     it('is a function', () =>

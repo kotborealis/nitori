@@ -2,7 +2,7 @@ const {
     getCorrelationId,
     runWithCorrelation,
     NO_CORRELATION_ID
-} = require('./correlation');
+} = require('../../../src/correlation/correlation');
 
 describe('correlation', () => {
     it('returns NO_CORRELATION_ID out of context', () => {

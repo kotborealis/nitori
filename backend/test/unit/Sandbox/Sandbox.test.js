@@ -1,6 +1,6 @@
 const config = require('chen.js').config('.config.js');
 const {Docker} = require('node-docker-api');
-const {Sandbox} = require('./Sandbox');
+const {Sandbox} = require('../../../src/Sandbox/Sandbox');
 
 const docker = new Docker(config.docker);
 
