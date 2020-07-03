@@ -1,5 +1,6 @@
 const {PromiseTimeout} = require('../utils/PromiseTimeout');
-const debug = require('debug')('nitori:sandbox');
+
+const logger = require('../logging/logger')('Sandbox');
 
 const shortid = require('shortid');
 const {PromiseTimeoutError} = require('../utils/PromiseTimeout');
@@ -48,7 +49,8 @@ class Sandbox {
         this.docker = docker;
         this.config = config;
         this.id = shortid.generate();
-        this.debug = debug.extend(this.id);
+
+        logger.info('Sandbox started', {id: this.id, config});
     }
 
     /**
@@ -71,30 +73,30 @@ class Sandbox {
      * @returns {Promise<void>}
      */
     static async destroy_all(docker) {
-        debug("Destroying all created Sandbox containers");
+        logger.info("Destroying all created Sandbox containers", {instanceId});
 
         const containers = await Sandbox.get_children_containers(docker);
 
-        debug(`Destroying ${containers.length} containers`);
+        logger.info(`Destroying ${containers.length} containers`);
 
         for await (let container of containers){
             await container.pause();
 
             const {data: {Name, Image, State: {Status}}} = await container.status();
-            debug("Killing container", Name, Image, Status);
+            logger.info("Killing container", {Name, Image, Status});
 
             try{
                 await container.kill();
             }
             catch(e){
-                debug("Error during container.kill()", e);
+                logger.error("Error during container.kill()", e);
             }
 
             try{
                 await container.delete();
             }
             catch(e){
-                debug("Error during container.delete()", e);
+                logger.error("Error during container.delete()", e);
             }
         }
     }
@@ -104,10 +106,10 @@ class Sandbox {
      * @returns {Promise<void>}
      */
     async stop() {
-        this.debug("Stop sandbox & delete container");
+        logger.debug("Stop sandbox & delete container", {id: this.id});
 
         if(!this._running){
-            this.debug("Already not running");
+            logger.debug("Already not running", {id: this.id});
             return;
         }
 
@@ -116,7 +118,7 @@ class Sandbox {
             await container.delete({force: true});
         }
         catch(e){
-            this.debug("Error during container.delete()", e);
+            logger.error("Error during container.delete()", e);
         }
 
         this._running = false;
@@ -134,7 +136,7 @@ class Sandbox {
     async exec(cmd = [], {root = false, tty = true, working_dir = '', timeout = 0} = {}) {
         const {container} = this;
 
-        this.debug(`Execute \`${cmd.join(' ')}\` in \`${working_dir}\` with timeout \`${timeout}\``);
+        logger.debug(`Execute \`${cmd.join(' ')}\` in \`${working_dir}\` with timeout \`${timeout}\``, {id: this.id});
 
         try{
             const exec = await container.exec.create({
@@ -151,12 +153,11 @@ class Sandbox {
             const {stdout, stderr} = await PromiseTimeout(promisifyDockerStream(dockerStream), timeout);
             const {data: {ExitCode: exitCode}} = await exec.status();
 
-            this.debug(`Exec exitCode=\`${exitCode}\``);
-            this.debug("Exec stdout:", stdout);
-            this.debug("Exec stderr:", stderr);
+            logger.debug(`exec result`, {id: this.id, exitCode, stdout, stderr});
 
             // handle SIGSEGV via exitCode
             if(exitCode === '139'){
+                logger.info(`handled sigsegv (return 139)`);
                 return {
                     exitCode,
                     stdout: stdout + `\nAbort (segmentation fault)\n`,
@@ -168,13 +169,13 @@ class Sandbox {
         }
         catch(e){
             if(e instanceof PromiseTimeoutError){
-                this.debug(`Exec timed out in ${timeout}ms.`);
+                logger.info(`Exec timed out in ${timeout}ms.`, {id: this.id});
                 await this.stop();
                 // 124 is exit code for timeout command
                 return {exitCode: 124, stdout: e.message, stderr: ""};
             }
             else{
-                this.debug("Error while executing", e);
+                logger.error("Error while executing", e);
             }
         }
     };
@@ -186,7 +187,7 @@ class Sandbox {
      * @returns {Promise<Object>}
      */
     async fs_put(tarball, path = '/') {
-        this.debug("Fs put into", path);
+        logger.debug("Fs put into", {path});
         return this.container.fs.put(tarball, {path});
     }
 
@@ -196,7 +197,7 @@ class Sandbox {
      * @returns {Promise<Object>}
      */
     async fs_get(path) {
-        this.debug("Fs get from", path);
+        logger.debug("Fs get from", {path});
         return this.container.fs.get({path});
     }
 
@@ -205,10 +206,10 @@ class Sandbox {
      * @returns {Promise<void>}
      */
     async start() {
-        this.debug("Start");
+        logger.debug("Start");
 
         if(this._running){
-            this.debug("Already running");
+            logger.debug("Already running");
             return;
         }
 
@@ -227,7 +228,7 @@ class Sandbox {
             await this.container.start();
         }
         catch(e){
-            this.debug("Error while creating/starting container", e);
+            logger.error("Error while creating/starting container", e);
         }
 
         this._running = true;
