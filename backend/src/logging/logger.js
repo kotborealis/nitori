@@ -2,6 +2,12 @@ const {getCorrelationId} = require('../correlation/correlation');
 const {createLogger, format, transports} = require('winston');
 const {combine, timestamp, label, json, errors, simple, colorize} = format;
 
+//noinspection JSValidateJSDoc
+/**
+ *
+ * @param {string} serviceName
+ * @returns {winston.Logger}
+ */
 const logger = (serviceName) =>
     createLogger({
         level: 'debug',
