@@ -11,9 +11,6 @@ const {correlationMiddleware} = require('../../api/middleware/correlationMiddlew
  */
 module.exports = ({app, config}) => {
 
-    // Correlation ID middleware
-    app.use(correlationMiddleware());
-
     // transform mongo objects into plain json
     // TODO: rewrite, dirty hacks
     app.use((req, res, next) => {
@@ -32,5 +29,6 @@ module.exports = ({app, config}) => {
     // Cookie parser middleware
     app.use(cookieParser());
 
-
+    // Correlation ID middleware
+    app.use(correlationMiddleware());
 };
