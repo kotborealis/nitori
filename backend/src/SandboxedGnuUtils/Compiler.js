@@ -1,5 +1,5 @@
 const tar = require('tar-stream');
-const debug = require('debug')('nitori:SandboxedGnuUtils:compiler');
+const logger = require('../logging/logger')('SandboxedGnuUtils:Compiler');
 
 class Compiler {
     sandbox;
@@ -42,7 +42,7 @@ class Compiler {
         const obj_file_names = cpp_file_names
             .map((name) => name.slice(0, name.lastIndexOf(".")) + ".o");
 
-        debug("creating tarball");
+        logger.debug("creating tarball");
 
         const tarball = tar.pack();
 
@@ -67,12 +67,11 @@ class Compiler {
 
         tarball.finalize();
 
-        debug("created tarball");
+        logger.debug("created tarball", {source_files});
 
         await sandbox.fs_put(tarball);
 
-        debug("uploaded tarball");
-
+        logger.debug("uploaded tarball");
 
         const res = (await Promise.all(cpp_file_names.map((name, i) =>
             sandbox.exec([

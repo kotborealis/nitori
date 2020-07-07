@@ -1,4 +1,3 @@
-const debug = require('debug')('nitori:api:widgets:testTargets');
 const {Router} = require('express');
 const {TestTargetModel} = require('../../../../database/index');
 const compileTestTarget = require('../../../../TestTarget/compileTestTarget');
@@ -32,8 +31,6 @@ module.exports = (config) => {
                 'userData.name': {$regex: userDataName, $options: 'i'},
                 'userData.groupName': {$regex: userDataGroupName, $options: 'i'}
             };
-
-            debug("query", query, limit, skip);
 
             const testTargets = await TestTargetModel
                 .find(query, null, {limit, skip, lean: true})

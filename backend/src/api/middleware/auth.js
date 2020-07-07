@@ -1,4 +1,3 @@
-const debug = require('debug')('nitori:auth');
 const {auth} = require('../../auth/auth');
 
 /**

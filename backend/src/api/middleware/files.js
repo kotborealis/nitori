@@ -1,5 +1,3 @@
-const debug = require('debug')('nitori:api:filesMiddleware');
-
 function fileSizesValid(files) {
     return files.map(({truncated}) => truncated).every(i => !i);
 }
