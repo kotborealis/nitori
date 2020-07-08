@@ -4,3 +4,11 @@ services:
   database:
     ports:
       - "27017:27017"
+
+  loki:
+    ports:
+      - "3300:3100"
+
+  grafana:
+    ports:
+      - "3200:3000"

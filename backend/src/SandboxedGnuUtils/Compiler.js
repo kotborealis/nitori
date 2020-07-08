@@ -1,5 +1,5 @@
 const tar = require('tar-stream');
-const logger = require('../logging/logger')('SandboxedGnuUtils:Compiler');
+const logger = require(('../logging/logger')).logger('SandboxedGnuUtils:Compiler');
 
 class Compiler {
     sandbox;

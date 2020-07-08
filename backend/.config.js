@@ -41,5 +41,11 @@ module.exports = {
     },
     auth: {
         url: process.env.AUTH_API || 'http://127.0.0.1:8080/auth/user_data.php'
+    },
+    logging: {
+        loki: {
+            host: process.env.LOGGING_LOKI_HOST || 'loki:3100',
+            basicAuth: process.env.LOGGING_LOKI_BASICAUTH || undefined
+        }
     }
 };

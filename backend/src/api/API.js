@@ -1,4 +1,4 @@
-const logger = require('../logging/logger')('API');
+const logger = require(('../logging/logger')).logger('API');
 
 const express = require('express');
 

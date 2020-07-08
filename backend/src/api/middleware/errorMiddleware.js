@@ -1,4 +1,4 @@
-const logger = require('../../logging/logger')('ErrorHandlingMiddleware');
+const logger = require(('../../logging/logger')).logger('ErrorHandlingMiddleware');
 
 /**
  * Error handling middleware

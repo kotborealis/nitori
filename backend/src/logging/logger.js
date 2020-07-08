@@ -1,32 +1,39 @@
 const {getCorrelationId} = require('../correlation/correlation');
 const {createLogger, format, transports} = require('winston');
 const {combine, timestamp, label, json, errors, simple, colorize} = format;
+const LokiTransport = require('winston-loki');
+
+let config;
+const init = (config_) => config = config_;
 
 //noinspection JSValidateJSDoc
 /**
  *
- * @param {string} serviceName
+ * @param {string} service
  * @returns {winston.Logger}
  */
-const logger = (serviceName) =>
+const logger = (service) =>
     createLogger({
         level: 'debug',
-        defaultMeta: {serviceName},
         format: combine(
             format((info) => {
-                info.label = `${serviceName}/${getCorrelationId()}`;
+                const correlationId = getCorrelationId();
+                info.labels = {correlationId};
                 return info;
             })(),
             timestamp({
-                format: `YYYY-MM-DD HH:mm:ss'`
+                format: `YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ`
             }),
             errors({stack: true}),
-            colorize(),
-            simple(),
+            json(),
         ),
         transports: [
-            new transports.Console()
+            new LokiTransport({
+                ...config.logging.loki,
+                json: true,
+                labels: {app: 'testcpp', service}
+            })
         ],
     });
 
-module.exports = logger;
+module.exports = {logger, init};

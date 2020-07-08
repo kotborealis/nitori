@@ -1,6 +1,6 @@
 const {PromiseTimeout} = require('../utils/PromiseTimeout');
 
-const logger = require('../logging/logger')('Sandbox');
+const logger = require(('../logging/logger')).logger('Sandbox');
 
 const shortid = require('shortid');
 const {PromiseTimeoutError} = require('../utils/PromiseTimeout');

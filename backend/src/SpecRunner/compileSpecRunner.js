@@ -1,5 +1,5 @@
 const {Objcopy} = require('../SandboxedGnuUtils');
-const logger = require('../logging/logger')('compileSpecRunner');
+const logger = require(('../logging/logger')).logger('compileSpecRunner');
 const {Compiler} = require('../SandboxedGnuUtils');
 const {Sandbox} = require('../Sandbox');
 const {Docker} = require('node-docker-api');
