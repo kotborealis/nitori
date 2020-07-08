@@ -17,8 +17,7 @@ const logger = (service) =>
         level: 'debug',
         format: combine(
             format((info) => {
-                const correlationId = getCorrelationId();
-                info.labels = {correlationId};
+                info.correlationId = getCorrelationId();
                 return info;
             })(),
             timestamp({
