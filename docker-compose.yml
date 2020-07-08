@@ -49,7 +49,10 @@ services:
       - default
 
   promtail:
-    image: grafana/promtail:latest
+    build:
+      context: ./promtail/
+      dockerfile: Dockerfile
+    command: -config.file=/etc/promtail/config.yaml
     networks:
       - default
 
@@ -60,6 +63,13 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=123qwe
       - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - default
+
+  vector:
+    build:
+      context: ./vector/
+      dockerfile: Dockerfile
     networks:
       - default
 
