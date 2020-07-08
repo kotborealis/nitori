@@ -2,7 +2,6 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const mockApi = require('../mock-api/mock-api');
 
 const PUBLIC_PATH = process.env.PUBLIC_PATH || '/';
 
@@ -150,7 +149,7 @@ module.exports = (env = {prod: false}) => {
             }),
         ]),
 
-        devServer: {
+        devServer: ifDebug({
             host: `0.0.0.0`,
             port: 8080,
             public: `localhost:8080`,
@@ -161,8 +160,8 @@ module.exports = (env = {prod: false}) => {
             openPage: '',
             overlay: true,
             historyApiFallback: true,
-            before: mockApi
-        }
+            before: !env.prod && require('../mock-api/mock-api')
+        })
     };
 
 };
