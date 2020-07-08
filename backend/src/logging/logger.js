@@ -30,7 +30,7 @@ const logger = (service) =>
             new LokiTransport({
                 ...config.logging.loki,
                 json: true,
-                labels: {app: 'testcpp', service}
+                labels: {app: 'backend', service}
             })
         ],
     });
