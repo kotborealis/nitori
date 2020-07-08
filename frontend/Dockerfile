@@ -8,8 +8,10 @@ RUN mkdir -p /app
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
-COPY . .
+RUN npm ci
+COPY ./src/ ./src/
+COPY ./webpack/ ./webpack/
+COPY ./.babelrc ./.babelrc
 RUN npm run build
 
 # ----
