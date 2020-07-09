@@ -8,7 +8,7 @@
   "scripts": {
     "build": "npm run-script clear-dist && npm run-script build:webpack",
     "build:webpack": "webpack --config webpack/webpack.config.js --progress --colors --env.prod --mode production",
-    "clear-dist": "node clear-dist.js",
+    "clear-dist": "node webpack/clear-dist.js",
     "start": "webpack-dev-server --config webpack/webpack.config.js --color --mode development"
   },
   "dependencies": {
