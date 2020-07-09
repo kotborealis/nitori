@@ -48,14 +48,6 @@ services:
     networks:
       - default
 
-  promtail:
-    build:
-      context: ./promtail/
-      dockerfile: Dockerfile
-    command: -config.file=/etc/promtail/config.yaml
-    networks:
-      - default
-
   grafana:
     image: grafana/grafana:latest
     volumes:
