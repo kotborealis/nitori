@@ -12,3 +12,7 @@ services:
   grafana:
     ports:
       - "3200:3000"
+
+  vector:
+    ports:
+      - "513:513/udp"

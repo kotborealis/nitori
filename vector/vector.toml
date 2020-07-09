@@ -1,7 +1,19 @@
+[sources.backend_app]
+  type = "syslog"
+  mode = "udp"
+  address = "0.0.0.0:513"
+
 [sources.frontend_nginx]
   type = "syslog"
   mode = "udp"
   address = "0.0.0.0:514"
+
+[transforms.backend_app_parser]
+  type = "json_parser"
+  inputs = ["backend_app"]
+  field = "message"
+  drop_field = true
+  drop_invalid = false
 
 [transforms.frontend_nginx_parser]
   type = "json_parser"
@@ -9,6 +21,13 @@
   field = "message"
   drop_field = true
   drop_invalid = false
+
+[sinks.loki_backend_app]
+  type = "loki"
+  inputs = ["backend_app_parser"]
+  endpoint = "http://loki:3100"
+  encoding.codec = "json"
+  labels.app = "backend"
 
 [sinks.loki_frontend_nginx]
   type = "loki"

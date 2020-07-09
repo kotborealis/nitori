@@ -43,9 +43,10 @@ module.exports = {
         url: process.env.AUTH_API || 'http://127.0.0.1:8080/auth/user_data.php'
     },
     logging: {
-        loki: {
-            host: process.env.LOGGING_LOKI_HOST || 'loki:3100',
-            basicAuth: process.env.LOGGING_LOKI_BASICAUTH || undefined
+        syslog: {
+            host: process.env.LOGGING_SYSLOG_HOST || 'vector',
+            port: process.env.LOGGING_SYSLOG_PORT || 513,
+            protocol: process.env.LOGGING_SYSLOG_PROTOCOL || 'udp4'
         }
     }
 };

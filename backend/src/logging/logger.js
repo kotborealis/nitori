@@ -1,7 +1,9 @@
+require('winston-syslog');
 const {getCorrelationId} = require('../correlation/correlation');
 const {createLogger, format, transports} = require('winston');
-const {combine, timestamp, label, json, errors, simple, colorize} = format;
-const LokiTransport = require('winston-loki');
+const {combine, timestamp, json, errors} = format;
+const {Syslog, Console} = transports;
+const {levels: SyslogLevels} = require('winston').config.syslog;
 
 let config;
 const init = (config_) => config = config_;
@@ -15,6 +17,7 @@ const init = (config_) => config = config_;
 const logger = (service) =>
     createLogger({
         level: 'debug',
+        levels: SyslogLevels,
         format: combine(
             format((info) => {
                 info.correlationId = getCorrelationId();
@@ -27,11 +30,10 @@ const logger = (service) =>
             json(),
         ),
         transports: [
-            new LokiTransport({
-                ...config.logging.loki,
-                json: true,
-                labels: {app: 'backend', service}
-            })
+            new Syslog({
+                ...config.logging.syslog
+            }),
+            new Console()
         ],
     });
 

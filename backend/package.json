@@ -32,7 +32,7 @@
     "swagger-ui-express": "^4.1.2",
     "tar-stream": "^2.1.0",
     "winston": "^3.3.3",
-    "winston-loki": "^5.1.2",
+    "winston-syslog": "^2.4.4",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {}
