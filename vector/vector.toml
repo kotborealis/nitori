@@ -3,9 +3,16 @@
   mode = "udp"
   address = "0.0.0.0:514"
 
-[sinks.loki]
-  type = "loki"
+[transforms.frontend_nginx_parser]
+  type = "json_parser"
   inputs = ["frontend_nginx"]
+  field = "message"
+  drop_field = true
+  drop_invalid = false
+
+[sinks.loki_frontend_nginx]
+  type = "loki"
+  inputs = ["frontend_nginx_parser"]
   endpoint = "http://loki:3100"
   encoding.codec = "json"
-  labels.app = "frontend/ngixn"
+  labels.app = "frontend/nginx"
