@@ -23,16 +23,17 @@ services:
       context: ./frontend/
       dockerfile: Dockerfile
       args:
-        PUBLIC_PATH: "${FRONTEND_PUBLIC_PATH}"
-        AUTH_PATH: "${FRONTEND_AUTH_PATH}"
+        PUBLIC_PATH: "${PUBLIC_PATH}"
+        AUTH_PATH: "${AUTH_PATH}"
     env_file:
       - .env
     ports:
-      - "${FRONTEND_PUBLIC_PORT}:80"
+      - "${PUBLIC_PORT}:80"
     networks:
       - default
     depends_on:
       - backend
+      - vector
 
   database:
     image: "mongo"
@@ -49,12 +50,14 @@ services:
       - default
 
   grafana:
-    image: grafana/grafana:latest
+    build:
+      context: ./grafana/
+      dockerfile: Dockerfile
+    command: --config=/etc/grafana/custom.ini
     volumes:
       - grafana_data:/var/lib/grafana
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=123qwe
-      - GF_USERS_ALLOW_SIGN_UP=false
+    env_file:
+      - .env
     networks:
       - default
 
