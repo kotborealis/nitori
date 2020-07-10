@@ -16,3 +16,11 @@ services:
   vector:
     ports:
       - "513:513/udp"
+
+  prometheus:
+    ports:
+      - "9090:9090"
+
+  prom_aggregation_gateway:
+    ports:
+      - "9091:80"

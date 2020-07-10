@@ -65,6 +65,19 @@ services:
     networks:
       - default
 
+  prometheus:
+    build:
+      context: ./prometheus/
+      dockerfile: Dockerfile
+    command: --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      - default
+
+  prom_aggregation_gateway:
+    image: weaveworks/prom-aggregation-gateway:latest
+    networks:
+      - default
+
 volumes:
   database_mongo:
   grafana_data:
