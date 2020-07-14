@@ -29,12 +29,30 @@ const logger = (service) =>
             errors({stack: true}),
             json(),
         ),
-        transports: [
-            new Syslog({
-                ...config.logging.syslog
-            }),
-            new Console()
-        ],
+        transports: generateTransports(config.logging.transports, config)
     });
+
+/**
+ * Map of names and supported transports
+ * @type {{console: (function(): *), syslog: (function({logging?: *}): *)}}
+ */
+const transportMap = {
+    console: () => new Console(),
+    syslog: ({logging: syslog}) => console.log("creating syslog", syslog) || new Syslog(syslog)
+};
+
+/**
+ * Generate transports from names and config
+ * @param names
+ * @param config
+ * @returns {*[]}
+ */
+const generateTransports = (names, config) =>
+    names
+        .filter(name =>
+            transportMap.hasOwnProperty(name)
+            || console.warn(`Transport ${name} is not supported. Supported: ${Object.keys(transportMap)}`)
+        )
+        .map(name => transportMap[name](config));
 
 module.exports = {logger, init};
