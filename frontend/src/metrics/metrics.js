@@ -2,28 +2,12 @@ import prom from 'promjs';
 
 const registry = prom();
 
-window.addEventListener('load', () => setTimeout(() => {
-    const page_load_time = registry.create(
-        'histogram',
-        'page_load_time',
-        'Page load timing',
-        [0, 1000, 2000]
-    );
+const REGISTRY_PREFIX = 'frontend_app_';
 
-    const {loadEventEnd, navigationStart} = performance.timing;
-    page_load_time.observe(loadEventEnd - navigationStart);
+const push = () => fetch('/api/metrics/', {method: 'POST', body: registry.metrics()})
+    .then(() => 0) // Don't care
+    .catch(console.error.bind(console));
 
-    const page_render_time = registry.create(
-        'histogram',
-        'page_render_time',
-        'Page render timing',
-        [0, 1000, 2000]
-    );
-
-    const {domComplete, domLoading} = performance.timing;
-    page_render_time.observe(domComplete - domLoading);
-
-    fetch('/api/metrics/', {method: 'POST', body: registry.metrics()});
-}, 0));
-
-window.registry = registry;
+export const metricsRegistry = registry;
+export const metricsPush = push;
+export const METRICS_PREFIX = REGISTRY_PREFIX;

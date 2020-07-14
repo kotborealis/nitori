@@ -11,7 +11,7 @@ import {AuthBanner} from '../components/AuthBanner/AuthBanner';
 import Container from '@material-ui/core/Container';
 import {Submit} from '../views/Submit/Submit';
 
-import '../metrics/metrics';
+import '../metrics/page_performance';
 
 const RouterRoot = ({children}) => {
     // Fetch user data
