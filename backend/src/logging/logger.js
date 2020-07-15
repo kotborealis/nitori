@@ -38,7 +38,7 @@ const logger = (service) =>
  */
 const transportMap = {
     console: () => new Console(),
-    syslog: ({logging: syslog}) => console.log("creating syslog", syslog) || new Syslog(syslog)
+    syslog: ({logging: {syslog}}) => new Syslog(syslog)
 };
 
 /**
