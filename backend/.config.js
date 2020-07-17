@@ -40,11 +40,13 @@ module.exports = {
         name: process.env.DATABASE_NAME || 'nitori'
     },
     auth: {
-        url: process.env.AUTH_API || 'http://127.0.0.1:8080/auth/user_data.php'
+        url: process.env.AUTH_API || 'http://127.0.0.1:8080/auth/user_data.php',
+        admins: (process.env.AUTH_ADMINS || 'prep')
+            .split(',').filter(i => i),
     },
     logging: {
         transports:
-            (process.env.LOGGING_TRANSPORTS || ['syslog', 'console'])
+            (process.env.LOGGING_TRANSPORTS || 'syslog,console')
                 .split(',').filter(i => i),
         syslog: {
             host: process.env.LOGGING_SYSLOG_HOST || 'vector',

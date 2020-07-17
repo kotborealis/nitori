@@ -6,4 +6,4 @@ const {authMiddleware} = require('../../api/middleware/auth');
  * @param config
  */
 module.exports = ({app, config}) =>
-    app.use(authMiddleware(config.auth.url));
+    app.use(authMiddleware(config.auth.url, config.auth.admins));

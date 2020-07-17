@@ -4,21 +4,16 @@ const {auth} = require('../../auth/auth');
  * Middleware for auth with access control
  * If successful, adds `userData` property to req
  * @param url
+ * @param {[string]} admins
  * @returns {Function}
  */
-const authMiddleware = (url) => async (req, res, next) => {
+const authMiddleware = (url, admins = []) => async (req, res, next) => {
     if(!req.userData){
         req.userData = await auth(url)(req.cookies.PHPSESSID);
-        // TODO убери костыль
-        if(req.userData && req.userData.login === "prep"){
-            req.userData.isAdmin = true;
-        }
-        if(req.userData && req.userData.login === "kotbarealis"){
-            req.userData.isAdmin = true;
-        }
-        if(req.userData && req.userData.login === "vel"){
-            req.userData.isAdmin = true;
-        }
+
+        if(req.userData)
+            req.userData.isAdmin =
+                req.userData.isAdmin || admins.indexOf(req.userData.login) >= 0;
     }
 
     req.auth = (...when) => {
