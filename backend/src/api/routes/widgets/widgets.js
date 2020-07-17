@@ -17,7 +17,6 @@ module.exports = (config) => {
     });
 
     router.get('/', async (req, res) => {
-        req.auth([({isAdmin}) => isAdmin === true]);
         const widgets = await WidgetModel.find();
         res.mongo(widgets);
     });
