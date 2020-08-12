@@ -1,0 +1,14 @@
+# my global config
+global:
+  scrape_interval:     5s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 5s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+scrape_configs:
+  - job_name: 'frontend_app'
+    static_configs:
+      - targets: ['prom_aggregation_gateway:80']
+
+  - job_name: 'backend_api'
+    static_configs:
+      - targets: ['backend:3000']

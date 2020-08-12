@@ -1,4 +1,4 @@
-FROM node:13-alpine AS build
+FROM node:14-alpine AS build
 
 ARG PUBLIC_PATH
 
@@ -8,15 +8,16 @@ RUN mkdir -p /app
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
-COPY . .
+RUN npm ci
+COPY ./src/ ./src/
+COPY ./webpack/ ./webpack/
+COPY ./.babelrc ./.babelrc
 RUN npm run build
 
 # ----
 
 FROM nginx:alpine
 
-RUN rm /etc/nginx/conf.d/default.conf
-COPY frontend.conf /etc/nginx/conf.d/
+COPY nginx/nginx.conf /etc/nginx/
 
 COPY --from=build /app/build/ /usr/share/nginx/html/

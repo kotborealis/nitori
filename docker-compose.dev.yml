@@ -4,3 +4,23 @@ services:
   database:
     ports:
       - "27017:27017"
+
+  loki:
+    ports:
+      - "3300:3100"
+
+  grafana:
+    ports:
+      - "3200:3000"
+
+  vector:
+    ports:
+      - "513:513/udp"
+
+  prometheus:
+    ports:
+      - "9090:9090"
+
+  prom_aggregation_gateway:
+    ports:
+      - "9091:80"

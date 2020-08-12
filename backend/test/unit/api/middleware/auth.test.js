@@ -1,6 +1,6 @@
 const express = require('express');
-const authMockHandler = require('../../../test/mock/auth/mock-auth-handler');
-const {authMiddleware} = require('./auth');
+const authMockHandler = require('../../../mock/auth/mock-auth-handler');
+const {authMiddleware} = require('../../../../src/api/middleware/auth');
 
 describe('Auth api integration', () => {
     let app;

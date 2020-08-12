@@ -1,7 +1,7 @@
 const config = require('chen.js').config('.config.js');
 const {Docker} = require('node-docker-api');
-const {Sandbox} = require('../Sandbox/Sandbox');
-const Compiler = require('./Compiler');
+const {Sandbox} = require('../../../src/Sandbox/Sandbox');
+const Compiler = require('../../../src/SandboxedGnuUtils/Compiler');
 
 const docker = new Docker(config.docker);
 

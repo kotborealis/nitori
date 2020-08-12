@@ -13,8 +13,8 @@ services:
       - --config=./.config.js
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    links:
-      - database
+    networks:
+      - default
     depends_on:
       - database
 
@@ -23,22 +23,67 @@ services:
       context: ./frontend/
       dockerfile: Dockerfile
       args:
-        PUBLIC_PATH: "${FRONTEND_PUBLIC_PATH}"
-        AUTH_PATH: "${FRONTEND_AUTH_PATH}"
+        PUBLIC_PATH: "${PUBLIC_PATH}"
+        AUTH_PATH: "${AUTH_PATH}"
     env_file:
       - .env
     ports:
-      - "${FRONTEND_PUBLIC_PORT}:80"
-    links:
-      - backend
+      - "${PUBLIC_PORT}:80"
+    networks:
+      - default
     depends_on:
       - backend
+      - vector
 
   database:
     image: "mongo"
     volumes:
       - database_mongo:/data/db
     restart: unless-stopped
+    networks:
+      - default
+
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - default
+
+  grafana:
+    build:
+      context: ./grafana/
+      dockerfile: Dockerfile
+    command: --config=/etc/grafana/custom.ini
+    volumes:
+      - grafana_data:/var/lib/grafana
+    env_file:
+      - .env
+    networks:
+      - default
+
+  vector:
+    build:
+      context: ./vector/
+      dockerfile: Dockerfile
+    networks:
+      - default
+
+  prometheus:
+    build:
+      context: ./prometheus/
+      dockerfile: Dockerfile
+    command: --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      - default
+
+  prom_aggregation_gateway:
+    image: weaveworks/prom-aggregation-gateway:latest
+    networks:
+      - default
 
 volumes:
   database_mongo:
+  grafana_data:
+
+networks:
+  default:

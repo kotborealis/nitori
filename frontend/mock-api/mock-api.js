@@ -12,5 +12,11 @@ module.exports = (app) => {
         }
     }));
 
+    app.use('/api/metrics', createProxyMiddleware({
+        target: 'http://127.0.0.1:9091/metrics',
+        context: ['/api/metrics'],
+        pathRewrite: {'^/api/metrics': ''}
+    }));
+
     authMock(app);
 };

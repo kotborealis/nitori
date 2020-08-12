@@ -1,0 +1,41 @@
+# Backend app
+
+[sources.backend_app]
+  type = "syslog"
+  mode = "udp"
+  address = "0.0.0.0:513"
+
+[transforms.backend_app_parser]
+  type = "json_parser"
+  inputs = ["backend_app"]
+  field = "message"
+  drop_field = true
+  drop_invalid = false
+
+[sinks.loki_backend_app]
+  type = "loki"
+  inputs = ["backend_app_parser"]
+  endpoint = "http://loki:3100"
+  encoding.codec = "json"
+  labels.app = "backend"
+
+# Frontend nginx
+
+[sources.frontend_nginx]
+  type = "syslog"
+  mode = "udp"
+  address = "0.0.0.0:514"
+
+[transforms.frontend_nginx_parser]
+  type = "json_parser"
+  inputs = ["frontend_nginx"]
+  field = "message"
+  drop_field = true
+  drop_invalid = false
+
+[sinks.loki_frontend_nginx]
+  type = "loki"
+  inputs = ["frontend_nginx_parser"]
+  endpoint = "http://loki:3100"
+  encoding.codec = "json"
+  labels.app = "frontend/nginx"

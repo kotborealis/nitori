@@ -1,5 +1,5 @@
 const {Objcopy} = require('../SandboxedGnuUtils');
-const debug = require('debug')('nitori:compileSpecRunner');
+const logger = require(('../logging/logger')).logger('compileSpecRunner');
 const {Compiler} = require('../SandboxedGnuUtils');
 const {Sandbox} = require('../Sandbox');
 const {Docker} = require('node-docker-api');
@@ -21,7 +21,7 @@ const compileSpecRunner = async (config, spec, example) => {
     }], {working_dir, I: ["/opt/nitori/"], include: ["/opt/nitori/testing.hpp"]});
 
     if(specCompilerResult.exitCode){
-        debug(`Failed to compile spec`);
+        logger.debug(`Failed to compile spec`);
         await sandbox.stop();
         return {specCompilerResult};
     }
@@ -35,7 +35,7 @@ const compileSpecRunner = async (config, spec, example) => {
     }], {working_dir});
 
     if(exampleCompilerResult.exitCode){
-        debug(`Failed to compile example`);
+        logger.notice(`Failed to compile example`);
         await sandbox.stop();
         return {specCompilerResult, exampleCompilerResult};
     }
@@ -56,7 +56,7 @@ const compileSpecRunner = async (config, spec, example) => {
         timeout: config.timeout.run
     });
 
-    sandbox.stop().catch((...args) => debug(...args));
+    sandbox.stop().catch((...args) => logger.error(...args));
 
     return {specCompilerResult, exampleCompilerResult, linkerResult, runnerResult};
 };

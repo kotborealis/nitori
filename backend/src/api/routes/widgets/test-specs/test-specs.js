@@ -1,6 +1,5 @@
 const {Router} = require('express');
 const {TestSpecModel} = require('../../../../database');
-const debug = require('debug')('nitori:api:widget:test-spec');
 
 module.exports = (config) => {
 
