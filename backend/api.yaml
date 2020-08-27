@@ -427,7 +427,6 @@ paths:
         - SpecRunner
       requestBody:
         description: SpecRunner request
-        required: true
         content:
           application/json:
             schema:
