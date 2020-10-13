@@ -7,7 +7,6 @@
 #include <fstream>
 #include <cctype>
 #include <locale>
-
 #include <cstdio>
 
 extern "C" {
@@ -31,6 +30,7 @@ namespace nitori {
  * Hijack stdout
  */
 void hijack_stdout() {
+    fflush(stdout);
     freopen(".stdout", "w", stdout);
 }
 
@@ -38,6 +38,7 @@ void hijack_stdout() {
  * Restore stdout
  */
 void restore_stdout() {
+    fflush(stdout);
     freopen("/dev/tty", "w", stdout);
 }
 
@@ -45,6 +46,7 @@ void restore_stdout() {
  * Hijack stderr
  */
 void hijack_stderr() {
+    fflush(stderr);
     freopen(".stderr", "w", stderr);
 }
 
@@ -52,6 +54,7 @@ void hijack_stderr() {
  * Restore stderr
  */
 void restore_stderr() {
+    fflush(stderr);
     freopen("/dev/tty", "w", stderr);
 }
 
