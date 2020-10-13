@@ -1,6 +1,7 @@
 #include "testing.hpp"
 
-int readInt();
+int sum(int, int);
+void print(int);
 
 TEST_CASE("self-test") {
     SECTION("Hijack&restore stdout") {
@@ -76,5 +77,15 @@ TEST_CASE("self-test") {
         });
     }
 
-
+    SECTION("with_stdout") {
+        {
+            const auto [output, retval] = nitori::with_stdout(sum, 2, 3);
+            REQUIRE(output == "2+3=5");
+            REQUIRE(retval == 5);
+        }
+        {
+            const auto [output] = nitori::with_stdout(print, 777);
+            REQUIRE(output == "777");
+        }
+    }
 }

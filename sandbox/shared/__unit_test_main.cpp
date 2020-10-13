@@ -7,3 +7,12 @@ int main() {
     printf("%d", c);
     return 7;
 }
+
+int sum(int a, int b) {
+    printf("%d+%d=%d", a, b, a+b);
+    return a+b;
+}
+
+void print(int a) {
+    printf("%d", a);
+}
