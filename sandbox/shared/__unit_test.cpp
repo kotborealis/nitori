@@ -79,12 +79,12 @@ TEST_CASE("self-test") {
 
     SECTION("with_stdout") {
         {
-            const auto [output, retval] = nitori::with_stdout(sum, 2, 3);
+            const auto [output, retval] = nitori::call(sum, 2, 3);
             REQUIRE(output == "2+3=5");
             REQUIRE(retval == 5);
         }
         {
-            const auto [output] = nitori::with_stdout(print, 777);
+            const auto [output] = nitori::call(print, 777);
             REQUIRE(output == "777");
         }
     }

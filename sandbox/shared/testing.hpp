@@ -207,7 +207,7 @@ void main(::nitori::processTest::ProcessTestSuite suite) {
  *      where stdout is trimmed, and retval is return value of function fn
  */
 template<typename... Args>
-auto with_stdout(auto fn, Args... args) {
+auto call(auto fn, Args... args) {
     if constexpr (std::is_same_v<decltype(fn(args...)), void>) {
         ::nitori::hijack_stdout();
         fn(std::forward<Args>(args)...);
