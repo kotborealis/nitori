@@ -8,6 +8,7 @@
 #include <cctype>
 #include <locale>
 #include <cstdio>
+#include <tuple>
 
 extern "C" {
     int __NITORI_HIJACK_MAIN__(int argc, char** argv) __attribute__((weak));
@@ -113,6 +114,15 @@ void stdin(std::string value = "") {
 }
 
 /**
+ * Hijack stdin alias
+ *
+ * @param value stdin value
+ */
+void stdin(const char* value) {
+    hijack_stdin(value);
+}
+
+/**
  * Call hijacked main with classic argc & argv
  * Automaticly hijacks and restores stdout and stderr
  *
@@ -186,6 +196,30 @@ int main(::nitori::processTest::ProcessTestCase test) {
 void main(::nitori::processTest::ProcessTestSuite suite) {
     auto test = GENERATE_REF(from_range(suite.begin(), suite.end()));
     ::nitori::main(test);
+}
+
+/**
+ * Call function fn with arguments args and return its stdout and return value
+ * Returns tuple:
+ * * If fn returns void: std::tuple<std::string stdout>,
+ *      where stdout are trimmed
+ * * Else if fn returns type T: std::tuple<std::string stdout, T retval>,
+ *      where stdout is trimmed, and retval is return value of function fn
+ */
+template<typename... Args>
+auto with_stdout(auto fn, Args... args) {
+    if constexpr (std::is_same_v<decltype(fn(args...)), void>) {
+        ::nitori::hijack_stdout();
+        fn(std::forward<Args>(args)...);
+        ::nitori::restore_stdout();
+        return std::make_tuple(::nitori::stdout());
+    }
+    else {
+        ::nitori::hijack_stdout();
+        auto retval = fn(std::forward<Args>(args)...);
+        ::nitori::restore_stdout();
+        return std::make_tuple(::nitori::stdout(), retval);
+    }
 }
 
 }
