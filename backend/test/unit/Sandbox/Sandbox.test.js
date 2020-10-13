@@ -12,6 +12,11 @@ describe('Sandbox', () => {
         sandbox = new Sandbox(docker, config)
     );
 
+    test('build', async () => {
+        const image = await Sandbox.build(docker, config);
+        expect(image.id).toEqual(config.container.Image);
+    }, 600000);
+
     test('init', () => {
         expect(sandbox.id).toBeTruthy();
         expect(sandbox.container).toBeFalsy();

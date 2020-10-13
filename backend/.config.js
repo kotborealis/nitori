@@ -1,3 +1,5 @@
+require('chen.js').env();
+
 module.exports = {
     api: {
         port: process.env.API_PORT || 3000,
@@ -18,7 +20,8 @@ module.exports = {
             Memory: 1024 * 1024 * 1000,
             DiskQuota: 1024 * 1024 * 100,
             OomKillDisable: false,
-        }
+        },
+        imageContextPath: "../sandbox/"
     },
     sandbox: {
         container_prefix: "nitori-sandbox-",
