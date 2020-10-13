@@ -3,7 +3,8 @@ FROM node:14-alpine
 RUN mkdir -p /app
 WORKDIR /app
 
-COPY package*.json ./
+COPY ./backend/package*.json ./
 RUN npm ci
-COPY . .
+COPY ./backend/ .
+COPY ./sandbox /sandbox
 ENTRYPOINT ["node", "/app/src/index.js"]
