@@ -21,7 +21,7 @@ module.exports = {
             DiskQuota: 1024 * 1024 * 100,
             OomKillDisable: false,
         },
-        imageContextPath: "../sandbox/"
+        imageContextPath: process.env.CONTAINER_IMAGE_CONTEXT_PATH || "/sandbox/"
     },
     sandbox: {
         container_prefix: "nitori-sandbox-",
