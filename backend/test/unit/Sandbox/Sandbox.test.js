@@ -1,4 +1,5 @@
 const config = require('chen.js').config('.config.js');
+require('../../../src/logging/logger').init(config);
 const {Docker} = require('node-docker-api');
 const {Sandbox} = require('../../../src/Sandbox/Sandbox');
 

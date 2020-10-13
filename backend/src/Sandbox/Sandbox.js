@@ -7,6 +7,8 @@ const {PromiseTimeoutError} = require('../utils/PromiseTimeout');
 
 const {promisifyDockerStream} = require('../utils/promisifyDockerStream');
 
+const tar = require('tar-fs');
+
 const instanceId = shortid.generate();
 
 /**
@@ -99,6 +101,17 @@ class Sandbox {
                 logger.error("Error during container.delete()", e);
             }
         }
+    }
+
+    static build(docker, config) {
+        const tarball = tar.pack(config.container.imageContextPath);
+        return new Promise((resolve, reject) =>
+            docker.image.build(tarball, {t: config.container.Image})
+                .then(promisifyDockerStream)
+                .then(() => docker.image.get(config.container.Image).status())
+                .then(resolve)
+                .catch(reject)
+        );
     }
 
     /**
