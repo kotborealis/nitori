@@ -9,7 +9,7 @@ const {Sandbox} = require('./Sandbox');
 process.on('unhandledRejection', (reason) => console.error('unhandledRejection', reason));
 
 (async () => {
-    await Sandbox.build(new Docker(config.docker), config);
+    Sandbox.build(new Docker(config.docker), config);
     databaseInit(config);
     API(config);
 })();
