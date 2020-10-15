@@ -1,5 +1,3 @@
-#include "testing.hpp"
-
 int sum(int, int);
 void print(int);
 
