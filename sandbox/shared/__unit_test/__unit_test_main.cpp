@@ -16,3 +16,7 @@ int sum(int a, int b) {
 void print(int a) {
     printf("%d", a);
 }
+
+int call_fpe() {
+    return 0/0;
+}

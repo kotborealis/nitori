@@ -1,5 +1,6 @@
 int sum(int, int);
 void print(int);
+int call_fpe();
 
 TEST_CASE("self-test") {
     SECTION("Hijack&restore stdout") {
@@ -85,5 +86,9 @@ TEST_CASE("self-test") {
             const auto [output] = nitori::call(print, 777);
             REQUIRE(output == "777");
         }
+    }
+
+    SECTION("Handles FPE") {
+        call_fpe();
     }
 }

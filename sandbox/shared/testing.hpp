@@ -1,7 +1,8 @@
 #pragma once
 
-#define CATCH_CONFIG_MAIN
+#define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
+#include "backtrace.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -9,6 +10,24 @@
 #include <locale>
 #include <cstdio>
 #include <tuple>
+
+int main(int argc, char** argv) {
+    __exec_name = argv[0];
+
+    struct sigaction sa;
+
+    sa.sa_sigaction = bt_sighandler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART|SA_SIGINFO;
+
+    sigaction(SIGSEGV, &sa, NULL);
+    sigaction(SIGFPE,  &sa, NULL);
+    sigaction(SIGILL,  &sa, NULL);
+    sigaction(SIGBUS,  &sa, NULL);
+    sigaction(SIGABRT, &sa, NULL);
+    sigaction(SIGTRAP, &sa, NULL);
+    return Catch::Session().run(argc, argv);
+}
 
 extern "C" {
     int __NITORI_HIJACK_MAIN__(int argc, char** argv) __attribute__((weak));
