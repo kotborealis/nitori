@@ -48,9 +48,10 @@ export const TestSpecsList = () => {
                 {
                     icon: 'delete',
                     tooltip: 'Удалить задание',
-                    onClick: (event, entity) =>
+                    onClick: async (event, entity) =>
                         confirm(`Удалить задание ${entity.name}?`)
-                        && apiActions.testSpecDelete({widgetId: entity.widget, testSpecId: entity._id})
+                        && await apiActions.testSpecDelete({widgetId: entity.widget, testSpecId: entity._id})
+                        && tableRef.current.onQueryChange()
                 }
             ]}
 
