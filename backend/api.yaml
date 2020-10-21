@@ -72,7 +72,6 @@ paths:
       tags:
         - TestSpecs
       parameters:
-        - $ref: '#/components/parameters/widgetId'
         - name: limit
           description: Limit
           in: query
@@ -125,7 +124,6 @@ paths:
       tags:
         - TestSpecs
       parameters:
-        - $ref: '#/components/parameters/widgetId'
         - name: name
           in: query
           required: true
@@ -133,7 +131,8 @@ paths:
             type: string
         - name: description
           in: query
-          required: true
+          required: false
+          allowEmptyValue: true
           schema:
             type: string
             default: ""
@@ -210,6 +209,7 @@ paths:
           $ref: "#/components/responses/NotFound"
         403:
           $ref: "#/components/responses/Unauthorized"
+
     put:
       tags:
         - TestSpecs
@@ -248,17 +248,11 @@ paths:
           $ref: "#/components/responses/NotFound"
         403:
           $ref: "#/components/responses/Unauthorized"
+
     delete:
       summary: Delete TestSpecs by id
       tags:
         - TestSpecs
-      parameters:
-        - $ref: '#/components/parameters/widgetId'
-        - name: testSpecId
-          in: path
-          required: true
-          schema:
-            type: string
       responses:
         200:
           description: Deleted specified TestSpec
