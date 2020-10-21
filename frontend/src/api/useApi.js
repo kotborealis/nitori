@@ -54,7 +54,7 @@ export const useApi = (fetcher, deps = []) => {
     const reset = () => {
         fetchCancelManager.current.cancel();
         setState(initialState);
-    }
+    };
 
     return {
         ...state,
