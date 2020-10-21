@@ -1,7 +1,7 @@
 require('winston-syslog');
 const {getCorrelationId} = require('../correlation/correlation');
 const {createLogger, format, transports} = require('winston');
-const {combine, timestamp, json, errors} = format;
+const {combine, timestamp, json, errors, prettyPrint} = format;
 const {Syslog, Console} = transports;
 const {levels: SyslogLevels} = require('winston').config.syslog;
 
@@ -18,17 +18,6 @@ const logger = (service) =>
     createLogger({
         level: 'debug',
         levels: SyslogLevels,
-        format: combine(
-            format((info) => {
-                info.correlationId = getCorrelationId();
-                return info;
-            })(),
-            timestamp({
-                format: `YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ`
-            }),
-            errors({stack: true}),
-            json(),
-        ),
         transports: generateTransports(config.logging.transports, config)
     });
 
@@ -37,8 +26,40 @@ const logger = (service) =>
  * @type {{console: (function(): *), syslog: (function({logging?: *}): *)}}
  */
 const transportMap = {
-    console: () => new Console(),
-    syslog: ({logging: {syslog}}) => new Syslog(syslog)
+    console: (_, format) => new Console({format}),
+    syslog: ({logging: {syslog}}, format) => new Syslog({...syslog, format})
+};
+
+/**
+ * Map of names and transport formats
+ * @type {{console: (function(): *), syslog: (function({logging?: *}): *)}}
+ */
+const transportFormatMap = {
+    console: combine(
+        format.splat(),
+        format((info) => {
+            info.correlationId = getCorrelationId();
+            return info;
+        })(),
+        timestamp({
+            format: `YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ`
+        }),
+        errors({stack: true}),
+        format.colorize(),
+        format.simple(),
+    ),
+    syslog: combine(
+        format.splat(),
+        format((info) => {
+            info.correlationId = getCorrelationId();
+            return info;
+        })(),
+        timestamp({
+            format: `YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ`
+        }),
+        errors({stack: true}),
+        json()
+    )
 };
 
 /**
@@ -53,6 +74,6 @@ const generateTransports = (names, config) =>
             transportMap.hasOwnProperty(name)
             || console.warn(`Transport ${name} is not supported. Supported: ${Object.keys(transportMap)}`)
         )
-        .map(name => transportMap[name](config));
+        .map(name => transportMap[name](config, transportFormatMap[name]));
 
 module.exports = {logger, init};
