@@ -420,7 +420,7 @@ paths:
         404:
           $ref: "#/components/responses/NotFound"
 
-  /widgets/{widgetId}/overview/user/test-specs:
+  /widgets/{widgetId}/overview/test-targets/users/test-specs:
     get:
       summary: Get TestTargets overview, grouped by user and TestSpecs
       tags:
@@ -437,7 +437,7 @@ paths:
         404:
           $ref: "#/components/responses/NotFound"
 
-  /widgets/{widgetId}/overview/test-specs/user:
+  /widgets/{widgetId}/overview/test-targets/test-specs/users:
     get:
       summary: Get TestTargets overview, grouped by TestSpecs and by users
       tags:
@@ -451,6 +451,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TestTargetsByTestSpecByUser'
+        404:
+          $ref: "#/components/responses/NotFound"
+
+  /widgets/{widgetId}/overview/users:
+    get:
+      summary: Get users
+      tags:
+        - TestTargets
+      parameters:
+        - $ref: '#/components/parameters/widgetId'
+      responses:
+        200:
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDataList'
         404:
           $ref: "#/components/responses/NotFound"
 
@@ -581,6 +598,11 @@ components:
           type: number
         groupName:
           type: string
+
+    UserDataList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserData'
 
     TestTarget:
       type: object

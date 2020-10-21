@@ -6,7 +6,7 @@ module.exports = (config) => {
 
     const router = Router();
 
-    router.route('/user/test-specs')
+    router.route('/test-targets/users/test-specs')
         .get(async (req, res) => {
 
             const widgetId = ObjectId(req.widgetId);
@@ -109,7 +109,7 @@ module.exports = (config) => {
             res.mongo(testTargets);
         });
 
-    router.route('/test-specs/user')
+    router.route('/test-targets/test-specs/users')
         .get(async (req, res) => {
 
             const widgetId = ObjectId(req.widgetId);
@@ -176,6 +176,30 @@ module.exports = (config) => {
                                     }
                                 }
                             ]
+                        }
+                    }
+                ]);
+
+            res.mongo(testTargets);
+        });
+
+    router.route('/users')
+        .get(async (req, res) => {
+            /**
+             * На выходе получаем массив структур UserData
+             */
+            const testTargets = await TestTargetModel
+                .aggregate([
+                    {
+                        '$group': {
+                            '_id': '$userData.userId',
+                            'userData': {
+                                '$first': '$userData'
+                            }
+                        }
+                    }, {
+                        '$replaceRoot': {
+                            'newRoot': '$userData'
                         }
                     }
                 ]);
