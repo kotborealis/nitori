@@ -420,6 +420,40 @@ paths:
         404:
           $ref: "#/components/responses/NotFound"
 
+  /widgets/{widgetId}/overview/user/test-specs:
+    get:
+      summary: Get TestTargets overview, grouped by user and TestSpecs
+      tags:
+        - TestTargets
+      parameters:
+        - $ref: '#/components/parameters/widgetId'
+      responses:
+        200:
+          description: TestTargets overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestTargetsByUserByTestSpec'
+        404:
+          $ref: "#/components/responses/NotFound"
+
+  /widgets/{widgetId}/overview/test-specs/user:
+    get:
+      summary: Get TestTargets overview, grouped by TestSpecs and by users
+      tags:
+        - TestTargets
+      parameters:
+        - $ref: '#/components/parameters/widgetId'
+      responses:
+        200:
+          description: TestTargets overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestTargetsByTestSpecByUser'
+        404:
+          $ref: "#/components/responses/NotFound"
+
   /specRunner:
     post:
       summary: Test spec and example runner
@@ -569,6 +603,38 @@ components:
           $ref: '#/components/schemas/ExecOutput'
         sourceFiles:
           $ref: '#/components/schemas/SourceFileList'
+
+    TestTargetsByUserByTestSpec:
+      type: array
+      items:
+        type: object
+        properties:
+          userData:
+            $ref: '#/components/schemas/UserData'
+          testTargetsByTestSpec:
+            properties:
+              testSpec:
+                $ref: '#/components/schemas/TestSpec'
+              testTargets:
+                $ref: '#/components/schemas/TestTargetList'
+
+    TestTargetsByTestSpecByUser:
+      type: array
+      items:
+        type: object
+        properties:
+          testSpec:
+            $ref: '#/components/schemas/TestSpec'
+          testTargetsByUser:
+            type: array
+            items:
+              type: object
+              properties:
+                userData:
+                  $ref: '#/components/schemas/UserData'
+                testTargets:
+                  $ref: '#/components/schemas/TestTargetList'
+
 
     TestTargetList:
       type: array
