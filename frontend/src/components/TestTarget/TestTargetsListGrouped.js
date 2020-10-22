@@ -10,20 +10,75 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import TreeItem from '@material-ui/lab/TreeItem';
 import {Link} from '@material-ui/core';
 import Chip from '@material-ui/core/Chip';
+import Typography from '@material-ui/core/Typography';
+
+function testTargetLabel({widget, _id, targetCompilerResult, specCompilerResult, linkerResult, runnerResult, timestamp}) {
+    return <Link href={`/dashboard/${widget}/test-targets/${_id}`}
+                 rel="noopener noreferrer"
+                 target="_blank">
+        <ChevronRightIcon/>
+        {testTargetResultBadges({
+            targetCompilerResult,
+            specCompilerResult,
+            linkerResult,
+            runnerResult
+        })}
+        <Chip variant="outlined"
+              label={<TimeUpdated>{timestamp}</TimeUpdated>}/>
+    </Link>;
+}
+
+function testTargetsByTestSpecList(testTargetsByTestSpec, userData) {
+    const hasSolution = testTargetsByTestSpec
+        ?.map(({testTargets}) =>
+            testTargets.map(target => target.runnerResult?.exitCode)
+                ?.some(_ => _ === 0)
+        );
+
+    console.log(hasSolution, testTargetsByTestSpec);
+
+    return testTargetsByTestSpec.map(({testSpec, testTargets}, i) =>
+        <TreeItem
+            nodeId={testSpec._id + userData.login}
+            label={
+                <Typography style={{background: hasSolution[i] ? '#b4ffb4' : ''}}>
+                    {testSpec.name}
+                </Typography>
+            }
+        >
+            {testTargets.map(target =>
+                <TreeItem nodeId={target._id}
+                          component='a'
+                          label={testTargetLabel(target)}
+                />
+            )}
+        </TreeItem>
+    );
+}
+
+function usersList(users) {
+    return users.map(({userData, testTargetsByTestSpec}) =>
+        <TreeItem nodeId={userData.login} label={`${userData.name} (${userData.login})`}>
+            {testTargetsByTestSpecList(testTargetsByTestSpec, userData)}
+        </TreeItem>
+    );
+}
+
+function groupsList(testTargetsGrouped) {
+    return testTargetsGrouped.data?.map(({group, users}) =>
+        <TreeItem nodeId={`group-${group}`} label={group}>
+            {usersList(users)}
+        </TreeItem>
+    );
+}
 
 export const TestTargetsListGrouped = () => {
     const history = useHistory();
     const {widgetId} = useParams();
     const tableRef = useRef(null);
 
-    //useEffect(() => tableRef.current && tableRef.current.onQueryChange(), [widgetId]);
-
     const testTargetsGrouped = useApi(apiActions.testTargetsByGroupByUsersByTestSpecs);
     testTargetsGrouped.useFetch({widgetId})([widgetId]);
-
-    //const groupsUsersTree = testTargetsGrouped.data?.map(({group, users}) =>
-    //
-    //);
 
     return (
         <TreeView
@@ -31,111 +86,7 @@ export const TestTargetsListGrouped = () => {
             defaultExpandIcon={<ChevronRightIcon/>}
             defaultExpanded={['root']}
         >
-            {testTargetsGrouped.data?.map(({group, users}) =>
-                <TreeItem nodeId={`group-${group}`} label={group}>
-                    {users.map(({userData, testTargetsByTestSpec}) =>
-                        <TreeItem nodeId={userData.login} label={`${userData.name} (${userData.login})`}>
-                            {testTargetsByTestSpec.map(({testSpec, testTargets}) =>
-                                <TreeItem nodeId={testSpec._id + userData.login} label={testSpec.name}>
-                                    {testTargets.map(({_id, timestamp, targetCompilerResult, specCompilerResult, linkerResult, runnerResult}) =>
-                                        <TreeItem nodeId={_id}
-                                                  label={
-                                                      <Link href={`/dashboard/${widgetId}/test-targets/${_id}`}
-                                                            rel="noopener noreferrer"
-                                                            target="_blank">
-                                                          <ChevronRightIcon/>
-                                                          {testTargetResultBadges({
-                                                              targetCompilerResult,
-                                                              specCompilerResult,
-                                                              linkerResult,
-                                                              runnerResult
-                                                          })}
-                                                          <Chip variant="outlined"
-                                                                label={<TimeUpdated>{timestamp}</TimeUpdated>}/>
-                                                      </Link>
-                                                  }
-                                        />
-                                    )}
-                                </TreeItem>
-                            )}
-                        </TreeItem>
-                    )}
-                </TreeItem>
-            )}
+            {groupsList(testTargetsGrouped)}
         </TreeView>
     );
-
-    //return (
-    //    <MaterialTable
-    //        title={"Решения"}
-    //        tableRef={tableRef}
-    //        options={{
-    //            showTitle: true,
-    //            search: true
-    //        }}
-    //
-    //        onRowClick={(event, rowData) => {
-    //            history.push(`/dashboard/${widgetId}/test-targets/${rowData._id}`);
-    //        }}
-    //
-    //        columns={[
-    //            {
-    //                title: 'Тест',
-    //                render: ({testSpec}) => <TestSpecName testSpecId={testSpec} widgetId={widgetId}/>,
-    //                sorting: false,
-    //            },
-    //            {
-    //                title: 'Пользователь',
-    //                render: ({userData: {name, login}}) => name ? `${name} (${login})` : login,
-    //                sorting: false,
-    //            },
-    //            {
-    //                title: 'Отправлено',
-    //                render: ({timestamp}) => <TimeUpdated>{timestamp}</TimeUpdated>,
-    //                sorting: true,
-    //                sortingField: 'timestamp',
-    //            },
-    //            {
-    //                title: 'Проверки',
-    //                render: testTargetResultBadges,
-    //                sorting: false
-    //            }
-    //        ]}
-    //
-    //        data={async ({
-    //                         page,
-    //                         pageSize,
-    //                         search,
-    //                         orderBy,
-    //                         orderDirection
-    //                     }) => {
-    //            const totalCount = await apiActions.testTargetsTotalCount({widgetId});
-    //
-    //            let data;
-    //            try{
-    //                data = await apiActions.testTargets({
-    //                    widgetId,
-    //                    limit: pageSize,
-    //                    skip: page * pageSize,
-    //                    userDataName: search,
-    //                    sortBy: orderBy ? orderBy.sortingField : undefined,
-    //                    orderBy: orderDirection,
-    //                });
-    //            }
-    //            catch(e){
-    //                console.error(e);
-    //                return {
-    //                    data: [],
-    //                    page: 0,
-    //                    totalCount: 0
-    //                };
-    //            }
-    //
-    //            return {
-    //                data,
-    //                page,
-    //                totalCount
-    //            };
-    //        }}/>
-    //);
 };
