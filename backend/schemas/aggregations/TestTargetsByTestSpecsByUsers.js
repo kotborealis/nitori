@@ -64,6 +64,8 @@ const TestTargetsByTestSpecsByUsers = ({widgetId, includeSources}) => [
                         }
                     }
                 }, {
+                    '$sort': {"userData.name": 1}
+                }, {
                     '$project': {
                         '_id': false
                     }

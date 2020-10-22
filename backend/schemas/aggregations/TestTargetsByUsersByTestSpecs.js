@@ -24,6 +24,8 @@ const TestTargetsByUsersByTestSpecs = ({widgetId, includeSources}) => [
             }
         }
     }, {
+        '$sort': {"userData.name": -1}
+    }, {
         '$group': {
             '_id': '$_id.userId',
             'testTargetsByTestSpec': {

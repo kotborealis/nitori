@@ -41,6 +41,8 @@ const TestTargetsByGroupsByUsersByTestSpecs = ({widgetId, includeSources}) => [
             '_id': false
         }
     }, {
+        '$sort': {"userData.name": 1}
+    }, {
         '$lookup': {
             'let': {
                 'widget': widgetId,
