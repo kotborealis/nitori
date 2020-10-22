@@ -15,6 +15,7 @@ import {TestTargetView} from '../../components/TestTarget/TestTargetView';
 import {TestSpecEdit} from '../../components/TestSpec/TestSpecEdit';
 import TestSpec from '../../components/TestSpec/TestSpec';
 import Typography from '@material-ui/core/Typography';
+import {TestTargetsListGrouped} from '../../components/TestTarget/TestTargetsListGrouped';
 
 const DashboardBasic = () => {
     const {widgetId, dashboardTab = 'test-specs', itemId} = useParams();
@@ -52,6 +53,7 @@ const DashboardBasic = () => {
             <Tabs value={tab} onChange={handleTabChange}>
                 <Tab label={"Задания"} value={"test-specs"}/>
                 <Tab label={"Решения"} value={"test-targets"}/>
+                <Tab label={"Решения (по группам)"} value={"test-targets-grouped"}/>
                 <Tab label={"Добавить задание"} value={"test-spec-submit"}/>
             </Tabs>
         </Paper>
@@ -61,6 +63,9 @@ const DashboardBasic = () => {
             </TabPanel>
             <TabPanel value={tab} index={"test-targets"}>
                 <TestTargetsList/>
+            </TabPanel>
+            <TabPanel value={tab} index={"test-targets-grouped"}>
+                <TestTargetsListGrouped widgetId={widgetId}/>
             </TabPanel>
             <TabPanel value={tab} index={"test-spec-submit"}>
                 <TestSpecEdit widgetId={widgetId}/>

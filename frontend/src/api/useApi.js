@@ -8,7 +8,7 @@ const initialState = {
     error: null,
 };
 
-export const useApi = (fetcher, deps = []) => {
+export const useApi = (fetcher) => {
     const fetchCancelManager = useRef(new FetchCancelManager());
 
     const [state, setState] = useState(initialState);
