@@ -11,7 +11,8 @@ const TestSpecSchema = Schema({
     widget: {
         type: Schema.Types.ObjectID,
         ref: 'Widget',
-        required: true
+        required: true,
+        index: true
     },
     description: {
         type: String,

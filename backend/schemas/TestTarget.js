@@ -13,12 +13,14 @@ const TestTargetSchema = Schema({
     testSpec: {
         type: Schema.Types.ObjectID,
         ref: 'TestSpec',
-        required: true
+        required: true,
+        index: true
     },
     widget: {
         type: Schema.Types.ObjectID,
         ref: 'Widget',
-        required: true
+        required: true,
+        index: true
     },
     targetCompilerResult: ExecOutputSchema,
     specCompilerResult: ExecOutputSchema,
