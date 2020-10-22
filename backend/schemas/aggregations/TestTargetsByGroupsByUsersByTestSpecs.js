@@ -17,10 +17,6 @@ const TestTargetsByGroupsByUsersByTestSpecs = ({widgetId, includeSources}) => [
             'widget': widgetId
         }
     }, {
-        '$project': {
-            'sourceFiles': includeSources
-        }
-    }, {
         '$group': {
             '_id': {
                 'userId': '$userData.userId',
@@ -69,7 +65,13 @@ const TestTargetsByGroupsByUsersByTestSpecs = ({widgetId, includeSources}) => [
                             ]
                         }
                     }
-                }, {
+                },
+                ...(includeSources ? [] : [{
+                    '$project': {
+                        sourceFiles: 0,
+                    }
+                }]),
+                {
                     '$sort': {
                         'timestamp': -1
                     }

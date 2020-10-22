@@ -12,7 +12,7 @@ module.exports = (config) => {
         .get(async (req, res) => {
 
             const widgetId = ObjectId(req.widgetId);
-            const {includeSources = true} = req.params;
+            const {includeSources = true} = req.query;
 
             const testTargets = await TestTargetModel
                 .aggregate(aggregations.TestTargetsByUsersByTestSpecs({widgetId, includeSources}));
@@ -24,19 +24,19 @@ module.exports = (config) => {
         .get(async (req, res) => {
 
             const widgetId = ObjectId(req.widgetId);
-            const {includeSources = true} = req.params;
+            const {includeSources = true} = req.query;
 
             const testTargets = await TestTargetModel
                 .aggregate(aggregations.TestTargetsByGroupsByUsersByTestSpecs({widgetId, includeSources}));
 
-            res.mongo(testTargets);
+            res.json(testTargets);
         });
 
     router.route('/test-targets/by/test-specs/users')
         .get(async (req, res) => {
 
             const widgetId = ObjectId(req.widgetId);
-            const {includeSources = true} = req.params;
+            const {includeSources = true} = req.query;
 
             const testTargets = await TestSpecModel
                 .aggregate(aggregations.TestTargetsByTestSpecsByUsers({widgetId, includeSources}));

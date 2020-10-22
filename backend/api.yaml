@@ -469,7 +469,7 @@ paths:
         404:
           $ref: "#/components/responses/NotFound"
 
-  /widgets/{widgetId}/overview/by/test-targets/test-specs/users:
+  /widgets/{widgetId}/overview/test-targets/by/test-specs/users:
     get:
       summary: Get TestTargets overview, grouped by TestSpecs and by users
       tags:

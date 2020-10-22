@@ -43,7 +43,13 @@ const TestTargetsByTestSpecsByUsers = ({widgetId, includeSources}) => [
                             ]
                         }
                     }
-                }, {
+                },
+                ...(includeSources ? [] : [{
+                    '$project': {
+                        sourceFiles: 0,
+                    }
+                }]),
+                {
                     '$sort': {
                         'timestamp': -1
                     }
