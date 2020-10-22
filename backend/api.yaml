@@ -292,6 +292,11 @@ paths:
         - TestTargets
       parameters:
         - $ref: '#/components/parameters/widgetId'
+        - name: includeSources
+          in: query
+          required: false
+          schema:
+            type: boolean
         #       Filters
         - name: limit
           description: Limit
@@ -404,6 +409,12 @@ paths:
           required: true
           schema:
             type: string
+        - name: includeSources
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
       responses:
         200:
           description: TestTarget info
@@ -414,13 +425,18 @@ paths:
         404:
           $ref: "#/components/responses/NotFound"
 
-  /widgets/{widgetId}/overview/test-targets/users/test-specs:
+  /widgets/{widgetId}/overview/test-targets/by/users/test-specs:
     get:
       summary: Get TestTargets overview, grouped by user and TestSpecs
       tags:
         - TestTargets
       parameters:
         - $ref: '#/components/parameters/widgetId'
+        - name: includeSources
+          in: query
+          required: false
+          schema:
+            type: boolean
       responses:
         200:
           description: TestTargets overview
@@ -431,13 +447,40 @@ paths:
         404:
           $ref: "#/components/responses/NotFound"
 
-  /widgets/{widgetId}/overview/test-targets/test-specs/users:
+  /widgets/{widgetId}/overview/test-targets/by/groups/users/test-specs:
+    get:
+      summary: Get TestTargets overview, grouped by groups, user and TestSpecs
+      tags:
+        - TestTargets
+      parameters:
+        - $ref: '#/components/parameters/widgetId'
+        - name: includeSources
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: TestTargets overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestTargetsByGroupsByUserByTestSpec'
+        404:
+          $ref: "#/components/responses/NotFound"
+
+  /widgets/{widgetId}/overview/by/test-targets/test-specs/users:
     get:
       summary: Get TestTargets overview, grouped by TestSpecs and by users
       tags:
         - TestTargets
       parameters:
         - $ref: '#/components/parameters/widgetId'
+        - name: includeSources
+          in: query
+          required: false
+          schema:
+            type: boolean
       responses:
         200:
           description: TestTargets overview
@@ -621,6 +664,20 @@ components:
           $ref: '#/components/schemas/SourceFileList'
 
     TestTargetsByUserByTestSpec:
+      type: array
+      items:
+        type: object
+        properties:
+          userData:
+            $ref: '#/components/schemas/UserData'
+          testTargetsByTestSpec:
+            properties:
+              testSpec:
+                $ref: '#/components/schemas/TestSpec'
+              testTargets:
+                $ref: '#/components/schemas/TestTargetList'
+
+    TestTargetsByGroupsByUserByTestSpec:
       type: array
       items:
         type: object
