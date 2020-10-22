@@ -26,7 +26,7 @@ module.exports = (env = {prod: false}) => {
             publicPath: PUBLIC_PATH
         },
 
-        devtool: ifDebug('source-map'),
+        devtool: ifDebug('eval-source-map'),
         resolve: {
             alias: {
                 "components": path.resolve(__dirname, '../src/components'),
