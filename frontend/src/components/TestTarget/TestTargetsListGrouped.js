@@ -35,8 +35,6 @@ function testTargetsByTestSpecList(testTargetsByTestSpec, userData) {
                 ?.some(_ => _ === 0)
         );
 
-    console.log(hasSolution, testTargetsByTestSpec);
-
     return testTargetsByTestSpec.map(({testSpec, testTargets}, i) =>
         <TreeItem
             nodeId={testSpec._id + userData.login}
