@@ -9,8 +9,8 @@ services:
       - backend/.env
     entrypoint:
       - node
-      - backend/src/index
-      - --config=./backend/.config.js
+      - /app/backend/src/index
+      - --config=/app/backend/.config.js
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
