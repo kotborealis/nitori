@@ -1,6 +1,6 @@
 const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express');
-const {OpenApiValidator} = require('express-openapi-validator');
+const OpenApiValidator = require('express-openapi-validator');
 const swaggerDocument = YAML.load('./api.yaml');
 
 /**
@@ -19,17 +19,18 @@ module.exports = ({app, config}) => {
     // swagger UI
     app.use('/swagger/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-    // openapi validator
-    new OpenApiValidator({
-        apiSpec: './api.yaml',
-        validateRequests: true,
-        validateResponses: {
-            removeAdditional: true
-        },
-        multerOpts: {
-            limits: {
-                fileSize: config.api.limits.fileSize
+    app.use(
+        OpenApiValidator.middleware({
+            apiSpec: './api.yaml',
+            validateRequests: true,
+            validateResponses: true,
+            validateFormats: 'fast',
+            validateSecurity: false,
+            fileUploader: {
+                limits: {
+                    fileSize: config.api.limits.fileSize
+                }
             }
-        }
-    }).install(app);
+        })
+    );
 };

@@ -26,7 +26,7 @@ module.exports = (env = {prod: false}) => {
             publicPath: PUBLIC_PATH
         },
 
-        devtool: ifDebug('source-map'),
+        devtool: ifDebug('eval-source-map'),
         resolve: {
             alias: {
                 "components": path.resolve(__dirname, '../src/components'),
@@ -151,7 +151,7 @@ module.exports = (env = {prod: false}) => {
 
         devServer: ifDebug({
             host: `0.0.0.0`,
-            port: 8081,
+            port: 8080,
             public: `localhost:8080`,
             contentBase: path.join(__dirname, '../build/'),
             disableHostCheck: true,

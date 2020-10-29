@@ -79,6 +79,7 @@ class Compiler {
                 ...(std ? [`--std=${std}`] : []),
                 ...I.map(_ => `-I${_}`),
                 ...include.map(_ => [`-include`, _]).flat(),
+                "-g3",
                 "-c",
                 "-Winvalid-pch",
                 name,

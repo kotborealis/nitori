@@ -2,6 +2,7 @@
     display: flex;
     flex-direction: row;
     padding: 20px;
+    background-color: #3f51b5;
 }
 
 .link {

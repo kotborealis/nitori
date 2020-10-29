@@ -1,3 +1,3 @@
 #! /usr/bin/env bash
 
-docker build . -t nitori_sandbox
+winpty docker build . -t nitori_sandbox

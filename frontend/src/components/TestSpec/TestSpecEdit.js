@@ -20,6 +20,7 @@ export const TestSpecEdit = (
         _id = false,
         name = '',
         description = '',
+        removed = false,
         specFile: {content: specFileContent} = {content: null},
         exampleTargetFile: {content: exampleFileContent} = {content: null}
     }
@@ -49,6 +50,12 @@ export const TestSpecEdit = (
             spec,
             example
         });
+    };
+
+    const handleDelete = async () => {
+        confirm(`Удалить задание ${specName}?`)
+        && await apiActions.testSpecDelete({widgetId, testSpecId: _id})
+        && (removed = true);
     };
 
     let specRunnerResult;
@@ -94,6 +101,18 @@ export const TestSpecEdit = (
                     />
                 </FormControl>
             </div>
+            {_id && <div>
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    component="label"
+                    style={{width: 300}}
+                    onClick={handleDelete}
+                    disabled={removed}
+                >
+                    {removed ? 'Удалено' : 'Удалить'}
+                </Button>
+            </div>}
             <div className={styles.editorsLayout}>
                 <div>
                     <Typography>Код теста</Typography>
@@ -120,6 +139,7 @@ export const TestSpecEdit = (
                     component="label"
                     style={{width: 300}}
                     onClick={handleSave}
+                    disabled={removed}
                 >
                     Сохранить
                 </Button>

@@ -17,7 +17,8 @@ export const TestSpecsList = () => {
             tableRef={tableRef}
             options={{
                 showTitle: true,
-                search: false
+                search: false,
+                actionsColumnIndex: -1
             }}
 
             onRowClick={(event, rowData) => {
@@ -40,6 +41,17 @@ export const TestSpecsList = () => {
                     render: ({timestamp}) => <TimeUpdated>{timestamp}</TimeUpdated>,
                     sorting: true,
                     sortingField: 'timestamp'
+                }
+            ]}
+
+            actions={[
+                {
+                    icon: 'delete',
+                    tooltip: 'Удалить задание',
+                    onClick: async (event, entity) =>
+                        confirm(`Удалить задание ${entity.name}?`)
+                        && await apiActions.testSpecDelete({widgetId: entity.widget, testSpecId: entity._id})
+                        && tableRef.current.onQueryChange()
                 }
             ]}
 

@@ -91,5 +91,10 @@ export const apiActions = {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({spec, example})
             }
-        })
+        }),
+
+    testTargetsByGroupByUsersByTestSpecs: ({widgetId, includeSources = false}) => {
+        console.log("TTBGBUBTS", widgetId, includeSources);
+        return api(`/widgets/${widgetId}/overview/test-targets/by/groups/users/test-specs`, {query: {includeSources}});
+    }
 };

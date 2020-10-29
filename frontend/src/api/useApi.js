@@ -8,7 +8,7 @@ const initialState = {
     error: null,
 };
 
-export const useApi = (fetcher, deps = []) => {
+export const useApi = (fetcher) => {
     const fetchCancelManager = useRef(new FetchCancelManager());
 
     const [state, setState] = useState(initialState);
@@ -54,7 +54,7 @@ export const useApi = (fetcher, deps = []) => {
     const reset = () => {
         fetchCancelManager.current.cancel();
         setState(initialState);
-    }
+    };
 
     return {
         ...state,

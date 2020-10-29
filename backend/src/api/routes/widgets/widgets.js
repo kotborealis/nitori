@@ -44,6 +44,7 @@ module.exports = (config) => {
 
     router.use('/:widgetId/test-specs', require('./test-specs/test-specs')(config));
     router.use('/:widgetId/test-targets', require('./test-targets/test-targets')(config));
+    router.use('/:widgetId/overview', require('./overview/overview')(config));
 
     return router;
 };

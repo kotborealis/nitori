@@ -1,4 +1,5 @@
 const config = require('chen.js').config('.config.js');
+require('../../../src/logging/logger').init(config);
 const {Docker} = require('node-docker-api');
 const {Sandbox} = require('../../../src/Sandbox/Sandbox');
 
@@ -10,6 +11,11 @@ describe('Sandbox', () => {
     beforeAll(async () =>
         sandbox = new Sandbox(docker, config)
     );
+
+    test('build', async () => {
+        const image = await Sandbox.build(docker, config);
+        expect(image.id).toEqual(config.container.Image);
+    }, 600000);
 
     test('init', () => {
         expect(sandbox.id).toBeTruthy();

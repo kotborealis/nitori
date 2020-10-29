@@ -15,15 +15,40 @@ RUN useradd -M -d /sandbox sandbox
 RUN chown -R sandbox:sandbox /sandbox
 WORKDIR /sandbox
 
-RUN mkdir -p /opt/nitori/
-COPY ./shared/catch.hpp /opt/nitori/catch.hpp
-COPY ./shared/util.hpp /opt/nitori/util.hpp
-COPY shared/processTest.hpp /opt/nitori/processTest.hpp
-COPY ./shared/testing.hpp /opt/nitori/testing.hpp
+RUN mkdir -p /opt/nitori/__unit_test/
+COPY ./shared/* /opt/nitori/
+COPY ./shared/__unit_test/* /opt/nitori/__unit_test/
+
+RUN g++ \
+        -g3 \
+        -std=c++2a \
+        -c \
+        -include /opt/nitori/testing.hpp \
+        /opt/nitori/__unit_test/__unit_test.cpp \
+        -o /opt/nitori/__unit_test/__unit_test.o \
+    && g++ \
+        -g3 \
+        -std=c++2a \
+        -c \
+        /opt/nitori/__unit_test/__unit_test_main.cpp \
+        -o /opt/nitori/__unit_test/__unit_test_main.o \
+    && objcopy \
+        /opt/nitori/__unit_test/__unit_test_main.o \
+        --redefine-sym \
+        main=__NITORI_HIJACK_MAIN__ \
+    && g++ \
+        -g3 \
+        -std=c++2a \
+        /opt/nitori/__unit_test/__unit_test.o /opt/nitori/__unit_test/__unit_test_main.o \
+        -o /opt/nitori/__unit_test/unit_test
+
+
+#RUN /opt/nitori/__unit_test/unit_test
 
 RUN g++ \
     -std=c++2a \
     -c \
     /opt/nitori/testing.hpp \
-    -o /opt/nitori/testing.hpp.gch \
-    && rm /opt/nitori/*.hpp
+    -o /opt/nitori/testing.hpp.gch
+
+CMD /bin/bash

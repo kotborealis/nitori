@@ -1,14 +1,33 @@
 #pragma once
 
-#define CATCH_CONFIG_MAIN
+#define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
+#include "backtrace.hpp"
 
 #include <iostream>
 #include <fstream>
 #include <cctype>
 #include <locale>
-
 #include <cstdio>
+#include <tuple>
+
+int main(int argc, char** argv) {
+    __exec_name = argv[0];
+
+    struct sigaction sa;
+
+    sa.sa_sigaction = bt_sighandler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART|SA_SIGINFO;
+
+    sigaction(SIGSEGV, &sa, NULL);
+    sigaction(SIGFPE,  &sa, NULL);
+    sigaction(SIGILL,  &sa, NULL);
+    sigaction(SIGBUS,  &sa, NULL);
+    sigaction(SIGABRT, &sa, NULL);
+    sigaction(SIGTRAP, &sa, NULL);
+    return Catch::Session().run(argc, argv);
+}
 
 extern "C" {
     int __NITORI_HIJACK_MAIN__(int argc, char** argv) __attribute__((weak));
@@ -31,6 +50,7 @@ namespace nitori {
  * Hijack stdout
  */
 void hijack_stdout() {
+    fflush(stdout);
     freopen(".stdout", "w", stdout);
 }
 
@@ -38,6 +58,7 @@ void hijack_stdout() {
  * Restore stdout
  */
 void restore_stdout() {
+    fflush(stdout);
     freopen("/dev/tty", "w", stdout);
 }
 
@@ -45,6 +66,7 @@ void restore_stdout() {
  * Hijack stderr
  */
 void hijack_stderr() {
+    fflush(stderr);
     freopen(".stderr", "w", stderr);
 }
 
@@ -52,6 +74,7 @@ void hijack_stderr() {
  * Restore stderr
  */
 void restore_stderr() {
+    fflush(stderr);
     freopen("/dev/tty", "w", stderr);
 }
 
@@ -106,6 +129,15 @@ std::string stdin(bool trim = true) {
  * @param value stdin value
  */
 void stdin(std::string value = "") {
+    hijack_stdin(value);
+}
+
+/**
+ * Hijack stdin alias
+ *
+ * @param value stdin value
+ */
+void stdin(const char* value) {
     hijack_stdin(value);
 }
 
@@ -183,6 +215,30 @@ int main(::nitori::processTest::ProcessTestCase test) {
 void main(::nitori::processTest::ProcessTestSuite suite) {
     auto test = GENERATE_REF(from_range(suite.begin(), suite.end()));
     ::nitori::main(test);
+}
+
+/**
+ * Call function fn with arguments args and return its stdout and return value
+ * Returns tuple:
+ * * If fn returns void: std::tuple<std::string stdout>,
+ *      where stdout are trimmed
+ * * Else if fn returns type T: std::tuple<std::string stdout, T retval>,
+ *      where stdout is trimmed, and retval is return value of function fn
+ */
+template<typename... Args>
+auto call(auto fn, Args... args) {
+    if constexpr (std::is_same_v<decltype(fn(args...)), void>) {
+        ::nitori::hijack_stdout();
+        fn(std::forward<Args>(args)...);
+        ::nitori::restore_stdout();
+        return std::make_tuple(::nitori::stdout());
+    }
+    else {
+        ::nitori::hijack_stdout();
+        auto retval = fn(std::forward<Args>(args)...);
+        ::nitori::restore_stdout();
+        return std::make_tuple(::nitori::stdout(), retval);
+    }
 }
 
 }
