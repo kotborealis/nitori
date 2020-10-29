@@ -7,4 +7,4 @@ COPY ./backend/package*.json ./
 RUN npm ci
 COPY ./backend/ .
 COPY ./sandbox /sandbox
-ENTRYPOINT ["node", "/app/src/index.js"]
+ENTRYPOINT ["node", "/app/backend/src/index.js"]
