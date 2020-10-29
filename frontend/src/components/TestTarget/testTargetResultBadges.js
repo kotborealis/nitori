@@ -23,3 +23,26 @@ export const testTargetResultBadges = ({targetCompilerResult, specCompilerResult
         </>
     );
 };
+
+export const testTargetLastStageBadge = ({targetCompilerResult, specCompilerResult, linkerResult, runnerResult}) => {
+    if(runnerResult){
+        const RunnerIcon = exitCodeToIcon(runnerResult?.exitCode);
+        const runnerColor = exitCodeToColor(runnerResult?.exitCode);
+        return <Chip icon={<RunnerIcon/>} color={runnerColor} label="Тесты"/>;
+    }
+    if(linkerResult){
+        const LinkerIcon = exitCodeToIcon(linkerResult?.exitCode);
+        const linkerColor = exitCodeToColor(linkerResult?.exitCode);
+        return <Chip icon={<LinkerIcon/>} color={linkerColor} label="Линковка"/>;
+    }
+    if(specCompilerResult){
+        const SpecIcon = exitCodeToIcon(specCompilerResult?.exitCode);
+        const specColor = exitCodeToColor(specCompilerResult?.exitCode);
+        return <Chip icon={<SpecIcon/>} color={specColor} label="Компиляция теста"/>;
+    }
+    if(targetCompilerResult){
+        const TargetIcon = exitCodeToIcon(targetCompilerResult?.exitCode);
+        const targetColor = exitCodeToColor(targetCompilerResult?.exitCode);
+        return <Chip icon={<TargetIcon/>} color={targetColor} label="Компиляция"/>;
+    }
+};

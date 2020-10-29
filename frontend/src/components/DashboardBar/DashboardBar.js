@@ -42,4 +42,5 @@ const BLink = (props) => <Link {...props} className={styles.link}>{props.childre
 const dashboardTabToString = tab => {
     if(tab === 'test-specs') return 'Задания';
     if(tab === 'test-targets') return 'Решения ';
+    if(tab === 'test-targets-grouped') return 'Решения (по группам)';
 };

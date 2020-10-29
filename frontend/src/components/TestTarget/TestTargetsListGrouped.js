@@ -1,72 +1,78 @@
-import React, {useRef} from 'react';
-import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
+import React, {useRef, useState} from 'react';
 import {useHistory, useParams} from 'react-router-dom';
 import {apiActions} from '../../api/apiActions';
-import {testTargetResultBadges} from './testTargetResultBadges';
+import {testTargetLastStageBadge} from './testTargetResultBadges';
 import {useApi} from '../../api/useApi';
-import TreeView from '@material-ui/lab/TreeView';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import TreeItem from '@material-ui/lab/TreeItem';
 import {Link} from '@material-ui/core';
-import Chip from '@material-ui/core/Chip';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Paper from '@material-ui/core/Paper/Paper';
+import {TabPanel} from '../TabPanel/TabPanel';
+import MaterialTable from 'material-table';
+import styles from './testTargetListGrouped.css';
 import Typography from '@material-ui/core/Typography';
 
-function testTargetLabel({widget, _id, targetCompilerResult, specCompilerResult, linkerResult, runnerResult, timestamp}) {
-    return <Link href={`/dashboard/${widget}/test-targets/${_id}`}
+function testSpecOverview(widgetId, testSpecId, testTargetsByTestSpec) {
+    const targets = testTargetsByTestSpec
+        .find(({testSpec}) => testSpec._id === testSpecId)?.testTargets;
+
+    if(!targets) return null;
+
+    const solution = targets.find(target => target.runnerResult?.exitCode === 0);
+    const badge = testTargetLastStageBadge(solution || targets[0]);
+
+    return <Link href={`/dashboard/${widgetId}/test-targets/${(solution || targets[0])._id}`}
                  rel="noopener noreferrer"
-                 target="_blank">
-        <ChevronRightIcon/>
-        {testTargetResultBadges({
-            targetCompilerResult,
-            specCompilerResult,
-            linkerResult,
-            runnerResult
-        })}
-        <Chip variant="outlined"
-              label={<TimeUpdated>{timestamp}</TimeUpdated>}/>
+                 target="_blank" className={styles.targetBadgeLink}>
+        {badge}
     </Link>;
 }
 
-function testTargetsByTestSpecList(testTargetsByTestSpec, userData) {
-    const hasSolution = testTargetsByTestSpec
-        ?.map(({testTargets}) =>
-            testTargets.map(target => target.runnerResult?.exitCode)
-                ?.some(_ => _ === 0)
-        );
+function usersList(widgetId, testTargetsGrouped, testSpecs, users) {
+    const loading = testSpecs.loading || testTargetsGrouped.loading;
+    return <MaterialTable
+        options={{
+            showTitle: false,
+            search: false,
+            paging: false,
+            headerStyle: {position: 'sticky', top: 0},
+            maxBodyHeight: '650px'
+        }}
 
-    return testTargetsByTestSpec.map(({testSpec, testTargets}, i) =>
-        <TreeItem
-            nodeId={testSpec._id + userData.login}
-            label={
-                <Typography style={{background: hasSolution[i] ? '#b4ffb4' : ''}}>
-                    {testSpec.name}
-                </Typography>
-            }
-        >
-            {testTargets.map(target =>
-                <TreeItem nodeId={target._id}
-                          component='a'
-                          label={testTargetLabel(target)}
-                />
-            )}
-        </TreeItem>
+        isLoading={loading}
+
+        columns={[
+            {
+                title: 'Пользователь',
+                render: ({userData: {name, login}}) => <Typography>{name ? `${name} (${login})` : login}</Typography>,
+                sorting: false,
+                width: 300,
+                cellStyle: {position: 'sticky', left: 0, background: 'white'},
+                headerStyle: {position: 'sticky', left: 0, zIndex: 999}
+            },
+            ...(loading ? [] : testSpecs.data?.map(({name, _id}) => ({
+                title: name,
+                render: ({testTargetsByTestSpec}) => testSpecOverview(widgetId, _id, testTargetsByTestSpec),
+                sorting: false,
+                cellStyle: {border: `1px solid rgba(0, 0, 0, 0.1)`},
+                width: 200
+            })))
+        ]}
+
+        data={users}/>;
+}
+
+function groupsListTabs(testTargetsGrouped) {
+    return testTargetsGrouped.data?.map(({group}) =>
+        <Tab label={group.trim() ? group : '(без названия)'} value={group}/>
     );
 }
 
-function usersList(users) {
-    return users.map(({userData, testTargetsByTestSpec}) =>
-        <TreeItem nodeId={userData.login} label={`${userData.name} (${userData.login})`}>
-            {testTargetsByTestSpecList(testTargetsByTestSpec, userData)}
-        </TreeItem>
-    );
-}
-
-function groupsList(testTargetsGrouped) {
+function groupsListPanels(widgetId, currentTab, testSpecs, testTargetsGrouped) {
     return testTargetsGrouped.data?.map(({group, users}) =>
-        <TreeItem nodeId={`group-${group}`} label={group}>
-            {usersList(users)}
-        </TreeItem>
+        <TabPanel value={currentTab} index={group}>
+            {usersList(widgetId, testTargetsGrouped, testSpecs, users)}
+        </TabPanel>
     );
 }
 
@@ -78,13 +84,22 @@ export const TestTargetsListGrouped = () => {
     const testTargetsGrouped = useApi(apiActions.testTargetsByGroupByUsersByTestSpecs);
     testTargetsGrouped.useFetch({widgetId})([widgetId]);
 
+    const testSpecs = useApi(apiActions.testSpecs);
+    testSpecs.useFetch({widgetId})([widgetId]);
+
+    const [tab, setTab] = useState(``);
+    const handleTabChange = (event, value) => setTab(value);
+
     return (
-        <TreeView
-            defaultCollapseIcon={<ExpandMoreIcon/>}
-            defaultExpandIcon={<ChevronRightIcon/>}
-            defaultExpanded={['root']}
-        >
-            {groupsList(testTargetsGrouped)}
-        </TreeView>
+        <>
+            <Paper square>
+                <Tabs value={tab} onChange={handleTabChange}>
+                    {groupsListTabs(testTargetsGrouped)}
+                </Tabs>
+            </Paper>
+            <Paper square>
+                {groupsListPanels(widgetId, tab, testSpecs, testTargetsGrouped)}
+            </Paper>
+        </>
     );
 };
