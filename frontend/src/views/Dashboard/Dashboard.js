@@ -46,7 +46,7 @@ const DashboardBasic = () => {
     return <>
         <Paper elevation={3} style={{padding: 10}}>
             <Typography>
-                <Link to={`/submit/${widgetId}`}>Отправка решений</Link>
+                <Link to={`/submit/${widgetId}`} target="_blank">Отправка решений</Link>
             </Typography>
         </Paper>
         <Paper square>

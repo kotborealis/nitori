@@ -3,7 +3,7 @@ import {useHistory, useParams} from 'react-router-dom';
 import {apiActions} from '../../api/apiActions';
 import {testTargetLastStageBadge} from './testTargetResultBadges';
 import {useApi} from '../../api/useApi';
-import {Link} from '@material-ui/core';
+import {Link} from 'react-router-dom';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Paper from '@material-ui/core/Paper/Paper';
