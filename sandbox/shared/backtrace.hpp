@@ -66,5 +66,5 @@ void bt_sighandler(int sig, siginfo_t *psi, void *ctxarg) {
     fprintf(stderr, "(%s)\n\n", messages[i]);
   }
 
-  exit(0);
+  exit(1);
 }
