@@ -89,8 +89,7 @@ module.exports = (config) => {
 
                 const {testSpecId} = req.params;
                 const {widgetId} = req;
-                const {name, description} = req.query;
-                const {spec, example} = req.body;
+                const {spec, example, name, description} = req.body;
 
                 const specFile = {
                     name: 'spec.cpp',
