@@ -3,6 +3,7 @@ import {useHistory, useParams} from 'react-router-dom';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 import MaterialTable from 'material-table';
 import {apiActions} from '../../api/apiActions';
+import ReactMarkdown from 'react-markdown';
 
 export const TestSpecsList = () => {
     const history = useHistory();
@@ -33,7 +34,7 @@ export const TestSpecsList = () => {
                 },
                 {
                     title: 'Описание',
-                    render: ({description}) => description,
+                    render: ({description}) => <ReactMarkdown>{description}</ReactMarkdown>,
                     sorting: false,
                 },
                 {

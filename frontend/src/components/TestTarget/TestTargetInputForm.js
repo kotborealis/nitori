@@ -10,6 +10,7 @@ import Select from '@material-ui/core/Select';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SendIcon from '@material-ui/icons/Send';
 import Typography from '@material-ui/core/Typography';
+import ReactMarkdown from 'react-markdown';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -68,7 +69,9 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tes
                              {selectedTask.name}
                          </Typography>
                          <Typography variant="body1">
-                             {selectedTask.description}
+                             <ReactMarkdown>
+                                {selectedTask.description}
+                             </ReactMarkdown>
                          </Typography>
                      </Grid>
                     }

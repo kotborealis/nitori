@@ -90,7 +90,7 @@ export const TestSpecEdit = (
                         onChange={({target: {value}}) => setName(value)}
                     />
                     <TextField
-                        label="Описание задания"
+                        label="Описание задания (markdown)"
                         variant="outlined"
                         multiline={true}
                         fullWidth
