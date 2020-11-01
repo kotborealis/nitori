@@ -123,25 +123,18 @@ paths:
       summary: Add TestSpec
       tags:
         - TestSpecs
-      parameters:
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: description
-          in: query
-          required: false
-          allowEmptyValue: true
-          schema:
-            type: string
-            default: ""
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
+                name:
+                  description: Spec name
+                  type: string
+                description:
+                  description: Spec description
+                  type: string
                 spec:
                   description: Spec source file content
                   type: string

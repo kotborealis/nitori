@@ -64,11 +64,10 @@ export const apiActions = {
 
     testSpecSubmit: ({widgetId, name, description, spec, example, testSpecId = false} = {}) =>
         api(`/widgets/${widgetId}/test-specs/${testSpecId || ""}`, {
-            query: {name, description},
             options: {
                 method: testSpecId === false ? 'POST' : 'PUT',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({spec, example})
+                body: JSON.stringify({spec, example, name, description})
             }
         }),
 
