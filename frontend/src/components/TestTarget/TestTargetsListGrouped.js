@@ -1,9 +1,8 @@
 import React, {useRef, useState} from 'react';
-import {useHistory, useParams} from 'react-router-dom';
+import {Link, useHistory, useParams} from 'react-router-dom';
 import {apiActions} from '../../api/apiActions';
 import {testTargetLastStageBadge} from './testTargetResultBadges';
 import {useApi} from '../../api/useApi';
-import {Link} from 'react-router-dom';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Paper from '@material-ui/core/Paper/Paper';
@@ -21,7 +20,7 @@ function testSpecOverview(widgetId, testSpecId, testTargetsByTestSpec) {
     const solution = targets.find(target => target.runnerResult?.exitCode === 0);
     const badge = testTargetLastStageBadge(solution || targets[0]);
 
-    return <Link href={`/dashboard/${widgetId}/test-targets/${(solution || targets[0])._id}`}
+    return <Link to={`/dashboard/${widgetId}/test-targets/${(solution || targets[0])._id}`}
                  rel="noopener noreferrer"
                  target="_blank" className={styles.targetBadgeLink}>
         {badge}
