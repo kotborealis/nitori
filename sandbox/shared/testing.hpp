@@ -44,7 +44,7 @@ extern "C" {
     static jmp_buf exit_jmp;
     static int exit_jmp_code;
 
-    int __HIJACK_EXIT__(int exitCode) {
+    int __HIJACK_HIJACK_EXIT__(int exitCode) {
         exit_jmp_code = exitCode;
         longjmp(exit_jmp, 1);
     }
