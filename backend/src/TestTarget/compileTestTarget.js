@@ -27,6 +27,9 @@ module.exports = async (config, testSpec, testTarget) => {
 
     const objcopy = new Objcopy(sandbox);
     await objcopy.redefine_sym(targetBinaries, "main", config.testing.hijack_main, {working_dir});
+    await Promise.all(`exit _exit _Exit abort quick_exit`.split(' ').map(fn =>
+        objcopy.redefine_sym(targetBinaries, fn, config.testing.hijack_exit, {working_dir})
+    ));
 
     const includePaths = testTarget.sourceFiles
         .map(({name}) => require('path').dirname(name))

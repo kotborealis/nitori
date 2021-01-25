@@ -31,6 +31,7 @@ module.exports = {
     testing: {
         libs: "/opt/testing_libs",
         hijack_main: "__NITORI_HIJACK_MAIN__",
+        hijack_exit: "__NITORI_HIJACK_EXIT__",
         test_archive_name: "__nitori_test.a"
     },
     timeout: {
