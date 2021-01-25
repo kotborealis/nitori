@@ -10,6 +10,7 @@
 #include <locale>
 #include <cstdio>
 #include <tuple>
+#include <csetjmp>
 
 int main(int argc, char** argv) {
     __exec_name = argv[0];
@@ -38,6 +39,14 @@ extern "C" {
 
         printf("exitCode=0xBADF00D\n");
         return 0xBADF00D;
+    }
+
+    static jmp_buf exit_jmp;
+    static int exit_jmp_code;
+
+    int __HIJACK_EXIT__(int exitCode) {
+        exit_jmp_code = exitCode;
+        longjmp(exit_jmp, 1);
     }
 }
 
@@ -149,8 +158,24 @@ void stdin(const char* value) {
  * @param argv
  */
 int main(int argc, char** argv) {
+    UNSCOPED_INFO("Running main() w/ argc=" << argc << " and argv:");
+    for(int i = 0; i < argc; i++)
+        UNSCOPED_INFO("\t argv[" << i << "]=`" << argv[i] << "`");
+
     nitori::hijack_stdout();
-    auto exitCode = __NITORI_HIJACK_MAIN__(argc, argv);
+
+    // init exit code
+    int exitCode = 0xDEADBEEF;
+
+    // if hijacked main calls exit/abort/etc, it kills whole process by default
+    // overwritten exit/abort/etc will perform longjump to exit main
+    if(!setjmp(exit_jmp)) {
+        exitCode = __NITORI_HIJACK_MAIN__(argc, argv);
+    }
+    else{
+        exitCode = exit_jmp_code;
+    }
+
     nitori::restore_stdout();
     nitori::restore_stdin();
 
