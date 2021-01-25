@@ -3,7 +3,7 @@ import {useHistory, useParams} from 'react-router-dom';
 import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 import MaterialTable from 'material-table';
 import {apiActions} from '../../api/apiActions';
-import ReactMarkdown from 'react-markdown';
+import {Typography} from '@material-ui/core';
 
 export const TestSpecsList = () => {
     const history = useHistory();
@@ -29,17 +29,12 @@ export const TestSpecsList = () => {
             columns={[
                 {
                     title: 'Название',
-                    render: ({name}) => name,
-                    sorting: false,
-                },
-                {
-                    title: 'Описание',
-                    render: ({description}) => <ReactMarkdown>{description}</ReactMarkdown>,
+                    render: ({name}) => <Typography>{name}</Typography>,
                     sorting: false,
                 },
                 {
                     title: 'Обновлено',
-                    render: ({timestamp}) => <TimeUpdated>{timestamp}</TimeUpdated>,
+                    render: ({timestamp}) => <Typography><TimeUpdated>{timestamp}</TimeUpdated></Typography>,
                     sorting: true,
                     sortingField: 'timestamp'
                 }
