@@ -3,6 +3,8 @@ import {encodeGetParams} from '../helpers/encodeGetParams';
 
 export const API_URL = urljoin(process.env.PUBLIC_PATH, `/api/v1/`);
 
+export const apiUrl = (...args) => urljoin(API_URL, ...args);
+
 export const fetchJSON = async (url, {query = {}, options = {}} = {}) => {
     const response = await fetch(urljoin(...[url].flat()) + '?' + encodeGetParams(query), options);
     const data = await response.json();
