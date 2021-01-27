@@ -384,6 +384,26 @@ paths:
         403:
           $ref: "#/components/responses/Unauthorized"
 
+  /widgets/{widgetId}/test-targets/download/:
+    get:
+      summary: Download all test targets source code
+      tags:
+        - TestTargets
+      parameters:
+        - $ref: '#/components/parameters/widgetId'
+      responses:
+        200:
+          description: .tar file with all TestTargets
+          content:
+            application/x-tar:
+              schema:
+                type: string
+                format: binary
+        404:
+          $ref: "#/components/responses/NotFound"
+        403:
+          $ref: "#/components/responses/Unauthorized"
+
   /widgets/{widgetId}/test-targets/{testTargetId}:
     get:
       summary: Get TestTarget info by id
