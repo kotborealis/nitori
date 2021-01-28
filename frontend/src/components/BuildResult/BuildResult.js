@@ -21,8 +21,8 @@ export const BuildResultGeneric = ({
     >
         {stages.map((name, i) => <Step key={i}>
             <StepLabel
-                error={results[i] ? results[i].exitCode !== 0 && 0 <= index : false}
-                disabled={!results[i]}
+                error={results[i].exitCode !== undefined ? results[i].exitCode !== 0 && 0 <= index : false}
+                disabled={results[i].exitCode === undefined}
             >
                 {name}
             </StepLabel>
@@ -60,31 +60,24 @@ export const BuildResultGeneric = ({
     </div>);
 };
 
-export const BuildResultSpecRunner = ({results}) =>
-    <BuildResultGeneric
-        results={results}
-        stages={[
-            `Компиляция теста`,
-            `Компиляция примера`,
-            `Линковка`,
-            `Тестирование`,
-        ]}
-    />;
-
-export const BuildResultTestSpec = ({results}) =>
-    <BuildResultGeneric
-        results={results}
-        stages={[
-            `Компиляция теста`
-        ]}
-    />;
-
-export const BuildResultTestTarget = ({results}) =>
-    <BuildResultGeneric
-        results={results}
-        stages={[
-            `Компиляция`,
-            `Линковка`,
-            `Тестирование`,
-        ]}
-    />;
+export const BuildResultAll =
+    ({results: {
+         specCompilerResult,
+         targetCompilerResult,
+         linkerResult,
+         runnerResult,
+     }}) =>
+        <BuildResultGeneric
+            results={[
+                targetCompilerResult,
+                specCompilerResult,
+                linkerResult,
+                runnerResult,
+            ]}
+            stages={[
+                `Компиляция`,
+                `Компиляция теста`,
+                `Линковка`,
+                `Тестирование`,
+            ]}
+        />;

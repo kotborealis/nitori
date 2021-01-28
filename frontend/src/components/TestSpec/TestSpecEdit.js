@@ -3,7 +3,7 @@ import styles from './testSpecEdit.css';
 import {CodeCpp} from '../CodeCpp/CodeCpp';
 import specSample from './specSample.cpp';
 import exampleSample from './exampleSample.cpp';
-import {BuildResultSpecRunner} from '../BuildResult/BuildResult';
+import {BuildResultAll} from '../BuildResult/BuildResult';
 import Button from '@material-ui/core/Button';
 import {useApi} from '../../api/useApi';
 import {apiActions} from '../../api/apiActions';
@@ -62,12 +62,7 @@ export const TestSpecEdit = (
     if(specRunner.init) specRunnerResult = null;
     else if(specRunner.loading) specRunnerResult = <Loading/>;
     else if(specRunner.error) specRunnerResult = <Error error={specRunner.error}/>;
-    else if(specRunner.data) specRunnerResult = <BuildResultSpecRunner results={[
-        specRunner.data.specCompilerResult,
-        specRunner.data.exampleCompilerResult,
-        specRunner.data.linkerResult,
-        specRunner.data.runnerResult,
-    ]}/>;
+    else if(specRunner.data) specRunnerResult = <BuildResultAll results={specRunner.data}/>;
 
     let specSubmitResult;
     if(testSpecSubmit.init) specSubmitResult = null;

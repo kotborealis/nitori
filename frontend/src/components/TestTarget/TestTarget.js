@@ -13,6 +13,7 @@ import {TimeUpdated} from '../TimeUpdated/TimeUpdated';
 import {TabPanel} from '../TabPanel/TabPanel';
 import {apiActions} from '../../api/apiActions';
 import {useApi} from '../../api/useApi';
+import {BuildResultAll} from '../BuildResult/BuildResult';
 
 export const TestTarget =
     ({
@@ -56,40 +57,16 @@ export const TestTarget =
                             </>} {userData.name} ({userData.login}), {userData.groupName},
                             отправлено <TimeUpdated>{timestamp}</TimeUpdated>
                         </Typography>
-
-                        <TestTargetStepper
-                            targetCompilerResult={targetCompilerResult}
-                            specCompilerResult={specCompilerResult}
-                            linkerResult={linkerResult}
-                            runnerResult={runnerResult}
-                        />
                     </Paper>
                 </Grid>
 
                 <Grid item xs={12}>
-                    <Paper square>
-                        <Tabs value={resultTab} onChange={handleResultTabChange}>
-                            <Tab label={"Компиляция"} id={0}/>
-                            <Tab label={"Компиляция теста"} id={0}/>
-                            <Tab label={"Линковка"} id={1}/>
-                            <Tab label={"Тестирование"} id={2}/>
-                        </Tabs>
-                    </Paper>
-
-                    <Paper square>
-                        <TabPanel value={resultTab} index={0}>
-                            <ExecOutput {...targetCompilerResult}/>
-                        </TabPanel>
-                        <TabPanel value={resultTab} index={1}>
-                            <ExecOutput {...specCompilerResult}/>
-                        </TabPanel>
-                        <TabPanel value={resultTab} index={2}>
-                            <ExecOutput {...linkerResult}/>
-                        </TabPanel>
-                        <TabPanel value={resultTab} index={3}>
-                            <ExecOutput {...runnerResult}/>
-                        </TabPanel>
-                    </Paper>
+                    <BuildResultAll results={{
+                        targetCompilerResult,
+                        specCompilerResult,
+                        linkerResult,
+                        runnerResult
+                    }}/>
                 </Grid>
 
                 <Grid item xs={12}>
