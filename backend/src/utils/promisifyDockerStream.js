@@ -3,9 +3,10 @@ const {prototype: {demuxStream}} = require('docker-modem/lib/modem');
 /**
  * Promisifies stream into strings
  * @param stream
+ * @param exec
  * @returns {Promise}
  */
-const promisifyDockerStream = (stream) => new Promise((resolve, reject) => {
+const promisifyDockerStream = (stream, exec = null) => new Promise((resolve, reject) => {
     let stdout = "";
     let stderr = "";
 
@@ -17,6 +18,16 @@ const promisifyDockerStream = (stream) => new Promise((resolve, reject) => {
     }, {
         write: chunk => stderr += chunk.toString()
     });
+
+    if(exec){
+        let healthCheck = setInterval(async () => {
+            const {data: {Running}} = await exec.status();
+            if(!Running){
+                clearInterval(healthCheck);
+                resolve({stdout, stderr});
+            }
+        }, 1000);
+    }
 });
 
 module.exports = {promisifyDockerStream};

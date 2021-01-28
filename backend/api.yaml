@@ -734,7 +734,7 @@ components:
       properties:
         specCompilerResult:
           $ref: '#/components/schemas/ExecOutput'
-        exampleCompilerResult:
+        targetCompilerResult:
           $ref: '#/components/schemas/ExecOutput'
         linkerResult:
           $ref: '#/components/schemas/ExecOutput'

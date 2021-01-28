@@ -170,7 +170,7 @@ class Sandbox {
             });
 
             const dockerStream = await exec.start();
-            const {stdout, stderr} = await PromiseTimeout(promisifyDockerStream(dockerStream), timeout);
+            const {stdout, stderr} = await PromiseTimeout(promisifyDockerStream(dockerStream, exec), timeout);
             const {data: {ExitCode: exitCode}} = await exec.status();
 
             logger.debug(`exec result`, {id: this.id, exitCode, stdout, stderr});

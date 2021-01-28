@@ -54,11 +54,31 @@ module.exports = async (config, testSpec, testTarget) => {
         return {targetCompilerResult, specCompilerResult, linkerResult};
     }
 
-    const runnerResult = await sandbox.exec(["./" + output], {
+    const runnerResult = await sandbox.exec(["valgrind", `--log-file=/sandbox/.valgrind`, `./${output}`], {
         timeout: config.timeout.run
     });
 
-    sandbox.stop().catch((...args) => debug(...args));
+    const valgrindResult = await sandbox.exec([`cat`, `/sandbox/.valgrind`]);
 
-    return {targetCompilerResult, specCompilerResult, linkerResult, runnerResult};
+    runnerResult.stdout += `valgrind memcheck:\n\n` + valgrindParser(config, valgrindResult.stdout);
+
+    sandbox.stop().catch((...args) => logger.error(...args));
+
+    return {specCompilerResult, targetCompilerResult, linkerResult, runnerResult};
+};
+
+const valgrindParser = (config, output) => {
+    output = output
+        .split('\n')
+        .map(str => str.replace(/^==\d+== /i, '').trim());
+
+    output = output.slice(output.indexOf(``) + 1);
+    const valgrindCrashIndex = output.findIndex(str => str.indexOf(`-- VALGRIND INTERNAL ERROR:`) > 2);
+    if(valgrindCrashIndex !== -1)
+        output = output.slice(0, valgrindCrashIndex);
+
+    output = output
+        .map(str => str.replace(new RegExp(config.testing.hijack_main, 'g'), 'main'));
+
+    return output.join('\n');
 };
