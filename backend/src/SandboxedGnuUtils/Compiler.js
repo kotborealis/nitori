@@ -1,4 +1,5 @@
 const tar = require('tar-stream');
+const shortid = require('shortid');
 const logger = require(('../logging/logger')).logger('SandboxedGnuUtils:Compiler');
 
 class Compiler {
@@ -40,7 +41,7 @@ class Compiler {
             .filter((name) => name.endsWith(".cpp") || name.endsWith(".c"));
 
         const obj_file_names = cpp_file_names
-            .map((name) => name.slice(0, name.lastIndexOf(".")) + ".o");
+            .map((name) => name.slice(0, name.lastIndexOf(".")) + `.${shortid.generate()}.o`);
 
         logger.debug("creating tarball");
 

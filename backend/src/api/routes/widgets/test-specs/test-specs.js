@@ -1,5 +1,6 @@
 const {Router} = require('express');
 const {TestSpecModel} = require('../../../../database');
+const shortid = require('shortid');
 
 module.exports = (config) => {
 
@@ -40,7 +41,7 @@ module.exports = (config) => {
                 const {spec, example, name, description} = req.body;
 
                 const specFile = {
-                    name: 'spec.cpp',
+                    name: `spec.${shortid.generate()}.cpp`,
                     content: spec,
                     type: 'text/cpp'
                 };
