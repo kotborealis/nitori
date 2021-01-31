@@ -62,7 +62,7 @@ module.exports = (config) => {
 
                 await testTarget.save();
 
-                const result = await compileTestTarget(config, testSpec, testTarget);
+                const result = await compileTestTarget(config, testSpec, testTarget).worker;
 
                 const {
                     targetCompilerResult,

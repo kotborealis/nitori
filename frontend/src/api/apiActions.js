@@ -52,14 +52,15 @@ export const apiActions = {
 
     testTarget: ({widgetId, testTargetId} = {}) => api(`/widgets/${widgetId}/test-targets/${testTargetId}`),
 
-    testTargetSubmit: ({widgetId, testSpecId, files} = {}) =>
+    testTargetSubmit: ({widgetId, testSpecId, files, getHeaders = () => 0} = {}) =>
         api(`/widgets/${widgetId}/test-targets/`, {
             query: {testSpecId},
             options: {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(files)
-            }
+            },
+            getHeaders
         }),
 
     testSpecSubmit: ({widgetId, name, description, spec, example, testSpecId = false} = {}) =>
@@ -83,17 +84,17 @@ export const apiActions = {
 
     userData: () => fetchJSON(`/auth/user_data.php`),
 
-    specRunner: ({spec, example} = {}) =>
+    specRunner: ({spec, example, getHeaders = () => 0} = {}) =>
         api(`/specRunner/`, {
             options: {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({spec, example})
-            }
+                body: JSON.stringify({spec, example}),
+            },
+            getHeaders
         }),
 
     testTargetsByGroupByUsersByTestSpecs: ({widgetId, includeSources = false}) => {
-        console.log("TTBGBUBTS", widgetId, includeSources);
         return api(`/widgets/${widgetId}/overview/test-targets/by/groups/users/test-specs`, {query: {includeSources}});
     }
 };

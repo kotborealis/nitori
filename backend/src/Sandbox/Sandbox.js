@@ -9,12 +9,14 @@ const {promisifyDockerStream} = require('../utils/promisifyDockerStream');
 
 const tar = require('tar-fs');
 
+const EventEmmiter = require('events').EventEmitter;
+
 const instanceId = shortid.generate();
 
 /**
  * Docker Sandbox class
  */
-class Sandbox {
+class Sandbox extends EventEmmiter {
     /**
      * Docker instance
      */
@@ -42,15 +44,20 @@ class Sandbox {
 
     _running = false;
 
+    static registry = new Map;
+
     /**
      * Constructor
      * @param docker Docker instance
      * @param config Configuration
      */
     constructor(docker, config) {
+        super();
         this.docker = docker;
         this.config = config;
         this.id = shortid.generate();
+
+        Sandbox.registry.set(this.id, this);
 
         logger.info('Sandbox started', {id: this.id, config});
     }
@@ -126,6 +133,7 @@ class Sandbox {
      * @returns {Promise<void>}
      */
     async stop() {
+        Sandbox.registry.delete(this.id);
         logger.debug("Stop sandbox & delete container", {id: this.id});
 
         if(!this._running){
@@ -169,8 +177,8 @@ class Sandbox {
                 User: root ? "root" : "sandbox"
             });
 
-            const dockerStream = await exec.start();
-            const {stdout, stderr} = await PromiseTimeout(promisifyDockerStream(dockerStream, exec), timeout);
+            const dockerStream = await exec.start({hijack: true, stdin: true});
+            const {stdout, stderr} = await PromiseTimeout(promisifyDockerStream(dockerStream, exec, this), timeout);
             const {data: {ExitCode: exitCode}} = await exec.status();
 
             logger.debug(`exec result`, {id: this.id, exitCode, stdout, stderr});
@@ -253,6 +261,10 @@ class Sandbox {
 
         this._running = true;
     };
+
+    stdout(str) {
+        this.emit('stdout', str);
+    }
 }
 
 module.exports = {Sandbox};

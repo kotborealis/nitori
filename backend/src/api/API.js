@@ -1,6 +1,7 @@
 const logger = require(('../logging/logger')).logger('API');
 
 const express = require('express');
+const expressWs = require('express-ws');
 
 const initApiMetrics = require('../loaders/api/metrics');
 const initApiAuth = require('../loaders/api/auth');
@@ -9,6 +10,7 @@ const initApiExpress = require('../loaders/api/express');
 const initApiRoutes = require('../loaders/api/routes');
 const initApiSwagger = require('../loaders/api/swagger');
 const initShutdown = require('../loaders/shutdown');
+const {Sandbox} = require('../Sandbox');
 
 module.exports = (config) => {
     const {port} = config.api;
@@ -16,6 +18,24 @@ module.exports = (config) => {
     logger.info(`Initializing api on port ${port}`, config);
 
     const app = express();
+    expressWs(app);
+
+    app.ws('/ws/:id', (ws, req) => {
+        const {id} = req.params;
+        ws.addEventListener('open', () => {
+            ws.addEventListener('message', ({data}) => Sandbox.registry.get(id)?.emit('stdin', data));
+
+            const sender = message => ws.send(message);
+            Sandbox.registry.get(id)?.on('stdout', sender);
+            Sandbox.registry.get(id)?.on('stderr', sender);
+
+            ws.addEventListener('close', () => {
+                Sandbox.registry.get(id)?.removeEventListener('stdout', sender);
+                Sandbox.registry.get(id)?.removeEventListener('stderr', sender);
+            });
+        });
+    });
+
     initApiMetrics({app, config});
     initApiSwagger({app, config});
     initApiExpress({app, config});

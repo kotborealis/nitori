@@ -1,4 +1,5 @@
 const compileTestTarget = require('../../../TestTarget/compileTestTarget');
+const {compilationSet} = require('../../../TestTarget/compilationSet');
 const {Router} = require('express');
 
 module.exports = (config) => {
@@ -7,7 +8,7 @@ module.exports = (config) => {
     router.post('/', async (req, res) => {
         const {spec, example} = req.body;
 
-        res.status(200).json(await compileTestTarget(
+        const {sandbox, worker} = compileTestTarget(
             config,
             {
                 specFile: {
@@ -21,7 +22,12 @@ module.exports = (config) => {
                     content: example
                 }]
             }
-        ));
+        );
+
+        res.setHeader("Sandbox-Id", sandbox.id);
+        res.write(' ');
+        res.write(JSON.stringify(await worker));
+        res.end();
     });
 
     return router;

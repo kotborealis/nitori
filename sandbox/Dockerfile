@@ -1,4 +1,8 @@
+FROM tsl0922/ttyd:latest
+
 FROM bitnami/minideb:unstable
+
+COPY --from=0 /usr/bin/ttyd /usr/bin/ttyd
 
 RUN apt-get update && apt-get install -y --no-install-recommends locales g++ valgrind gdb vim \
  && rm -rf /var/lib/apt/lists/* \
@@ -47,4 +51,4 @@ RUN g++ \
     /opt/nitori/testing.hpp \
     -o /opt/nitori/testing.hpp.gch
 
-CMD /bin/bash
+CMD /usr/bin/ttyd --port 7681 bash

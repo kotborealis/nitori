@@ -99,7 +99,6 @@ export const TestTargetInputForm = ({onSubmit = undefined, disabled = false, tes
                                     style={{display: "none"}}
                                     onChange={({target: {files}}) => {
                                         setFormState(state => ({...state, files}));
-                                        console.log(files);
                                     }}
                                 />
                             </Button>

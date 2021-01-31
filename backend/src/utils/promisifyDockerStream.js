@@ -6,7 +6,7 @@ const {prototype: {demuxStream}} = require('docker-modem/lib/modem');
  * @param exec
  * @returns {Promise}
  */
-const promisifyDockerStream = (stream, exec = null) => new Promise((resolve, reject) => {
+const promisifyDockerStream = (stream, exec = null, eventEmmiter = null) => new Promise((resolve, reject) => {
     let stdout = "";
     let stderr = "";
 
@@ -14,10 +14,18 @@ const promisifyDockerStream = (stream, exec = null) => new Promise((resolve, rej
     stream.on('error', reject);
 
     demuxStream(stream, {
-        write: chunk => stdout += chunk.toString()
+        write: chunk => {
+            stdout += chunk.toString();
+            eventEmmiter && eventEmmiter.emit('stdout', chunk.toString());
+        }
     }, {
-        write: chunk => stderr += chunk.toString()
+        write: chunk => {
+            stderr += chunk.toString();
+            eventEmmiter && eventEmmiter.emit('stderr', chunk.toString());
+        }
     });
+
+    eventEmmiter && eventEmmiter.on('stdin', (data) => stream.write(data))
 
     if(exec){
         let healthCheck = setInterval(async () => {

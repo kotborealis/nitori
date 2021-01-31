@@ -4,6 +4,7 @@ import {BrowserRouter, matchPath, Redirect, Route, Switch} from 'react-router-do
 import {Dashboard} from '../views/Dashboard/Dashboard';
 import {WidgetSearch} from '../views/WidgetSearch/WidgetSearch';
 import './index.css';
+import '!style-loader!css-loader!xterm/css/xterm.css'
 import {NotFound} from '../components/InvalidState/NotFound';
 import {useApi} from '../api/useApi';
 import {apiActions} from '../api/apiActions';

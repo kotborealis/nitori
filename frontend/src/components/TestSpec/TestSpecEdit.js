@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import styles from './testSpecEdit.css';
 import {CodeCpp} from '../CodeCpp/CodeCpp';
 import specSample from './specSample.cpp';
@@ -13,6 +13,9 @@ import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
 import {useHistory} from 'react-router-dom';
+
+import {Terminal} from 'xterm';
+import {AttachAddon} from 'xterm-addon-attach';
 
 export const TestSpecEdit = (
     {
@@ -35,9 +38,20 @@ export const TestSpecEdit = (
     const specRunner = useApi(apiActions.specRunner);
     const testSpecSubmit = useApi(apiActions.testSpecSubmit);
 
+    const term = useRef(null);
+    const termDom = useRef(null);
+
     const handleBuild = () => {
         testSpecSubmit.reset();
-        specRunner.fetch({spec, example});
+        specRunner.fetch({
+            spec, example, getHeaders: (headers) => {
+                term.current = new Terminal();
+                const socket = new WebSocket('ws://localhost:3000/ws/' + headers.get('sandbox-id'));
+                const attachAddon = new AttachAddon(socket);
+                term.current.loadAddon(attachAddon);
+                term.current.open(termDom.current);
+            }
+        });
     };
 
     const handleSave = () => {
@@ -60,8 +74,11 @@ export const TestSpecEdit = (
 
     let specRunnerResult;
     if(specRunner.init) specRunnerResult = null;
-    else if(specRunner.loading) specRunnerResult = <Loading/>;
-    else if(specRunner.error) specRunnerResult = <Error error={specRunner.error}/>;
+    else if(specRunner.loading) specRunnerResult = (<div>
+        <div ref={termDom}/>
+        <Loading/>
+    </div>);
+    else if(specRunner.error) specRunnerResult = <>SPEC RUNNER ERROR {JSON.stringify(specRunner)}<Error error={specRunner.error}/></>;
     else if(specRunner.data) specRunnerResult = <BuildResultAll results={specRunner.data}/>;
 
     let specSubmitResult;
