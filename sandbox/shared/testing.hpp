@@ -94,7 +94,7 @@ void restore_stderr() {
  */
 void hijack_stdin(std::string value = "") {
     freopen(".stdin", "w", stdin);
-    fprintf(stdin, value.c_str());
+    fprintf(stdin, "%s", value.c_str());
     freopen(".stdin", "r", stdin);
 }
 
