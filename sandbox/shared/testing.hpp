@@ -157,7 +157,7 @@ void stdin(const char* value) {
  * @param argc
  * @param argv
  */
-int main(int argc, char** argv) {
+int main(int argc, (const char*)* argv) {
     UNSCOPED_INFO("Running main() w/ argc=" << argc << " and argv:");
     for(int i = 0; i < argc; i++)
         UNSCOPED_INFO("\t argv[" << i << "]=`" << argv[i] << "`");
@@ -188,7 +188,7 @@ int main(int argc, char** argv) {
  *
  * @param args Vector with arguments, except argv[0] (program name)
  */
-int main(std::vector<char*> args) {
+int main(std::vector<const char*> args) {
     args.insert(args.begin(), "hijacked_main_call");
 
     int argc = args.size();

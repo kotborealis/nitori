@@ -82,7 +82,8 @@ class Compiler {
                 ...include.map(_ => [`-include`, _]).flat(),
                 "-g3",
                 "-c",
-                "-Winvalid-pch",
+                "-Wno-invalid-pch",
+                "-Wno-write-strings",
                 name,
                 "-o",
                 obj_file_names[i]
