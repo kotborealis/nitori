@@ -62,14 +62,19 @@ module.exports = (config) => {
 
                 await testTarget.save();
 
-                const result = await compileTestTarget(config, testSpec, testTarget).worker;
+                const {sandbox, worker} = compileTestTarget(config, testSpec, testTarget);
+
+                res.setHeader("Sandbox-Id", sandbox.id);
+                res.write(' ');
+                res.write(JSON.stringify(await worker));
+                res.end();
 
                 const {
                     targetCompilerResult,
                     specCompilerResult,
                     linkerResult,
                     runnerResult
-                } = result;
+                } = await worker;
 
                 testTarget.targetCompilerResult = targetCompilerResult;
                 testTarget.specCompilerResult = specCompilerResult;

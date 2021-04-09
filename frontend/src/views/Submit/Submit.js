@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {useParams} from 'react-router-dom';
 import Container from '@material-ui/core/Container';
 import {useApi} from '../../api/useApi';
@@ -7,6 +7,8 @@ import {Loading} from '../../components/InvalidState/Loading';
 import {Error} from '../../components/InvalidState/Error';
 import {TestTarget} from '../../components/TestTarget/TestTarget';
 import {TestTargetInputForm} from '../../components/TestTarget/TestTargetInputForm';
+import {Terminal} from "xterm";
+import {AttachAddon} from 'xterm-addon-attach';
 
 export const Submit = ({}) => {
     const {widgetId} = useParams();
@@ -15,6 +17,9 @@ export const Submit = ({}) => {
     testSpecs.useFetch({widgetId})([widgetId]);
 
     const testTargetSubmit = useApi(apiActions.testTargetSubmit);
+
+    const term = useRef(null);
+    const termDom = useRef(null);
 
     const onSubmit = async event => {
         event.preventDefault();
@@ -39,7 +44,16 @@ export const Submit = ({}) => {
                 reader.readAsText(file);
             })));
 
-        testTargetSubmit.fetch({widgetId, testSpecId, files});
+        testTargetSubmit.fetch({
+            widgetId, testSpecId, files, getHeaders: (headers) => {
+                console.log("headers", headers);
+                term.current = new Terminal();
+                const socket = new WebSocket('ws://localhost:3000/ws/' + headers.get('sandbox-id'));
+                const attachAddon = new AttachAddon(socket);
+                term.current.loadAddon(attachAddon);
+                term.current.open(termDom.current);
+            }
+        });
     };
 
     let result;
@@ -47,7 +61,11 @@ export const Submit = ({}) => {
     if(testTargetSubmit.init)
         result = null;
     else if(testTargetSubmit.loading)
-        result = <Loading/>;
+        result =
+            <>
+                <div ref={termDom}/>
+                <Loading/>
+            </>;
     else if(testTargetSubmit.error)
         result = <Error error={testTargetSubmit.error}/>;
     else if(!testTargetSubmit.init)
