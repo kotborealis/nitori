@@ -25,7 +25,9 @@ const promisifyDockerStream = (stream, exec = null, eventEmmiter = null) => new 
         }
     });
 
-    eventEmmiter && eventEmmiter.on('stdin', (data) => stream.write(data))
+    if(eventEmmiter) {
+        eventEmmiter.on('stdin', (data) => stream.write(data));
+    }
 
     if(exec){
         let healthCheck = setInterval(async () => {

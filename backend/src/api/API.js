@@ -22,17 +22,17 @@ module.exports = (config) => {
 
     app.ws('/ws/:id', (ws, req) => {
         const {id} = req.params;
-        ws.addEventListener('open', () => {
-            ws.addEventListener('message', ({data}) => Sandbox.registry.get(id)?.emit('stdin', data));
+        ws.addEventListener('message', ({data}) => Sandbox.registry.get(id)?.emit('stdin', data));
 
-            const sender = message => ws.send(message);
+        const sender = message => ws.send(message);
+
+        Sandbox.registry.await(id, () => {
             Sandbox.registry.get(id)?.on('stdout', sender);
             Sandbox.registry.get(id)?.on('stderr', sender);
-
-            ws.addEventListener('close', () => {
-                Sandbox.registry.get(id)?.removeEventListener('stdout', sender);
-                Sandbox.registry.get(id)?.removeEventListener('stderr', sender);
-            });
+        });
+        ws.addEventListener('close', () => {
+            Sandbox.registry.get(id)?.removeEventListener('stdout', sender);
+            Sandbox.registry.get(id)?.removeEventListener('stderr', sender);
         });
     });
 

@@ -1,3 +1,5 @@
+const {Registry} = require('./Registry');
+
 const {PromiseTimeout} = require('../utils/PromiseTimeout');
 
 const logger = require(('../logging/logger')).logger('Sandbox');
@@ -44,7 +46,7 @@ class Sandbox extends EventEmmiter {
 
     _running = false;
 
-    static registry = new Map;
+    static registry = new Registry;
 
     /**
      * Constructor
@@ -57,7 +59,7 @@ class Sandbox extends EventEmmiter {
         this.config = config;
         this.id = shortid.generate();
 
-        Sandbox.registry.set(this.id, this);
+        Sandbox.registry.register(this);
 
         logger.info('Sandbox started', {id: this.id, config});
     }
@@ -133,7 +135,7 @@ class Sandbox extends EventEmmiter {
      * @returns {Promise<void>}
      */
     async stop() {
-        Sandbox.registry.delete(this.id);
+        Sandbox.registry.unregister(this);
         logger.debug("Stop sandbox & delete container", {id: this.id});
 
         if(!this._running){
@@ -161,10 +163,12 @@ class Sandbox extends EventEmmiter {
      * @param timeout Exec timeout
      * @returns {Promise<{stdout, exitCode: *, stderr}>}
      */
-    async exec(cmd = [], {root = false, tty = true, working_dir = '', timeout = 0} = {}) {
+    async exec(cmd = [], {root = false, tty = true, working_dir = '', timeout = 0, interactive = false} = {}) {
         const {container} = this;
 
         logger.debug(`Execute \`${cmd.join(' ')}\` in \`${working_dir}\` with timeout \`${timeout}\``, {id: this.id});
+
+        this.stdout(`${working_dir}$ ${cmd.join(' ')}`);
 
         try{
             const exec = await container.exec.create({
@@ -178,8 +182,14 @@ class Sandbox extends EventEmmiter {
             });
 
             const dockerStream = await exec.start({hijack: true, stdin: true});
-            const {stdout, stderr} = await PromiseTimeout(promisifyDockerStream(dockerStream, exec, this), timeout);
+            const {stdout, stderr} = await PromiseTimeout(
+                promisifyDockerStream(
+                    dockerStream, exec, interactive && this
+                ), timeout);
             const {data: {ExitCode: exitCode}} = await exec.status();
+
+            this.stdout(stdout);
+            this.stderr(stderr);
 
             logger.debug(`exec result`, {id: this.id, exitCode, stdout, stderr});
 
@@ -263,7 +273,10 @@ class Sandbox extends EventEmmiter {
     };
 
     stdout(str) {
-        this.emit('stdout', str);
+        this.emit('stdout', str + `\r\n`);
+    }
+    stderr(str) {
+        this.emit('stderr', str + `\r\n`);
     }
 }
 
