@@ -10,8 +10,9 @@ const logger = require(('../logging/logger')).logger('compileTestTarget');
  * @param config
  * @param {TestSpecModel} testSpec
  * @param {TestTargetModel} testTarget
+ * @param debug
  */
-module.exports = (config, testSpec, testTarget) => {
+module.exports = (config, testSpec, testTarget, debug = false) => {
     const docker = new Docker(config.docker);
     const sandbox = new Sandbox(docker, config);
     const working_dir = config.sandbox.working_dir;
@@ -30,9 +31,9 @@ module.exports = (config, testSpec, testTarget) => {
 
         const objcopy = new Objcopy(sandbox);
         await objcopy.redefine_sym(targetBinaries, "main", config.testing.hijack_main, {working_dir});
-        await Promise.all(`exit _exit _Exit abort quick_exit`.split(' ').map(fn =>
-            objcopy.redefine_sym(targetBinaries, fn, config.testing.hijack_exit, {working_dir})
-        ));
+        for await(let fn of `exit _exit _Exit abort quick_exit`.split(' ')) {
+            await objcopy.redefine_sym(targetBinaries, fn, config.testing.hijack_exit, {working_dir});
+        }
 
         const includePaths = testTarget.sourceFiles
             .map(({name}) => require('path').dirname(name))
@@ -46,6 +47,10 @@ module.exports = (config, testSpec, testTarget) => {
         if(specCompilerResult.exitCode !== 0){
             await sandbox.stop();
             return {targetCompilerResult, specCompilerResult};
+        }
+
+        if(!debug){
+            await sandbox.exec([`cp`, `/dev/null`, testSpec.specFile.name], {working_dir, root: true});
         }
 
         const {exec: linkerResult, output} = await targetCompiler.link(

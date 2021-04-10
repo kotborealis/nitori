@@ -46,6 +46,8 @@ class Sandbox extends EventEmmiter {
 
     _running = false;
 
+    _hideOutput = false;
+
     static registry = new Registry;
 
     /**
@@ -151,6 +153,8 @@ class Sandbox extends EventEmmiter {
             logger.error("Error during container.delete()", e);
         }
 
+        this.emit('stop');
+
         this._running = false;
     };
 
@@ -161,6 +165,7 @@ class Sandbox extends EventEmmiter {
      * @param tty Allocate tty?
      * @param working_dir Set working dir
      * @param timeout Exec timeout
+     * @param interactive
      * @returns {Promise<{stdout, exitCode: *, stderr}>}
      */
     async exec(cmd = [], {root = false, tty = true, working_dir = '', timeout = 0, interactive = false} = {}) {
@@ -239,6 +244,11 @@ class Sandbox extends EventEmmiter {
         return this.container.fs.get({path});
     }
 
+    async fs_delete(path) {
+        logger.debug("Fs delete from", {path});
+        return this.container.fs.delete({path});
+    }
+
     /**
      * Create & start container
      * @returns {Promise<void>}
@@ -273,10 +283,20 @@ class Sandbox extends EventEmmiter {
     };
 
     stdout(str) {
-        this.emit('stdout', str + `\r\n`);
+        if(!this._hideOutput)
+            this.emit('stdout', str + `\r\n`);
     }
     stderr(str) {
-        this.emit('stderr', str + `\r\n`);
+        if(!this._hideOutput)
+            this.emit('stderr', str + `\r\n`);
+    }
+
+    /**
+     *
+     * @param {boolean} state
+     */
+    hideOutput(state) {
+        this._hideOutput = state;
     }
 }
 

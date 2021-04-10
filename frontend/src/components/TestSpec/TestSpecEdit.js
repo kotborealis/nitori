@@ -153,7 +153,7 @@ export const TestSpecEdit = (
                     style={{width: 300}}
                     onClick={handleBuild({debug: true})}
                 >
-                    Build + interactive debug
+                    Build + interactive shell
                 </Button>
                 <Button
                     variant="outlined"
