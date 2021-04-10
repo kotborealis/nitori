@@ -16,6 +16,7 @@ import {useHistory} from 'react-router-dom';
 
 import {Terminal} from 'xterm';
 import {AttachAddon} from 'xterm-addon-attach';
+import {apiUrl, apiWsUrl} from '../../api';
 
 export const TestSpecEdit = (
     {
@@ -41,12 +42,12 @@ export const TestSpecEdit = (
     const term = useRef(null);
     const termDom = useRef(null);
 
-    const handleBuild = () => {
+    const handleBuild = ({debug = false} = {}) => () => {
         testSpecSubmit.reset();
         specRunner.fetch({
-            spec, example, getHeaders: (headers) => {
+            spec, example, debug, getHeaders: (headers) => {
                 term.current = new Terminal();
-                const socket = new WebSocket('ws://localhost:3000/ws/' + headers.get('sandbox-id'));
+                const socket = new WebSocket(apiWsUrl(headers.get('sandbox-id')));
                 const attachAddon = new AttachAddon(socket);
                 term.current.loadAddon(attachAddon);
                 term.current.open(termDom.current);
@@ -141,9 +142,18 @@ export const TestSpecEdit = (
                     color="secondary"
                     component="label"
                     style={{width: 300}}
-                    onClick={handleBuild}
+                    onClick={handleBuild()}
                 >
-                    Проверить сборку
+                    Build
+                </Button>
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    component="label"
+                    style={{width: 300}}
+                    onClick={handleBuild({debug: true})}
+                >
+                    Build + interactive debug
                 </Button>
                 <Button
                     variant="outlined"

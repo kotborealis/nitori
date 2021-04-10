@@ -84,12 +84,12 @@ export const apiActions = {
 
     userData: () => fetchJSON(`/auth/user_data.php`),
 
-    specRunner: ({spec, example, getHeaders = () => 0} = {}) =>
+    specRunner: ({spec, example, debug, getHeaders = () => 0} = {}) =>
         api(`/specRunner/`, {
             options: {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({spec, example}),
+                body: JSON.stringify({spec, example, debug}),
             },
             getHeaders
         }),

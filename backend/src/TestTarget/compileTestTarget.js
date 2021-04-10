@@ -65,15 +65,8 @@ module.exports = (config, testSpec, testTarget) => {
 
         runnerResult.stdout += `valgrind memcheck:\n\n` + valgrindParser(config, valgrindResult.stdout);
 
-        sandbox.exec([`/bin/bash`]);
-
-        //sandbox.stop().catch((...args) => logger.error(...args));
-
-        compilationSet.delete(sandbox.id);
         return {specCompilerResult, targetCompilerResult, linkerResult, runnerResult};
     })();
-
-    compilationSet.set(sandbox.id, worker);
 
     return {worker, sandbox};
 };

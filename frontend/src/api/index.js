@@ -3,7 +3,17 @@ import {encodeGetParams} from '../helpers/encodeGetParams';
 
 export const API_URL = urljoin(process.env.PUBLIC_PATH, `/api/v1/`);
 
-export const apiUrl = (...args) => urljoin(API_URL, ...args);
+export const apiUrl = (...args) =>
+    urljoin(API_URL, ...args);
+
+export const apiWsUrl = (...args) =>
+    (process.env.API_OVERRIDE
+            ? urljoin(process.env.API_OVERRIDE.replace('http:', 'ws:'), `ws`, ...args)
+            : location.host === `https:` ? `wss:` : `ws:`
+                + `//`
+                + location.host
+                + urljoin(API_URL, `ws`, ...args)
+    );
 
 export const fetcherEarlyHeaders = Symbol("fetcherEarlyHeaders");
 

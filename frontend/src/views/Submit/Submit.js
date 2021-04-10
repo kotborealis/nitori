@@ -9,6 +9,7 @@ import {TestTarget} from '../../components/TestTarget/TestTarget';
 import {TestTargetInputForm} from '../../components/TestTarget/TestTargetInputForm';
 import {Terminal} from "xterm";
 import {AttachAddon} from 'xterm-addon-attach';
+import {apiUrl, apiWsUrl} from '../../api';
 
 export const Submit = ({}) => {
     const {widgetId} = useParams();
@@ -46,9 +47,9 @@ export const Submit = ({}) => {
 
         testTargetSubmit.fetch({
             widgetId, testSpecId, files, getHeaders: (headers) => {
-                console.log("headers", headers);
                 term.current = new Terminal();
-                const socket = new WebSocket('ws://localhost:3000/ws/' + headers.get('sandbox-id'));
+                console.log(apiWsUrl(headers.get('sandbox-id')));
+                const socket = new WebSocket(apiWsUrl(headers.get('sandbox-id')));
                 const attachAddon = new AttachAddon(socket);
                 term.current.loadAddon(attachAddon);
                 term.current.open(termDom.current);

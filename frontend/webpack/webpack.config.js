@@ -144,6 +144,8 @@ module.exports = (env = {prod: false}) => {
             })),
 
             new webpack.DefinePlugin({
+                'process.env.API_OVERRIDE':
+                    JSON.stringify(ifProd(false, process.env.API_OVERRIDE || false)),
                 'process.env.PUBLIC_PATH': JSON.stringify(process.env.PUBLIC_PATH || '/'),
                 'process.env.AUTH_PATH': JSON.stringify(process.env.AUTH_PATH || '/'),
             }),

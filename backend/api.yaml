@@ -728,6 +728,8 @@ components:
           type: string
         example:
           type: string
+        debug:
+          type: boolean
 
     SpecRunnerResult:
       type: object

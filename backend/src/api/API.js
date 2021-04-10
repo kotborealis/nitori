@@ -30,6 +30,8 @@ module.exports = (config) => {
             Sandbox.registry.get(id)?.on('stdout', sender);
             Sandbox.registry.get(id)?.on('stderr', sender);
         });
+
+        ws.addEventListener('close', () => Sandbox.registry.get(id)?.stop());
     });
 
     initApiMetrics({app, config});

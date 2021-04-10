@@ -184,7 +184,7 @@ class Sandbox extends EventEmmiter {
             const dockerStream = await exec.start({hijack: true, stdin: true});
             const {stdout, stderr} = await PromiseTimeout(
                 promisifyDockerStream(
-                    dockerStream, exec, interactive && this
+                    dockerStream, exec, interactive ? this : null
                 ), timeout);
             const {data: {ExitCode: exitCode}} = await exec.status();
 

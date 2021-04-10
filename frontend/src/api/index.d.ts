@@ -5,3 +5,5 @@ export declare function fetchJSON(url: string, params?: { query?: object, option
 export declare function api(url: string, params?: { query?: object, options?: object }): any;
 
 export declare function apiUrl(url: string): string;
+
+export declare function apiWsUrl(url: string): string;

@@ -69,6 +69,8 @@ module.exports = (config) => {
                 res.write(JSON.stringify(await worker));
                 res.end();
 
+                await sandbox.stop();
+
                 const {
                     targetCompilerResult,
                     specCompilerResult,
