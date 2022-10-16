@@ -1,6 +1,6 @@
 FROM tsl0922/ttyd:latest
 
-FROM bitnami/minideb:unstable
+FROM bitnami/minideb:latest
 
 COPY --from=0 /usr/bin/ttyd /usr/bin/ttyd
 
