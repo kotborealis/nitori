@@ -47,6 +47,9 @@ class Compiler {
 
         const tarball = tar.pack();
 
+        const uid = Number.parseInt((await sandbox.exec(["id", "-u", "sandbox"])).stdout);
+        const gid = Number.parseInt((await sandbox.exec(["id", "-g", "sandbox"])).stdout);
+
         // Setup dirs
         source_files
             .map(({name}) => name)
@@ -63,7 +66,9 @@ class Compiler {
             .forEach(({name, content}) => tarball.entry({
                 name: `${working_dir}/${name}`,
                 type: 'file',
-                mode: 0o644
+                mode: 0o665,
+                uid,
+                gid
             }, content));
 
         tarball.finalize();
