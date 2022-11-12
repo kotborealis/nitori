@@ -1,4 +1,3 @@
-const {compilationSet} = require('./compilationSet');
 const {Objcopy} = require('../SandboxedGnuUtils');
 const {Compiler} = require('../SandboxedGnuUtils');
 const {Sandbox} = require('../Sandbox');
@@ -68,12 +67,8 @@ module.exports = (config, testSpec, testTarget) => {
         sandbox.exec([`/bin/bash`]);
 
         //sandbox.stop().catch((...args) => logger.error(...args));
-
-        compilationSet.delete(sandbox.id);
         return {specCompilerResult, targetCompilerResult, linkerResult, runnerResult};
     })();
-
-    compilationSet.set(sandbox.id, worker);
 
     return {worker, sandbox};
 };

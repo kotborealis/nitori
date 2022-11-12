@@ -1,5 +1,4 @@
 const compileTestTarget = require('../../../TestTarget/compileTestTarget');
-const {compilationSet} = require('../../../TestTarget/compilationSet');
 const {Router} = require('express');
 
 module.exports = (config) => {
