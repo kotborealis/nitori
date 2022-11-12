@@ -45,11 +45,11 @@ export const TestSpecEdit = (
         testSpecSubmit.reset();
         specRunner.fetch({
             spec, example, getHeaders: (headers) => {
-                term.current = new Terminal();
-                const socket = new WebSocket('ws://localhost:3000/ws/' + headers.get('sandbox-id'));
-                const attachAddon = new AttachAddon(socket);
-                term.current.loadAddon(attachAddon);
-                term.current.open(termDom.current);
+                // term.current = new Terminal();
+                // const socket = new WebSocket('ws://localhost:3000/ws/' + headers.get('sandbox-id'));
+                // const attachAddon = new AttachAddon(socket);
+                // term.current.loadAddon(attachAddon);
+                // term.current.open(termDom.current);
             }
         });
     };
